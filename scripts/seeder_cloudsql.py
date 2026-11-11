@@ -67,6 +67,16 @@ CREATE INDEX IF NOT EXISTS idx_cand_eleicao_cargo ON Candidatos_Eleicao(cargo);
 CREATE INDEX IF NOT EXISTS idx_detalhes_eleicao ON Detalhes_Votacao(id_eleicao);
 """
 
+def normalizar_data(d):
+    if not d:
+        return None
+    d = str(d).strip()
+    if "/" in d:
+        partes = d.split("/")
+        if len(partes) == 3:
+            return f"{partes[2]}-{partes[1].zfill(2)}-{partes[0].zfill(2)}"
+    return d
+
 def processar():
     if not os.path.exists(ARQUIVO_JSON):
         print(f"[ERRO] JSON não encontrado em: {ARQUIVO_JSON}")
@@ -80,10 +90,11 @@ def processar():
     cursor = conn.cursor()
 
     try:
+        cursor.execute("SET datestyle TO 'ISO, DMY';")
         cursor.execute(DDL_SCHEMA)
         
         # 1. Pessoas
-        cands = [(info['titulo_eleitor'], info['nome_completo'], info['data_nascimento'] if info['data_nascimento'] else None) 
+        cands = [(info['titulo_eleitor'], info['nome_completo'], normalizar_data(info['data_nascimento'])) 
                  for info in dados['candidatos_base'].values()]
         execute_values(cursor, "INSERT INTO Dados_Candidato (titulo_eleitor, nome_completo, data_nascimento) VALUES %s ON CONFLICT (titulo_eleitor) DO NOTHING", cands)
 
