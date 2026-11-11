@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Server, Code, FileText, CheckCircle2, BarChart3, Layers, Download } from 'lucide-react';
+import { Database, Server, Code, FileText, CheckCircle2, BarChart3, Layers, Download, Vote, User } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -9,12 +9,11 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onDownloadAllSql }) => {
   const navItems = [
-    { id: 'ddl', label: 'Script DDL (Tabelas)', icon: Code },
-    { id: 'indexes', label: 'Índices & Tuning', icon: Database },
-    { id: 'er_diagram', label: 'Diagrama ER', icon: Layers },
-    { id: 'cloud_sql_guide', label: 'Guia Cloud SQL (GCP)', icon: Server },
-    { id: 'data_seeder', label: 'Carga Real (2000-2024)', icon: FileText },
-    { id: 'analytics', label: 'Consultas Analíticas', icon: BarChart3 },
+    { id: 'pleito', label: 'Visão Geral do Pleito', icon: Vote },
+    { id: 'dossie', label: 'Dossiê do Político', icon: User },
+    { id: 'partidos', label: 'Raio-X Partidário', icon: BarChart3 },
+    { id: 'backend', label: 'FastAPI & Cloud SQL', icon: Server },
+    { id: 'schema', label: 'Schema DDL & ER', icon: Layers },
   ];
 
   return (

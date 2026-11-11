@@ -73,3 +73,80 @@ export interface TableSchema {
   indexes: string[];
   constraints: string[];
 }
+
+// API DTOs matching FastAPI schemas
+export interface DetalhesVotacaoDto {
+  id: number;
+  cargo: string;
+  aptos: number;
+  comparecimento: number;
+  abstencoes: number;
+  validos: number;
+  brancos: number;
+  nulos: number;
+  taxa_abstencao_pct?: number;
+  taxa_comparecimento_pct?: number;
+}
+
+export interface EleicaoResumoDto {
+  id: number;
+  ano: number;
+  detalhes: DetalhesVotacaoDto[];
+}
+
+export interface ResultadoCandidatoDto {
+  posicao: number | null;
+  numero_urna: number;
+  nome_urna: string;
+  nome_completo: string;
+  titulo_eleitor: string;
+  sigla_partido: string;
+  cargo: string;
+  votos: number;
+  situacao: string;
+  percentual_validos?: number;
+}
+
+export interface HistoricoParticipacaoDto {
+  ano: number;
+  cargo: string;
+  numero_urna: number;
+  nome_urna: string;
+  sigla_partido: string;
+  votos: number;
+  situacao: string;
+  posicao: number | null;
+}
+
+export interface CandidatoHistoricoDto {
+  titulo_eleitor: string;
+  nome_completo: string;
+  data_nascimento?: string | null;
+  total_eleicoes_disputadas: number;
+  total_mandatos_conquistados: number;
+  total_votos_acumulados: number;
+  historico: HistoricoParticipacaoDto[];
+}
+
+export interface DesempenhoPartidoDto {
+  sigla: string;
+  votos_nominais: number;
+  votos_legenda: number;
+  total_votos: number;
+  percentual_total?: number;
+}
+
+export interface PartidosAnoDto {
+  ano: number;
+  partidos: DesempenhoPartidoDto[];
+  total_geral_votos: number;
+}
+
+export interface CloudSqlHealthDto {
+  status: 'healthy' | 'unhealthy' | 'fallback';
+  database: string;
+  server_ip: string;
+  engine: string;
+  cloud_project: string;
+  latency_ms?: number;
+}
