@@ -1,0 +1,5514 @@
+{
+  "municipio": {
+    "nome": "Braúnas",
+    "uf": "MG",
+    "codigo_tse": 41750
+  },
+  "eleicoes": {
+    "2000": {
+      "ano": 2000,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 4525,
+          "comparecimento": 3518,
+          "abstencoes": 1007,
+          "validos": 0,
+          "brancos": 71,
+          "nulos": 363
+        },
+        "vereador": {
+          "aptos": 4525,
+          "comparecimento": 3518,
+          "abstencoes": 1007,
+          "validos": 0,
+          "brancos": 55,
+          "nulos": 254
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PSDB",
+          "votos_nominais": 784,
+          "votos_legenda": 174,
+          "total_votos": 958
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 747,
+          "votos_legenda": 144,
+          "total_votos": 891
+        },
+        {
+          "partido": "PFL",
+          "votos_nominais": 770,
+          "votos_legenda": 75,
+          "total_votos": 845
+        },
+        {
+          "partido": "PT",
+          "votos_nominais": 374,
+          "votos_legenda": 34,
+          "total_votos": 408
+        },
+        {
+          "partido": "PTB",
+          "votos_nominais": 83,
+          "votos_legenda": 24,
+          "total_votos": 107
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Flávio",
+          "numero": 45,
+          "partido": "PSDB",
+          "votos": 1914,
+          "situacao": "Eleito",
+          "titulo_eleitor": "106688690230"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Ivam Pereira Alves Pinto",
+          "numero": 15,
+          "partido": "PMDB",
+          "votos": 1170,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "010955560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Brahim",
+          "numero": 45111,
+          "partido": "PSDB",
+          "votos": 311,
+          "situacao": "Eleito",
+          "titulo_eleitor": "091405140299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "José Aparecido",
+          "numero": 25666,
+          "partido": "PFL",
+          "votos": 217,
+          "situacao": "Eleito",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "José Moreira Filho",
+          "numero": 15620,
+          "partido": "PMDB",
+          "votos": 169,
+          "situacao": "Eleito",
+          "titulo_eleitor": "004501130264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Weyne",
+          "numero": 45333,
+          "partido": "PSDB",
+          "votos": 163,
+          "situacao": "Eleito",
+          "titulo_eleitor": "086430000299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Donizete",
+          "numero": 15615,
+          "partido": "PMDB",
+          "votos": 130,
+          "situacao": "Eleito",
+          "titulo_eleitor": "004528950264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Maria Ramos",
+          "numero": 45233,
+          "partido": "PSDB",
+          "votos": 115,
+          "situacao": "Eleito",
+          "titulo_eleitor": "037808190221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Antônio Camilo",
+          "numero": 15120,
+          "partido": "PMDB",
+          "votos": 113,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004507120264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Rui",
+          "numero": 15123,
+          "partido": "PMDB",
+          "votos": 110,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441060299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Dico",
+          "numero": 25655,
+          "partido": "PFL",
+          "votos": 106,
+          "situacao": "Eleito",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Gorete",
+          "numero": 25604,
+          "partido": "PFL",
+          "votos": 97,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "004506990256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Adeilson",
+          "numero": 25607,
+          "partido": "PFL",
+          "votos": 93,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106688770248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Charlinho",
+          "numero": 15147,
+          "partido": "PMDB",
+          "votos": 90,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071440930230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Clésio",
+          "numero": 13690,
+          "partido": "PT",
+          "votos": 88,
+          "situacao": "Eleito",
+          "titulo_eleitor": "037816720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Jair do Funil",
+          "numero": 13456,
+          "partido": "PT",
+          "votos": 71,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106713100281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Wecio",
+          "numero": 25612,
+          "partido": "PFL",
+          "votos": 68,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091399030230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Dazinho",
+          "numero": 14610,
+          "partido": "PTB",
+          "votos": 62,
+          "situacao": "Suplente",
+          "titulo_eleitor": "063023250230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Zezinho",
+          "numero": 45222,
+          "partido": "PSDB",
+          "votos": 61,
+          "situacao": "Suplente",
+          "titulo_eleitor": "014651570221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Joaquim Basílio",
+          "numero": 45666,
+          "partido": "PSDB",
+          "votos": 58,
+          "situacao": "Suplente",
+          "titulo_eleitor": "037816390205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Ze Bigode",
+          "numero": 25622,
+          "partido": "PFL",
+          "votos": 58,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004507380205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Ze do Negrinho",
+          "numero": 15678,
+          "partido": "PMDB",
+          "votos": 50,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527850221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Cabo Wilson",
+          "numero": 25615,
+          "partido": "PFL",
+          "votos": 48,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091403540256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "José Uilson",
+          "numero": 13123,
+          "partido": "PT",
+          "votos": 48,
+          "situacao": "Suplente",
+          "titulo_eleitor": "085289600248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Juca",
+          "numero": 13444,
+          "partido": "PT",
+          "votos": 48,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474280272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Nana",
+          "numero": 25608,
+          "partido": "PFL",
+          "votos": 48,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004482170248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Ze do Buteco",
+          "numero": 13111,
+          "partido": "PT",
+          "votos": 46,
+          "situacao": "Suplente",
+          "titulo_eleitor": "052476410230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Zinha",
+          "numero": 45444,
+          "partido": "PSDB",
+          "votos": 40,
+          "situacao": "Suplente",
+          "titulo_eleitor": "029657980299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Zequinha",
+          "numero": 45555,
+          "partido": "PSDB",
+          "votos": 36,
+          "situacao": "Suplente",
+          "titulo_eleitor": "029003770264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Dirlene do Preto",
+          "numero": 25611,
+          "partido": "PFL",
+          "votos": 35,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474930272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Ze Matos",
+          "numero": 15789,
+          "partido": "PMDB",
+          "votos": 34,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004480450272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "José Moreira Sobrinho",
+          "numero": 15125,
+          "partido": "PMDB",
+          "votos": 21,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106685200213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Ze Ziquita",
+          "numero": 14666,
+          "partido": "PTB",
+          "votos": 21,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527920256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Tina",
+          "numero": 13222,
+          "partido": "PT",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004481580256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Geraldo do Quim",
+          "numero": 13147,
+          "partido": "PT",
+          "votos": 19,
+          "situacao": "Suplente",
+          "titulo_eleitor": "014651300213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Davi",
+          "numero": 15456,
+          "partido": "MDB",
+          "votos": 18,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004473460299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Luciano",
+          "numero": 13250,
+          "partido": "PT",
+          "votos": 18,
+          "situacao": "Suplente",
+          "titulo_eleitor": "037807620256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Márcio Rodrigo",
+          "numero": 13333,
+          "partido": "PT",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "104157230221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Tia Nana de Brito",
+          "numero": 15240,
+          "partido": "MDB",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "078043510248"
+        }
+      ]
+    },
+    "2004": {
+      "ano": 2004,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 3536,
+          "comparecimento": 3328,
+          "abstencoes": 208,
+          "validos": 0,
+          "brancos": 70,
+          "nulos": 362
+        },
+        "vereador": {
+          "aptos": 3536,
+          "comparecimento": 3328,
+          "abstencoes": 208,
+          "validos": 0,
+          "brancos": 44,
+          "nulos": 181
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PSDB",
+          "votos_nominais": 617,
+          "votos_legenda": 112,
+          "total_votos": 729
+        },
+        {
+          "partido": "PTB",
+          "votos_nominais": 461,
+          "votos_legenda": 37,
+          "total_votos": 498
+        },
+        {
+          "partido": "PT",
+          "votos_nominais": 454,
+          "votos_legenda": 27,
+          "total_votos": 481
+        },
+        {
+          "partido": "PL",
+          "votos_nominais": 324,
+          "votos_legenda": 26,
+          "total_votos": 350
+        },
+        {
+          "partido": "PFL",
+          "votos_nominais": 295,
+          "votos_legenda": 48,
+          "total_votos": 343
+        },
+        {
+          "partido": "AVANTE",
+          "votos_nominais": 273,
+          "votos_legenda": 7,
+          "total_votos": 280
+        },
+        {
+          "partido": "PSC",
+          "votos_nominais": 202,
+          "votos_legenda": 12,
+          "total_votos": 214
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 58,
+          "votos_legenda": 45,
+          "total_votos": 103
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 45,
+          "votos_legenda": 13,
+          "total_votos": 58
+        },
+        {
+          "partido": "PTC",
+          "votos_nominais": 40,
+          "votos_legenda": 7,
+          "total_votos": 47
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Flávio",
+          "numero": 45,
+          "partido": "PSDB",
+          "votos": 2159,
+          "situacao": "Eleito",
+          "titulo_eleitor": "106688690230"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "João Samora",
+          "numero": 25,
+          "partido": "PFL",
+          "votos": 737,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "091405140299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Weyne",
+          "numero": 45333,
+          "partido": "PSDB",
+          "votos": 200,
+          "situacao": "Eleito",
+          "titulo_eleitor": "086430000299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Maria Ramos Alves da Silva",
+          "numero": 25555,
+          "partido": "PFL",
+          "votos": 129,
+          "situacao": "Eleito",
+          "titulo_eleitor": "037808190221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "Rui Barbosa",
+          "numero": 14222,
+          "partido": "PTB",
+          "votos": 125,
+          "situacao": "Eleito",
+          "titulo_eleitor": "071441060299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Rui Terra",
+          "numero": 13123,
+          "partido": "PT",
+          "votos": 119,
+          "situacao": "Eleito",
+          "titulo_eleitor": "004476550272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Ze Aparecido",
+          "numero": 14567,
+          "partido": "PTB",
+          "votos": 119,
+          "situacao": "Eleito",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Clésio",
+          "numero": 13789,
+          "partido": "PT",
+          "votos": 118,
+          "situacao": "Suplente",
+          "titulo_eleitor": "037816720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Gilson Carvalho",
+          "numero": 70100,
+          "partido": "PT do B",
+          "votos": 118,
+          "situacao": "Eleito",
+          "titulo_eleitor": "099880280281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Dico",
+          "numero": 45222,
+          "partido": "PSDB",
+          "votos": 115,
+          "situacao": "Eleito",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Jair",
+          "numero": 13456,
+          "partido": "PT",
+          "votos": 102,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106713100281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Ze Bobagem",
+          "numero": 70190,
+          "partido": "PT do B",
+          "votos": 102,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "004501130264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Lucilia",
+          "numero": 45111,
+          "partido": "PSDB",
+          "votos": 99,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "014650810299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Mauro Sérgio",
+          "numero": 22100,
+          "partido": "PL",
+          "votos": 98,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106714170213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Donizete",
+          "numero": 22111,
+          "partido": "PL",
+          "votos": 91,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004528950264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Iramira",
+          "numero": 14123,
+          "partido": "PTB",
+          "votos": 90,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106698940205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Wecinho",
+          "numero": 20111,
+          "partido": "PSC",
+          "votos": 82,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091399030230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Zé Raimundinho",
+          "numero": 25607,
+          "partido": "PFL",
+          "votos": 69,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004502200256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Tuniquinho",
+          "numero": 14115,
+          "partido": "PTB",
+          "votos": 66,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Maria do Dorico",
+          "numero": 45000,
+          "partido": "PSDB",
+          "votos": 65,
+          "situacao": "Suplente",
+          "titulo_eleitor": "080580370281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Antônio Vaso de Deus",
+          "numero": 20120,
+          "partido": "PSC",
+          "votos": 64,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106688450264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Criolo",
+          "numero": 13650,
+          "partido": "PT",
+          "votos": 62,
+          "situacao": "Suplente",
+          "titulo_eleitor": "078043360213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Dazinho",
+          "numero": 14111,
+          "partido": "PTB",
+          "votos": 61,
+          "situacao": "Suplente",
+          "titulo_eleitor": "063023250230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Emílio do Taxi",
+          "numero": 22222,
+          "partido": "PL",
+          "votos": 57,
+          "situacao": "Suplente",
+          "titulo_eleitor": "082252730248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Juquinha Teixeira",
+          "numero": 45678,
+          "partido": "PSDB",
+          "votos": 57,
+          "situacao": "Suplente",
+          "titulo_eleitor": "078043030248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Fernandinho",
+          "numero": 70123,
+          "partido": "PT do B",
+          "votos": 53,
+          "situacao": "Suplente",
+          "titulo_eleitor": "127114730248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Gorete",
+          "numero": 45550,
+          "partido": "PSDB",
+          "votos": 49,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506990256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Vital Mascate",
+          "numero": 25777,
+          "partido": "PFL",
+          "votos": 47,
+          "situacao": "Suplente",
+          "titulo_eleitor": "142082750299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Napinho",
+          "numero": 15015,
+          "partido": "PMDB",
+          "votos": 45,
+          "situacao": "Suplente",
+          "titulo_eleitor": "009682430213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Emilson",
+          "numero": 22123,
+          "partido": "PL",
+          "votos": 43,
+          "situacao": "Suplente",
+          "titulo_eleitor": "117993720272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Ze Rita",
+          "numero": 20333,
+          "partido": "PSC",
+          "votos": 37,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506540256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Cleunice do Antônio Teobaldo",
+          "numero": 22333,
+          "partido": "PL",
+          "votos": 35,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441230299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Tião da Rádio",
+          "numero": 25222,
+          "partido": "PFL",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "016212310221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Zequinha",
+          "numero": 45555,
+          "partido": "PSDB",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "029003770264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Gilberto",
+          "numero": 36666,
+          "partido": "PTC",
+          "votos": 28,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091399420248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Geraldo do Alcides",
+          "numero": 12333,
+          "partido": "PDT",
+          "votos": 26,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474130299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Socorro Machado",
+          "numero": 13613,
+          "partido": "PT",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "065538650205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Preto do Ze do Dico",
+          "numero": 20222,
+          "partido": "PSC",
+          "votos": 19,
+          "situacao": "Suplente",
+          "titulo_eleitor": "063024240213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Otaviano Menezes da Silva",
+          "numero": 25401,
+          "partido": "PFL",
+          "votos": 18,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004480660205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Wanderlei Ferreira da Silva",
+          "numero": 12444,
+          "partido": "PDT",
+          "votos": 14,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118006440248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Horácio",
+          "numero": 13640,
+          "partido": "PT",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441340248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Marleide Aparecida de Almeida",
+          "numero": 36333,
+          "partido": "PTC",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141589190213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "Márcio Rodrigo",
+          "numero": 13333,
+          "partido": "PT",
+          "votos": 11,
+          "situacao": "Suplente",
+          "titulo_eleitor": "104157230221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Ze do Ziquita",
+          "numero": 12666,
+          "partido": "PDT",
+          "votos": 10,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527920256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Pi Piu",
+          "numero": 12555,
+          "partido": "PDT",
+          "votos": 8,
+          "situacao": "Suplente",
+          "titulo_eleitor": "037815060272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 44,
+          "nome_urna": "Geraldo do Quim",
+          "numero": 13147,
+          "partido": "PT",
+          "votos": 6,
+          "situacao": "Suplente",
+          "titulo_eleitor": "014651300213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 45,
+          "nome_urna": "Nero",
+          "numero": 13654,
+          "partido": "PT",
+          "votos": 4,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106715600272"
+        }
+      ]
+    },
+    "2008": {
+      "ano": 2008,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 3522,
+          "comparecimento": 3329,
+          "abstencoes": 193,
+          "validos": 0,
+          "brancos": 62,
+          "nulos": 320
+        },
+        "vereador": {
+          "aptos": 3522,
+          "comparecimento": 3329,
+          "abstencoes": 193,
+          "validos": 0,
+          "brancos": 53,
+          "nulos": 160
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PSDB",
+          "votos_nominais": 601,
+          "votos_legenda": 50,
+          "total_votos": 651
+        },
+        {
+          "partido": "PV",
+          "votos_nominais": 492,
+          "votos_legenda": 90,
+          "total_votos": 582
+        },
+        {
+          "partido": "PTC",
+          "votos_nominais": 297,
+          "votos_legenda": 85,
+          "total_votos": 382
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 289,
+          "votos_legenda": 23,
+          "total_votos": 312
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 274,
+          "votos_legenda": 28,
+          "total_votos": 302
+        },
+        {
+          "partido": "PPS",
+          "votos_nominais": 257,
+          "votos_legenda": 9,
+          "total_votos": 266
+        },
+        {
+          "partido": "PTB",
+          "votos_nominais": 169,
+          "votos_legenda": 4,
+          "total_votos": 173
+        },
+        {
+          "partido": "DEM",
+          "votos_nominais": 157,
+          "votos_legenda": 6,
+          "total_votos": 163
+        },
+        {
+          "partido": "PL",
+          "votos_nominais": 127,
+          "votos_legenda": 21,
+          "total_votos": 148
+        },
+        {
+          "partido": "AVANTE",
+          "votos_nominais": 97,
+          "votos_legenda": 40,
+          "total_votos": 137
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Jovani",
+          "numero": 43,
+          "partido": "PV",
+          "votos": 1225,
+          "situacao": "Eleito",
+          "titulo_eleitor": "042526470272"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Ibrahim",
+          "numero": 36,
+          "partido": "PTC",
+          "votos": 910,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "091405140299"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 3,
+          "nome_urna": "Breno",
+          "numero": 70,
+          "partido": "PT do B",
+          "votos": 798,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "004500790221"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 4,
+          "nome_urna": "João Samora",
+          "numero": 25,
+          "partido": "DEM",
+          "votos": 14,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "078042770213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Weyne",
+          "numero": 45333,
+          "partido": "PSDB",
+          "votos": 151,
+          "situacao": "Eleito",
+          "titulo_eleitor": "086430000299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Durico",
+          "numero": 23111,
+          "partido": "PPS",
+          "votos": 141,
+          "situacao": "Eleito",
+          "titulo_eleitor": "004473320299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "José Aparecido",
+          "numero": 45555,
+          "partido": "PSDB",
+          "votos": 139,
+          "situacao": "Eleito",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Rui Terra",
+          "numero": 15123,
+          "partido": "PMDB",
+          "votos": 134,
+          "situacao": "Eleito",
+          "titulo_eleitor": "004476550272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Tunikinho",
+          "numero": 36345,
+          "partido": "PTC",
+          "votos": 133,
+          "situacao": "Eleito",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Dico",
+          "numero": 45222,
+          "partido": "PSDB",
+          "votos": 127,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Cláudio",
+          "numero": 43333,
+          "partido": "PV",
+          "votos": 124,
+          "situacao": "Eleito",
+          "titulo_eleitor": "081651410248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Clésio",
+          "numero": 43000,
+          "partido": "PV",
+          "votos": 107,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "037816720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Jair",
+          "numero": 15456,
+          "partido": "PMDB",
+          "votos": 106,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "106713100281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Rui Barbosa",
+          "numero": 14222,
+          "partido": "PTB",
+          "votos": 106,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441060299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Tunicão",
+          "numero": 70123,
+          "partido": "PT do B",
+          "votos": 97,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004475560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Natinha",
+          "numero": 43444,
+          "partido": "PV",
+          "votos": 89,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004528960248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Zezinho",
+          "numero": 12345,
+          "partido": "PDT",
+          "votos": 89,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "099879970221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Creusa, Creusa da Barroada",
+          "numero": 12000,
+          "partido": "PDT",
+          "votos": 88,
+          "situacao": "Suplente",
+          "titulo_eleitor": "260174350116"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Ze Bobagem",
+          "numero": 23190,
+          "partido": "PPS",
+          "votos": 88,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004501130264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Ademir Enfermeiro",
+          "numero": 43223,
+          "partido": "PV",
+          "votos": 83,
+          "situacao": "Suplente",
+          "titulo_eleitor": "026541640353"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Maria Ramos",
+          "numero": 25555,
+          "partido": "DEM",
+          "votos": 82,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "037808190221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Serginho da Informatica",
+          "numero": 43123,
+          "partido": "PV",
+          "votos": 77,
+          "situacao": "Suplente",
+          "titulo_eleitor": "101462140205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Mauro Cezar",
+          "numero": 22100,
+          "partido": "PR",
+          "votos": 76,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106714170213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Jassy",
+          "numero": 45444,
+          "partido": "PSDB",
+          "votos": 75,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474820213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Marivalda",
+          "numero": 36000,
+          "partido": "PTC",
+          "votos": 65,
+          "situacao": "Suplente",
+          "titulo_eleitor": "117997030205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Geneval",
+          "numero": 14444,
+          "partido": "PTB",
+          "votos": 63,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004473640272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Avani",
+          "numero": 12456,
+          "partido": "PDT",
+          "votos": 59,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091403450264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Emílio do Taxi",
+          "numero": 22222,
+          "partido": "PR",
+          "votos": 51,
+          "situacao": "Suplente",
+          "titulo_eleitor": "082252730248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Adilson de Andrade",
+          "numero": 36222,
+          "partido": "PTC",
+          "votos": 48,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141578610213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Gorete",
+          "numero": 45666,
+          "partido": "PSDB",
+          "votos": 41,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506990256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Lucilia",
+          "numero": 45111,
+          "partido": "PSDB",
+          "votos": 38,
+          "situacao": "Suplente",
+          "titulo_eleitor": "014650810299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Beto",
+          "numero": 25000,
+          "partido": "DEM",
+          "votos": 34,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "091403500221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Elinho",
+          "numero": 45678,
+          "partido": "PSDB",
+          "votos": 30,
+          "situacao": "Suplente",
+          "titulo_eleitor": "052490100264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Neuma",
+          "numero": 36140,
+          "partido": "PTC",
+          "votos": 28,
+          "situacao": "Suplente",
+          "titulo_eleitor": "084509650213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Sidney do Bide",
+          "numero": 15789,
+          "partido": "MDB",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004476710299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Zexé Bastiãozinho",
+          "numero": 36333,
+          "partido": "PTC",
+          "votos": 23,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106685200213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Gilson Carvalho",
+          "numero": 23100,
+          "partido": "PPS",
+          "votos": 22,
+          "situacao": "Suplente",
+          "titulo_eleitor": "099880280281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Jazinho",
+          "numero": 12333,
+          "partido": "PDT",
+          "votos": 22,
+          "situacao": "Suplente",
+          "titulo_eleitor": "099880310281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Cabo Wilson",
+          "numero": 15051,
+          "partido": "MDB",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091403540256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "José Roberto",
+          "numero": 25444,
+          "partido": "DEM",
+          "votos": 19,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "141590580213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Milton Pereira",
+          "numero": 12369,
+          "partido": "PDT",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "062872870272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Ze Rita",
+          "numero": 43121,
+          "partido": "PV",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506540256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Andréia",
+          "numero": 25678,
+          "partido": "DEM",
+          "votos": 10,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "169487310281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Juju",
+          "numero": 23330,
+          "partido": "PPS",
+          "votos": 6,
+          "situacao": "Suplente",
+          "titulo_eleitor": "048268040264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "Nilo Estofados",
+          "numero": 25666,
+          "partido": "DEM",
+          "votos": 6,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "003136220310"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Ronivon",
+          "numero": 25777,
+          "partido": "DEM",
+          "votos": 6,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "118003810205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Lúcio do Zé do Dico",
+          "numero": 15321,
+          "partido": "MDB",
+          "votos": 5,
+          "situacao": "Suplente",
+          "titulo_eleitor": "063022750230"
+        }
+      ]
+    },
+    "2012": {
+      "ano": 2012,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 3939,
+          "comparecimento": 3491,
+          "abstencoes": 448,
+          "validos": 0,
+          "brancos": 44,
+          "nulos": 194
+        },
+        "vereador": {
+          "aptos": 3939,
+          "comparecimento": 3491,
+          "abstencoes": 448,
+          "validos": 0,
+          "brancos": 63,
+          "nulos": 268
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PV",
+          "votos_nominais": 780,
+          "votos_legenda": 23,
+          "total_votos": 803
+        },
+        {
+          "partido": "PTC",
+          "votos_nominais": 441,
+          "votos_legenda": 91,
+          "total_votos": 532
+        },
+        {
+          "partido": "PSDB",
+          "votos_nominais": 371,
+          "votos_legenda": 77,
+          "total_votos": 448
+        },
+        {
+          "partido": "PSD",
+          "votos_nominais": 219,
+          "votos_legenda": 19,
+          "total_votos": 238
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 203,
+          "votos_legenda": 21,
+          "total_votos": 224
+        },
+        {
+          "partido": "PPS",
+          "votos_nominais": 217,
+          "votos_legenda": 5,
+          "total_votos": 222
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 186,
+          "votos_legenda": 8,
+          "total_votos": 194
+        },
+        {
+          "partido": "AVANTE",
+          "votos_nominais": 176,
+          "votos_legenda": 7,
+          "total_votos": 183
+        },
+        {
+          "partido": "PSB",
+          "votos_nominais": 108,
+          "votos_legenda": 1,
+          "total_votos": 109
+        },
+        {
+          "partido": "DEM",
+          "votos_nominais": 92,
+          "votos_legenda": 10,
+          "total_votos": 102
+        },
+        {
+          "partido": "PHS",
+          "votos_nominais": 56,
+          "votos_legenda": 0,
+          "total_votos": 56
+        },
+        {
+          "partido": "REPUBLICANOS",
+          "votos_nominais": 34,
+          "votos_legenda": 2,
+          "total_votos": 36
+        },
+        {
+          "partido": "PP",
+          "votos_nominais": 4,
+          "votos_legenda": 9,
+          "total_votos": 13
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Flávio",
+          "numero": 45,
+          "partido": "PSDB",
+          "votos": 1653,
+          "situacao": "Eleito",
+          "titulo_eleitor": "037808380299"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Ibrahim",
+          "numero": 36,
+          "partido": "PTC",
+          "votos": 1600,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "084193480248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Weyne",
+          "numero": 45333,
+          "partido": "PSDB",
+          "votos": 200,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "086430000299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Ziel Basílio",
+          "numero": 55123,
+          "partido": "PSD",
+          "votos": 167,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141589520230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "Natim",
+          "numero": 43444,
+          "partido": "PV",
+          "votos": 157,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "004528960248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Ze Aparecido",
+          "numero": 45555,
+          "partido": "PSDB",
+          "votos": 142,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Leone",
+          "numero": 36333,
+          "partido": "PTC",
+          "votos": 138,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "118003630213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Claudinho",
+          "numero": 43333,
+          "partido": "PV",
+          "votos": 126,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "081651410248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Creusa da Barroada",
+          "numero": 12000,
+          "partido": "PDT",
+          "votos": 116,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "260174350116"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Dico",
+          "numero": 43666,
+          "partido": "PV",
+          "votos": 110,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Tunicão",
+          "numero": 15500,
+          "partido": "PMDB",
+          "votos": 109,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "004475560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Tuniquim",
+          "numero": 36345,
+          "partido": "PTC",
+          "votos": 109,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Rui Barbosa",
+          "numero": 40000,
+          "partido": "PSB",
+          "votos": 108,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441060299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Geraci",
+          "numero": 43555,
+          "partido": "PV",
+          "votos": 100,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091398990213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Tim do Fisico",
+          "numero": 25123,
+          "partido": "DEM",
+          "votos": 92,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128643090299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Serginho da Informatica",
+          "numero": 43123,
+          "partido": "PV",
+          "votos": 91,
+          "situacao": "Suplente",
+          "titulo_eleitor": "101462140205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Durico",
+          "numero": 23111,
+          "partido": "PPS",
+          "votos": 70,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004473320299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Willian Fortunato",
+          "numero": 70000,
+          "partido": "PT do B",
+          "votos": 70,
+          "situacao": "Suplente",
+          "titulo_eleitor": "038470900205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Rener do Vicente",
+          "numero": 23333,
+          "partido": "PPS",
+          "votos": 67,
+          "situacao": "Suplente",
+          "titulo_eleitor": "159561200256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Jair",
+          "numero": 15456,
+          "partido": "PMDB",
+          "votos": 56,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106713100281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Renato do Padim",
+          "numero": 31310,
+          "partido": "PHS",
+          "votos": 56,
+          "situacao": "Suplente",
+          "titulo_eleitor": "089939090230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Hélio Santa Rita",
+          "numero": 43456,
+          "partido": "PV",
+          "votos": 55,
+          "situacao": "Suplente",
+          "titulo_eleitor": "082250950221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Mundico do Ivo",
+          "numero": 43111,
+          "partido": "PV",
+          "votos": 55,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004501560205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Alexandre do Marcolino",
+          "numero": 36777,
+          "partido": "PTC",
+          "votos": 52,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118007690264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Rene Despachante",
+          "numero": 55190,
+          "partido": "PSD",
+          "votos": 52,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004759980221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Ivam",
+          "numero": 70123,
+          "partido": "PT do B",
+          "votos": 51,
+          "situacao": "Suplente",
+          "titulo_eleitor": "010955560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Salomão",
+          "numero": 36444,
+          "partido": "PTC",
+          "votos": 50,
+          "situacao": "Suplente",
+          "titulo_eleitor": "010955670248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Teca",
+          "numero": 43500,
+          "partido": "PV",
+          "votos": 43,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103525430221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Aparecida do Donizete",
+          "numero": 70456,
+          "partido": "PT do B",
+          "votos": 41,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086424620299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Tony Calibre",
+          "numero": 36789,
+          "partido": "PTC",
+          "votos": 36,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086430960230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Ivanir Bispo",
+          "numero": 12123,
+          "partido": "PDT",
+          "votos": 35,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103529370230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Zezinho",
+          "numero": 12345,
+          "partido": "PDT",
+          "votos": 33,
+          "situacao": "Suplente",
+          "titulo_eleitor": "099879970221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Ze Bobagem",
+          "numero": 23190,
+          "partido": "PPS",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004501130264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Claudinéia",
+          "numero": 10222,
+          "partido": "REPUBLICANOS",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "159560730205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Vanisia",
+          "numero": 23222,
+          "partido": "PPS",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128639960221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Ze Rita",
+          "numero": 43121,
+          "partido": "PV",
+          "votos": 22,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506540256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Diney do Bide",
+          "numero": 15555,
+          "partido": "MDB",
+          "votos": 21,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004476710299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Soninha",
+          "numero": 43400,
+          "partido": "PV",
+          "votos": 21,
+          "situacao": "Suplente",
+          "titulo_eleitor": "149437880299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Moacir",
+          "numero": 12222,
+          "partido": "PDT",
+          "votos": 19,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004502840213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Barrabás",
+          "numero": 36222,
+          "partido": "PTC",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195765990213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Cidalia",
+          "numero": 23777,
+          "partido": "PPS",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "054506560256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Gorete",
+          "numero": 45666,
+          "partido": "PSDB",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004506990256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "Márcio Rodrigo",
+          "numero": 36666,
+          "partido": "PTC",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "104157230221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Caio Glória",
+          "numero": 70789,
+          "partido": "AVANTE",
+          "votos": 14,
+          "situacao": "Suplente",
+          "titulo_eleitor": "078051360230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Adair",
+          "numero": 36555,
+          "partido": "PTC",
+          "votos": 13,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106698340264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 44,
+          "nome_urna": "Darleia da Assistencia Social",
+          "numero": 45234,
+          "partido": "PSDB",
+          "votos": 13,
+          "situacao": "Suplente",
+          "titulo_eleitor": "098590200213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 45,
+          "nome_urna": "Didi do Naná",
+          "numero": 36123,
+          "partido": "PTC",
+          "votos": 11,
+          "situacao": "Suplente",
+          "titulo_eleitor": "067758730281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 46,
+          "nome_urna": "Vino",
+          "numero": 10333,
+          "partido": "REPUBLICANOS",
+          "votos": 10,
+          "situacao": "Suplente",
+          "titulo_eleitor": "077374680213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 47,
+          "nome_urna": "Vanice",
+          "numero": 23888,
+          "partido": "PPS",
+          "votos": 8,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591050264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 48,
+          "nome_urna": "Geralda",
+          "numero": 11111,
+          "partido": "PP",
+          "votos": 2,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004500390230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 49,
+          "nome_urna": "Adriana",
+          "numero": 11000,
+          "partido": "PP",
+          "votos": 1,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128644060213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 50,
+          "nome_urna": "Dorina",
+          "numero": 11222,
+          "partido": "PP",
+          "votos": 1,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086437710221"
+        }
+      ]
+    },
+    "2016": {
+      "ano": 2016,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 4385,
+          "comparecimento": 3756,
+          "abstencoes": 629,
+          "validos": 0,
+          "brancos": 42,
+          "nulos": 206
+        },
+        "vereador": {
+          "aptos": 4385,
+          "comparecimento": 3756,
+          "abstencoes": 629,
+          "validos": 0,
+          "brancos": 38,
+          "nulos": 131
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PROS",
+          "votos_nominais": 664,
+          "votos_legenda": 34,
+          "total_votos": 698
+        },
+        {
+          "partido": "PHS",
+          "votos_nominais": 575,
+          "votos_legenda": 51,
+          "total_votos": 626
+        },
+        {
+          "partido": "PPS",
+          "votos_nominais": 461,
+          "votos_legenda": 13,
+          "total_votos": 474
+        },
+        {
+          "partido": "SOLIDARIEDADE",
+          "votos_nominais": 426,
+          "votos_legenda": 9,
+          "total_votos": 435
+        },
+        {
+          "partido": "PP",
+          "votos_nominais": 349,
+          "votos_legenda": 28,
+          "total_votos": 377
+        },
+        {
+          "partido": "PTC",
+          "votos_nominais": 282,
+          "votos_legenda": 8,
+          "total_votos": 290
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 261,
+          "votos_legenda": 16,
+          "total_votos": 277
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 165,
+          "votos_legenda": 1,
+          "total_votos": 166
+        },
+        {
+          "partido": "PSD",
+          "votos_nominais": 153,
+          "votos_legenda": 3,
+          "total_votos": 156
+        },
+        {
+          "partido": "PSDB",
+          "votos_nominais": 26,
+          "votos_legenda": 2,
+          "total_votos": 28
+        },
+        {
+          "partido": "PL",
+          "votos_nominais": 0,
+          "votos_legenda": 16,
+          "total_votos": 16
+        },
+        {
+          "partido": "PV",
+          "votos_nominais": 15,
+          "votos_legenda": 1,
+          "total_votos": 16
+        },
+        {
+          "partido": "REPUBLICANOS",
+          "votos_nominais": 13,
+          "votos_legenda": 0,
+          "total_votos": 13
+        },
+        {
+          "partido": "AVANTE",
+          "votos_nominais": 0,
+          "votos_legenda": 12,
+          "total_votos": 12
+        },
+        {
+          "partido": "PATRIOTA",
+          "votos_nominais": 0,
+          "votos_legenda": 3,
+          "total_votos": 3
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Jovani",
+          "numero": 90,
+          "partido": "PROS",
+          "votos": 1400,
+          "situacao": "Eleito",
+          "titulo_eleitor": "042526470272"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Weyne",
+          "numero": 31,
+          "partido": "PHS",
+          "votos": 1192,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "004474820213"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 3,
+          "nome_urna": "Breno",
+          "numero": 70,
+          "partido": "PT do B",
+          "votos": 916,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "037816720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Marcone",
+          "numero": 23333,
+          "partido": "PPS",
+          "votos": 228,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "195765200264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Leone",
+          "numero": 36333,
+          "partido": "PTC",
+          "votos": 227,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "118003630213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "Tuniquim",
+          "numero": 11345,
+          "partido": "PP",
+          "votos": 185,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Ziel Basílio",
+          "numero": 77777,
+          "partido": "SD",
+          "votos": 172,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141589520230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Du do Burrinho",
+          "numero": 90000,
+          "partido": "PROS",
+          "votos": 143,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "118007760299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Célio Alves",
+          "numero": 11111,
+          "partido": "PP",
+          "votos": 133,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "118008060248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Claudinho",
+          "numero": 77333,
+          "partido": "SD",
+          "votos": 129,
+          "situacao": "Suplente",
+          "titulo_eleitor": "081651410248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Duriquinho da Santa Rita",
+          "numero": 31111,
+          "partido": "PHS",
+          "votos": 122,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "004473320299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Plínio",
+          "numero": 12345,
+          "partido": "PDT",
+          "votos": 118,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "004473830230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "José Aparecido",
+          "numero": 31000,
+          "partido": "PHS",
+          "votos": 113,
+          "situacao": "Suplente",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Gorete da Adé",
+          "numero": 55555,
+          "partido": "PSD",
+          "votos": 110,
+          "situacao": "Suplente",
+          "titulo_eleitor": "164125480256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Natim",
+          "numero": 90444,
+          "partido": "PROS",
+          "votos": 105,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004528960248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Diógenes",
+          "numero": 31333,
+          "partido": "PHS",
+          "votos": 99,
+          "situacao": "Suplente",
+          "titulo_eleitor": "058384260205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Nem do Pororoca",
+          "numero": 90123,
+          "partido": "PROS",
+          "votos": 96,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591390213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Ismar do Funil",
+          "numero": 90999,
+          "partido": "PROS",
+          "votos": 95,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527770213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Dico",
+          "numero": 90666,
+          "partido": "PROS",
+          "votos": 84,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Talin",
+          "numero": 15000,
+          "partido": "PMDB",
+          "votos": 81,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "191413000230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Jésus",
+          "numero": 23456,
+          "partido": "PPS",
+          "votos": 79,
+          "situacao": "Suplente",
+          "titulo_eleitor": "074576540221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Flávio",
+          "numero": 23222,
+          "partido": "PPS",
+          "votos": 75,
+          "situacao": "Suplente",
+          "titulo_eleitor": "200488360281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Ney do Deti",
+          "numero": 31222,
+          "partido": "PHS",
+          "votos": 74,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591130272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Teca",
+          "numero": 77888,
+          "partido": "SD",
+          "votos": 73,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103525430221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Dé do Jirico",
+          "numero": 90222,
+          "partido": "PROS",
+          "votos": 68,
+          "situacao": "Suplente",
+          "titulo_eleitor": "051278620264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Kívia",
+          "numero": 12222,
+          "partido": "PDT",
+          "votos": 68,
+          "situacao": "Suplente",
+          "titulo_eleitor": "159560370230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Tunicão",
+          "numero": 15500,
+          "partido": "PMDB",
+          "votos": 67,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004475560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Creusa da Barroadas",
+          "numero": 12000,
+          "partido": "PDT",
+          "votos": 60,
+          "situacao": "Suplente",
+          "titulo_eleitor": "260174350116"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Zé Negucinho",
+          "numero": 77123,
+          "partido": "SD",
+          "votos": 52,
+          "situacao": "Suplente",
+          "titulo_eleitor": "187370790264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Poliana do Tio Remo",
+          "numero": 90111,
+          "partido": "PROS",
+          "votos": 46,
+          "situacao": "Suplente",
+          "titulo_eleitor": "213605700281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Beca",
+          "numero": 55222,
+          "partido": "PSD",
+          "votos": 43,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106695850213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Joaquim",
+          "numero": 31555,
+          "partido": "PHS",
+          "votos": 41,
+          "situacao": "Suplente",
+          "titulo_eleitor": "066940930213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Alexandre do Marcolino",
+          "numero": 23123,
+          "partido": "PPS",
+          "votos": 39,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118007690264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "José Maria do Taxi",
+          "numero": 36222,
+          "partido": "PTC",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "043036870221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Lucimar",
+          "numero": 31133,
+          "partido": "PHS",
+          "votos": 30,
+          "situacao": "Suplente",
+          "titulo_eleitor": "127836990230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Wilson",
+          "numero": 31444,
+          "partido": "PHS",
+          "votos": 28,
+          "situacao": "Suplente",
+          "titulo_eleitor": "016212330299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Toni Calibre",
+          "numero": 11222,
+          "partido": "PP",
+          "votos": 27,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086430960230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Madalena",
+          "numero": 45123,
+          "partido": "PSDB",
+          "votos": 26,
+          "situacao": "Suplente",
+          "titulo_eleitor": "028185630230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Lucianete",
+          "numero": 31113,
+          "partido": "PHS",
+          "votos": 25,
+          "situacao": "Suplente",
+          "titulo_eleitor": "099879870256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Anãozinho do Povo",
+          "numero": 36666,
+          "partido": "PTC",
+          "votos": 23,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106695990213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Josimar",
+          "numero": 31456,
+          "partido": "PHS",
+          "votos": 22,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118000910281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Dirlene",
+          "numero": 15100,
+          "partido": "MDB",
+          "votos": 17,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474930272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Zé do Zequita",
+          "numero": 23600,
+          "partido": "PPS",
+          "votos": 17,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527920256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "Néia do Dimas",
+          "numero": 31666,
+          "partido": "PHS",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "126304690361"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Andrea do Lino",
+          "numero": 43333,
+          "partido": "PV",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "099875480299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Dodora",
+          "numero": 90998,
+          "partido": "PROS",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004528020264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 44,
+          "nome_urna": "Ivanir Bispo",
+          "numero": 12123,
+          "partido": "PDT",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103529370230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 45,
+          "nome_urna": "Vanisia",
+          "numero": 23000,
+          "partido": "PPS",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128639960221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 46,
+          "nome_urna": "Vino",
+          "numero": 10000,
+          "partido": "REPUBLICANOS",
+          "votos": 13,
+          "situacao": "Suplente",
+          "titulo_eleitor": "077374680213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 47,
+          "nome_urna": "Luciana Bessa",
+          "numero": 90555,
+          "partido": "PROS",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128642650230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 48,
+          "nome_urna": "Jairson",
+          "numero": 23700,
+          "partido": "PPS",
+          "votos": 8,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195768370205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 49,
+          "nome_urna": "Betim",
+          "numero": 31251,
+          "partido": "PHS",
+          "votos": 5,
+          "situacao": "Suplente",
+          "titulo_eleitor": "063571480205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 50,
+          "nome_urna": "Sandra Karlem",
+          "numero": 11333,
+          "partido": "PP",
+          "votos": 4,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118006400213"
+        }
+      ]
+    },
+    "2020": {
+      "ano": 2020,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 4452,
+          "comparecimento": 3558,
+          "abstencoes": 894,
+          "validos": 0,
+          "brancos": 33,
+          "nulos": 154
+        },
+        "vereador": {
+          "aptos": 4452,
+          "comparecimento": 3558,
+          "abstencoes": 894,
+          "validos": 0,
+          "brancos": 39,
+          "nulos": 138
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "SOLIDARIEDADE",
+          "votos_nominais": 947,
+          "votos_legenda": 76,
+          "total_votos": 1023
+        },
+        {
+          "partido": "PODE",
+          "votos_nominais": 944,
+          "votos_legenda": 21,
+          "total_votos": 965
+        },
+        {
+          "partido": "CIDADANIA",
+          "votos_nominais": 667,
+          "votos_legenda": 12,
+          "total_votos": 679
+        },
+        {
+          "partido": "PTB",
+          "votos_nominais": 557,
+          "votos_legenda": 46,
+          "total_votos": 603
+        },
+        {
+          "partido": "PT",
+          "votos_nominais": 103,
+          "votos_legenda": 8,
+          "total_votos": 111
+        },
+        {
+          "partido": "PSDB",
+          "votos_nominais": 601,
+          "votos_legenda": 50,
+          "total_votos": 651
+        },
+        {
+          "partido": "PV",
+          "votos_nominais": 492,
+          "votos_legenda": 90,
+          "total_votos": 582
+        },
+        {
+          "partido": "PTC",
+          "votos_nominais": 297,
+          "votos_legenda": 85,
+          "total_votos": 382
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 289,
+          "votos_legenda": 23,
+          "total_votos": 312
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 274,
+          "votos_legenda": 28,
+          "total_votos": 302
+        },
+        {
+          "partido": "PPS",
+          "votos_nominais": 257,
+          "votos_legenda": 9,
+          "total_votos": 266
+        },
+        {
+          "partido": "PTB",
+          "votos_nominais": 169,
+          "votos_legenda": 4,
+          "total_votos": 173
+        },
+        {
+          "partido": "DEM",
+          "votos_nominais": 157,
+          "votos_legenda": 6,
+          "total_votos": 163
+        },
+        {
+          "partido": "PL",
+          "votos_nominais": 127,
+          "votos_legenda": 21,
+          "total_votos": 148
+        },
+        {
+          "partido": "AVANTE",
+          "votos_nominais": 97,
+          "votos_legenda": 40,
+          "total_votos": 137
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Jovani",
+          "numero": 77,
+          "partido": "SOLIDARIEDADE",
+          "votos": 1770,
+          "situacao": "Eleito",
+          "titulo_eleitor": "091405140299"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Weyne",
+          "numero": 14,
+          "partido": "PTB",
+          "votos": 1601,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "195765200264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Zé Aparecido",
+          "numero": 19555,
+          "partido": "PODE",
+          "votos": 220,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Nem do Pororoca",
+          "numero": 77999,
+          "partido": "SOLIDARIEDADE",
+          "votos": 178,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141591390213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "Ziel Basílio",
+          "numero": 77777,
+          "partido": "SOLIDARIEDADE",
+          "votos": 173,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141589520230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Dú do Burrinho",
+          "numero": 77000,
+          "partido": "SOLIDARIEDADE",
+          "votos": 169,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "118007760299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Célio Alves",
+          "numero": 19123,
+          "partido": "PODE",
+          "votos": 164,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "118008060248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Flávio",
+          "numero": 23222,
+          "partido": "CIDADANIA",
+          "votos": 152,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "200488360281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Leone",
+          "numero": 14444,
+          "partido": "PTB",
+          "votos": 142,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "118003630213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Ismar do Funil",
+          "numero": 19777,
+          "partido": "PODE",
+          "votos": 140,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "004527770213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Claudinho",
+          "numero": 77333,
+          "partido": "SOLIDARIEDADE",
+          "votos": 123,
+          "situacao": "Suplente",
+          "titulo_eleitor": "081651410248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Tuniquinho",
+          "numero": 19345,
+          "partido": "PODE",
+          "votos": 121,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Plínio",
+          "numero": 23789,
+          "partido": "CIDADANIA",
+          "votos": 101,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "004473830230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Talin",
+          "numero": 14000,
+          "partido": "PTB",
+          "votos": 98,
+          "situacao": "Suplente",
+          "titulo_eleitor": "191413000230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Joaquim",
+          "numero": 14111,
+          "partido": "PTB",
+          "votos": 82,
+          "situacao": "Suplente",
+          "titulo_eleitor": "066940930213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Lucas Andrade",
+          "numero": 77123,
+          "partido": "SOLIDARIEDADE",
+          "votos": 78,
+          "situacao": "Suplente",
+          "titulo_eleitor": "191411370205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Edelcio Costa",
+          "numero": 19000,
+          "partido": "PODE",
+          "votos": 76,
+          "situacao": "Suplente",
+          "titulo_eleitor": "149433780264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Gilmar Marques",
+          "numero": 23123,
+          "partido": "CIDADANIA",
+          "votos": 76,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103528770264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Tunicão",
+          "numero": 14500,
+          "partido": "PTB",
+          "votos": 74,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004475560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Stefen",
+          "numero": 23555,
+          "partido": "CIDADANIA",
+          "votos": 72,
+          "situacao": "Suplente",
+          "titulo_eleitor": "189666040281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Rômulo do Zeze do Saltinho",
+          "numero": 77444,
+          "partido": "SOLIDARIEDADE",
+          "votos": 65,
+          "situacao": "Suplente",
+          "titulo_eleitor": "180929640205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "Dico",
+          "numero": 19666,
+          "partido": "PODE",
+          "votos": 59,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441240272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Diógenes",
+          "numero": 19111,
+          "partido": "PODE",
+          "votos": 59,
+          "situacao": "Suplente",
+          "titulo_eleitor": "058384260205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Bruno do Posto",
+          "numero": 14555,
+          "partido": "PTB",
+          "votos": 54,
+          "situacao": "Suplente",
+          "titulo_eleitor": "209825640221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Tekinha",
+          "numero": 23000,
+          "partido": "CIDADANIA",
+          "votos": 47,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106695880264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Luciano",
+          "numero": 14014,
+          "partido": "PTB",
+          "votos": 44,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128636620299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Iôiõ",
+          "numero": 23118,
+          "partido": "CIDADANIA",
+          "votos": 42,
+          "situacao": "Suplente",
+          "titulo_eleitor": "026365900213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Nandinho do Açaí",
+          "numero": 77456,
+          "partido": "SOLIDARIEDADE",
+          "votos": 38,
+          "situacao": "Suplente",
+          "titulo_eleitor": "206056120256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Rubinho",
+          "numero": 23567,
+          "partido": "CIDADANIA",
+          "votos": 37,
+          "situacao": "Suplente",
+          "titulo_eleitor": "136770730281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Salomão Avelino",
+          "numero": 19222,
+          "partido": "PODE",
+          "votos": 36,
+          "situacao": "Suplente",
+          "titulo_eleitor": "010955670248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Alzira",
+          "numero": 23456,
+          "partido": "CIDADANIA",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106687360213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Diusa da Nevica",
+          "numero": 13131,
+          "partido": "PT",
+          "votos": 32,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "007117751422"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Irmão Rubens",
+          "numero": 77222,
+          "partido": "SOLIDARIEDADE",
+          "votos": 31,
+          "situacao": "Suplente",
+          "titulo_eleitor": "084021720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Sabrina do Wanderley do Ziquit",
+          "numero": 19999,
+          "partido": "PODE",
+          "votos": 29,
+          "situacao": "Suplente",
+          "titulo_eleitor": "209825080213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Willian",
+          "numero": 23444,
+          "partido": "CIDADANIA",
+          "votos": 29,
+          "situacao": "Suplente",
+          "titulo_eleitor": "038470900205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Carlinhos Aurora",
+          "numero": 13111,
+          "partido": "PT",
+          "votos": 28,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "086430390248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Clóvis Caetano",
+          "numero": 23333,
+          "partido": "CIDADANIA",
+          "votos": 25,
+          "situacao": "Suplente",
+          "titulo_eleitor": "108617610116"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Teca",
+          "numero": 77666,
+          "partido": "SOLIDARIEDADE",
+          "votos": 25,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103525430221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Tim",
+          "numero": 13999,
+          "partido": "PT",
+          "votos": 25,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "118743190281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Poliana do Tio Remo",
+          "numero": 77111,
+          "partido": "SOLIDARIEDADE",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "213605700281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Dirlene do Preto",
+          "numero": 23023,
+          "partido": "CIDADANIA",
+          "votos": 23,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474930272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Márcio Rodrigo do Facebbok",
+          "numero": 23181,
+          "partido": "CIDADANIA",
+          "votos": 22,
+          "situacao": "Suplente",
+          "titulo_eleitor": "104157230221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "José Geraldo",
+          "numero": 14333,
+          "partido": "PTB",
+          "votos": 19,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106709060221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Zé do Ziquita",
+          "numero": 77555,
+          "partido": "SOLIDARIEDADE",
+          "votos": 19,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527920256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Luciana do Setenta",
+          "numero": 77770,
+          "partido": "SOLIDARIEDADE",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128642650230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 44,
+          "nome_urna": "Moacir Andrade",
+          "numero": 19998,
+          "partido": "PODE",
+          "votos": 16,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004502840213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 45,
+          "nome_urna": "Neiinha",
+          "numero": 19126,
+          "partido": "PODE",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "126304690361"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 46,
+          "nome_urna": "Maria Madalena",
+          "numero": 14140,
+          "partido": "PTB",
+          "votos": 14,
+          "situacao": "Suplente",
+          "titulo_eleitor": "028185630230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 47,
+          "nome_urna": "Raiane",
+          "numero": 14123,
+          "partido": "PTB",
+          "votos": 11,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195769360281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 48,
+          "nome_urna": "Cleunice",
+          "numero": 14788,
+          "partido": "PTB",
+          "votos": 10,
+          "situacao": "Suplente",
+          "titulo_eleitor": "071441230299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 49,
+          "nome_urna": "Renato Pedreiro",
+          "numero": 13123,
+          "partido": "PT",
+          "votos": 10,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "130251280230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 50,
+          "nome_urna": "Ana Maria",
+          "numero": 23111,
+          "partido": "CIDADANIA",
+          "votos": 9,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086434140248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 51,
+          "nome_urna": "Raquel do Ibituruna",
+          "numero": 14222,
+          "partido": "PTB",
+          "votos": 9,
+          "situacao": "Suplente",
+          "titulo_eleitor": "164121660281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 52,
+          "nome_urna": "Célia",
+          "numero": 77888,
+          "partido": "SOLIDARIEDADE",
+          "votos": 8,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106698650264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 53,
+          "nome_urna": "Ângela do Salão",
+          "numero": 19333,
+          "partido": "PODE",
+          "votos": 5,
+          "situacao": "Suplente",
+          "titulo_eleitor": "117997110213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 54,
+          "nome_urna": "Dodora",
+          "numero": 19444,
+          "partido": "PODE",
+          "votos": 4,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004528020264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 55,
+          "nome_urna": "Michele Ribeiro",
+          "numero": 13333,
+          "partido": "PT",
+          "votos": 4,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "142615590256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 56,
+          "nome_urna": "Zé Pretim",
+          "numero": 13130,
+          "partido": "PT",
+          "votos": 4,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "004480920299"
+        }
+      ]
+    },
+    "2024": {
+      "ano": 2024,
+      "detalhes": {
+        "prefeito": {
+          "aptos": 4635,
+          "comparecimento": 3660,
+          "abstencoes": 975,
+          "validos": 0,
+          "brancos": 25,
+          "nulos": 103
+        },
+        "vereador": {
+          "aptos": 4635,
+          "comparecimento": 3660,
+          "abstencoes": 975,
+          "validos": 0,
+          "brancos": 24,
+          "nulos": 83
+        }
+      },
+      "partidos_vereador": [
+        {
+          "partido": "PSD",
+          "votos_nominais": 678,
+          "votos_legenda": 43,
+          "total_votos": 721
+        },
+        {
+          "partido": "MDB",
+          "votos_nominais": 648,
+          "votos_legenda": 4,
+          "total_votos": 652
+        },
+        {
+          "partido": "PP",
+          "votos_nominais": 498,
+          "votos_legenda": 19,
+          "total_votos": 517
+        },
+        {
+          "partido": "SOLIDARIEDADE",
+          "votos_nominais": 456,
+          "votos_legenda": 14,
+          "total_votos": 470
+        },
+        {
+          "partido": "PSB",
+          "votos_nominais": 441,
+          "votos_legenda": 8,
+          "total_votos": 449
+        },
+        {
+          "partido": "PDT",
+          "votos_nominais": 354,
+          "votos_legenda": 36,
+          "total_votos": 390
+        },
+        {
+          "partido": "REDE",
+          "votos_nominais": 108,
+          "votos_legenda": 1,
+          "total_votos": 109
+        },
+        {
+          "partido": "PT",
+          "votos_nominais": 93,
+          "votos_legenda": 10,
+          "total_votos": 103
+        },
+        {
+          "partido": "PRD",
+          "votos_nominais": 87,
+          "votos_legenda": 7,
+          "total_votos": 94
+        },
+        {
+          "partido": "DC",
+          "votos_nominais": 47,
+          "votos_legenda": 1,
+          "total_votos": 48
+        }
+      ],
+      "resultados": [
+        {
+          "cargo": "Prefeito",
+          "posicao": 1,
+          "nome_urna": "Weyne",
+          "numero": 12,
+          "partido": "PDT",
+          "votos": 1747,
+          "situacao": "Eleito",
+          "titulo_eleitor": "132490240221"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 2,
+          "nome_urna": "Luis Artur",
+          "numero": 55,
+          "partido": "PSD",
+          "votos": 1647,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "033484791414"
+        },
+        {
+          "cargo": "Prefeito",
+          "posicao": 3,
+          "nome_urna": "Diusa",
+          "numero": 13,
+          "partido": "PT",
+          "votos": 138,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "007117751422"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 1,
+          "nome_urna": "Walquiria",
+          "numero": 15555,
+          "partido": "MDB",
+          "votos": 225,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "086437770213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 2,
+          "nome_urna": "Ziel Basílio",
+          "numero": 77777,
+          "partido": "SOLIDARIEDADE",
+          "votos": 188,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141589520230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 3,
+          "nome_urna": "Ze Aparecido",
+          "numero": 55555,
+          "partido": "PSD",
+          "votos": 176,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "091403840272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 4,
+          "nome_urna": "Nem do Pororoca",
+          "numero": 40999,
+          "partido": "PSB",
+          "votos": 170,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "141591390213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 5,
+          "nome_urna": "Flávio",
+          "numero": 15222,
+          "partido": "MDB",
+          "votos": 162,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "200488360281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 6,
+          "nome_urna": "Edelcio de Santa Rita",
+          "numero": 55123,
+          "partido": "PSD",
+          "votos": 146,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "149433780264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 7,
+          "nome_urna": "Leone",
+          "numero": 12222,
+          "partido": "PDT",
+          "votos": 141,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "118003630213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 8,
+          "nome_urna": "Gilmar",
+          "numero": 11555,
+          "partido": "PP",
+          "votos": 133,
+          "situacao": "Eleito por QP",
+          "titulo_eleitor": "103528770264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 9,
+          "nome_urna": "Joaquim",
+          "numero": 11111,
+          "partido": "PP",
+          "votos": 124,
+          "situacao": "Eleito por média",
+          "titulo_eleitor": "066940930213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 10,
+          "nome_urna": "Auxiliadora dos Santos",
+          "numero": 55321,
+          "partido": "PSD",
+          "votos": 110,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591080213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 11,
+          "nome_urna": "Gustavo Lata",
+          "numero": 15111,
+          "partido": "MDB",
+          "votos": 107,
+          "situacao": "Suplente",
+          "titulo_eleitor": "191720730299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 12,
+          "nome_urna": "Tuniquinho",
+          "numero": 40345,
+          "partido": "PSB",
+          "votos": 104,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103534100256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 13,
+          "nome_urna": "Ismar do Funil",
+          "numero": 55222,
+          "partido": "PSD",
+          "votos": 102,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004527770213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 14,
+          "nome_urna": "Miguel",
+          "numero": 12345,
+          "partido": "PDT",
+          "votos": 91,
+          "situacao": "Suplente",
+          "titulo_eleitor": "200490210248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 15,
+          "nome_urna": "Talin",
+          "numero": 11000,
+          "partido": "PP",
+          "votos": 90,
+          "situacao": "Suplente",
+          "titulo_eleitor": "191413000230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 16,
+          "nome_urna": "Vanderlei do Altinho",
+          "numero": 55666,
+          "partido": "PSD",
+          "votos": 86,
+          "situacao": "Suplente",
+          "titulo_eleitor": "149127950221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 17,
+          "nome_urna": "Claudinho do Povo",
+          "numero": 40123,
+          "partido": "PSB",
+          "votos": 84,
+          "situacao": "Suplente",
+          "titulo_eleitor": "081651410248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 18,
+          "nome_urna": "Plínio",
+          "numero": 15123,
+          "partido": "MDB",
+          "votos": 81,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004473830230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 19,
+          "nome_urna": "Jassy Gonçalves",
+          "numero": 77123,
+          "partido": "SOLIDARIEDADE",
+          "votos": 78,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004474820213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 20,
+          "nome_urna": "João Vitor Garajau",
+          "numero": 77047,
+          "partido": "SOLIDARIEDADE",
+          "votos": 69,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195769450272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 21,
+          "nome_urna": "Tunicão",
+          "numero": 15500,
+          "partido": "MDB",
+          "votos": 56,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004475560299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 22,
+          "nome_urna": "Ronio",
+          "numero": 11125,
+          "partido": "PP",
+          "votos": 55,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128645830213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 23,
+          "nome_urna": "Rael do Pipiu",
+          "numero": 12333,
+          "partido": "PDT",
+          "votos": 55,
+          "situacao": "Suplente",
+          "titulo_eleitor": "103525040213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 24,
+          "nome_urna": "Du do Burrinho",
+          "numero": 77000,
+          "partido": "SOLIDARIEDADE",
+          "votos": 55,
+          "situacao": "Suplente",
+          "titulo_eleitor": "118007760299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 25,
+          "nome_urna": "Tim do Fizico",
+          "numero": 18888,
+          "partido": "REDE",
+          "votos": 45,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "128643090299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 26,
+          "nome_urna": "Doutor Webert",
+          "numero": 27000,
+          "partido": "DC",
+          "votos": 36,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "203324470213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 27,
+          "nome_urna": "Leo Boi",
+          "numero": 11123,
+          "partido": "PP",
+          "votos": 32,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195768420264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 28,
+          "nome_urna": "Elen Flávia",
+          "numero": 25555,
+          "partido": "PRD",
+          "votos": 29,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "036977631422"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 29,
+          "nome_urna": "Olavio da Renata",
+          "numero": 18111,
+          "partido": "REDE",
+          "votos": 26,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "128642850281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 30,
+          "nome_urna": "Jozi do Joaquim",
+          "numero": 12321,
+          "partido": "PDT",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "127828140213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 31,
+          "nome_urna": "Maurina Caetana",
+          "numero": 40111,
+          "partido": "PSB",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591310256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 32,
+          "nome_urna": "Poliana do Tio Remo",
+          "numero": 77456,
+          "partido": "SOLIDARIEDADE",
+          "votos": 24,
+          "situacao": "Suplente",
+          "titulo_eleitor": "213605700281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 33,
+          "nome_urna": "Fernando da Bela",
+          "numero": 11222,
+          "partido": "PP",
+          "votos": 23,
+          "situacao": "Suplente",
+          "titulo_eleitor": "186831260299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 34,
+          "nome_urna": "Culano da Deja",
+          "numero": 25121,
+          "partido": "PRD",
+          "votos": 22,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "086430740221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 35,
+          "nome_urna": "Renato do Saltinho",
+          "numero": 13123,
+          "partido": "PT",
+          "votos": 22,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "130251280230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 36,
+          "nome_urna": "Carlos das Mudas",
+          "numero": 13213,
+          "partido": "PT",
+          "votos": 20,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "174012610264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 37,
+          "nome_urna": "Ioiô do Chico",
+          "numero": 40444,
+          "partido": "PSB",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "026365900213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 38,
+          "nome_urna": "Irmão Rubens",
+          "numero": 40222,
+          "partido": "PSB",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "084021720213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 39,
+          "nome_urna": "Márcio do Face",
+          "numero": 12181,
+          "partido": "PDT",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "104157230221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 40,
+          "nome_urna": "Romilda Martins",
+          "numero": 77555,
+          "partido": "SOLIDARIEDADE",
+          "votos": 20,
+          "situacao": "Suplente",
+          "titulo_eleitor": "209827020256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 41,
+          "nome_urna": "Aline do Charles Mecanico",
+          "numero": 55456,
+          "partido": "PSD",
+          "votos": 17,
+          "situacao": "Suplente",
+          "titulo_eleitor": "132507190264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 42,
+          "nome_urna": "Barrabas",
+          "numero": 55223,
+          "partido": "PSD",
+          "votos": 17,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195765990213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 43,
+          "nome_urna": "Célia Cristina",
+          "numero": 15333,
+          "partido": "MDB",
+          "votos": 17,
+          "situacao": "Suplente",
+          "titulo_eleitor": "163268480272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 44,
+          "nome_urna": "Cristiano Morais",
+          "numero": 25123,
+          "partido": "PRD",
+          "votos": 17,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "131356110299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 45,
+          "nome_urna": "Guidinha da Barruada",
+          "numero": 13233,
+          "partido": "PT",
+          "votos": 17,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "084197360264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 46,
+          "nome_urna": "Mary Santos",
+          "numero": 11220,
+          "partido": "PP",
+          "votos": 15,
+          "situacao": "Suplente",
+          "titulo_eleitor": "213607300213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 47,
+          "nome_urna": "Deel do Dico Arruda",
+          "numero": 55111,
+          "partido": "PSD",
+          "votos": 14,
+          "situacao": "Suplente",
+          "titulo_eleitor": "141591440272"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 48,
+          "nome_urna": "Rosilene do Cedro",
+          "numero": 11444,
+          "partido": "PP",
+          "votos": 14,
+          "situacao": "Suplente",
+          "titulo_eleitor": "098151020299"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 49,
+          "nome_urna": "Horácio Gonçalves",
+          "numero": 13640,
+          "partido": "PT",
+          "votos": 13,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "071441340248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 50,
+          "nome_urna": "Luciana Bessa",
+          "numero": 40000,
+          "partido": "PSB",
+          "votos": 12,
+          "situacao": "Suplente",
+          "titulo_eleitor": "128642650230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 51,
+          "nome_urna": "Natalício",
+          "numero": 25356,
+          "partido": "PRD",
+          "votos": 12,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "298074820167"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 52,
+          "nome_urna": "Célia",
+          "numero": 77888,
+          "partido": "SOLIDARIEDADE",
+          "votos": 11,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106698650264"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 53,
+          "nome_urna": "Jozi José da Silva",
+          "numero": 77321,
+          "partido": "SOLIDARIEDADE",
+          "votos": 11,
+          "situacao": "Suplente",
+          "titulo_eleitor": "004500600213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 54,
+          "nome_urna": "Zulemar Zanetti",
+          "numero": 18222,
+          "partido": "REDE",
+          "votos": 11,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "012355591430"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 55,
+          "nome_urna": "Jackeline Madeira Félix",
+          "numero": 55000,
+          "partido": "PSD",
+          "votos": 10,
+          "situacao": "Suplente",
+          "titulo_eleitor": "117989590221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 56,
+          "nome_urna": "Luana",
+          "numero": 12456,
+          "partido": "PDT",
+          "votos": 10,
+          "situacao": "Suplente",
+          "titulo_eleitor": "195769430213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 57,
+          "nome_urna": "Dimas de Paula",
+          "numero": 13555,
+          "partido": "PT",
+          "votos": 9,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "078048310213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 58,
+          "nome_urna": "Edimar da Lourdinha",
+          "numero": 18444,
+          "partido": "REDE",
+          "votos": 9,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "099877210205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 59,
+          "nome_urna": "Geraldo Barrao",
+          "numero": 18179,
+          "partido": "REDE",
+          "votos": 9,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "213605050281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 60,
+          "nome_urna": "Samara",
+          "numero": 11301,
+          "partido": "PP",
+          "votos": 9,
+          "situacao": "Suplente",
+          "titulo_eleitor": "180929950205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 61,
+          "nome_urna": "Dorinha Viegas",
+          "numero": 18123,
+          "partido": "REDE",
+          "votos": 8,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "080581780213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 62,
+          "nome_urna": "Ana Maria",
+          "numero": 12777,
+          "partido": "PDT",
+          "votos": 7,
+          "situacao": "Suplente",
+          "titulo_eleitor": "086434140248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 63,
+          "nome_urna": "Dirce Meire",
+          "numero": 40456,
+          "partido": "PSB",
+          "votos": 7,
+          "situacao": "Suplente",
+          "titulo_eleitor": "082253870213"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 64,
+          "nome_urna": "Sintia Fernandes",
+          "numero": 25264,
+          "partido": "PRD",
+          "votos": 7,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "174011330248"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 65,
+          "nome_urna": "Thayssa Kaila",
+          "numero": 27500,
+          "partido": "DC",
+          "votos": 7,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "231654160221"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 66,
+          "nome_urna": "Michele Ribeiro",
+          "numero": 13141,
+          "partido": "PT",
+          "votos": 6,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "142615590256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 67,
+          "nome_urna": "Stefen",
+          "numero": 12444,
+          "partido": "PDT",
+          "votos": 6,
+          "situacao": "Suplente",
+          "titulo_eleitor": "189666040281"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 68,
+          "nome_urna": "Lúcio Garajau",
+          "numero": 13115,
+          "partido": "PT",
+          "votos": 4,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "034179810205"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 69,
+          "nome_urna": "Natim da Grota",
+          "numero": 27100,
+          "partido": "DC",
+          "votos": 4,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "200489450230"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 70,
+          "nome_urna": "Herlei",
+          "numero": 11333,
+          "partido": "PP",
+          "votos": 3,
+          "situacao": "Suplente",
+          "titulo_eleitor": "106698430256"
+        },
+        {
+          "cargo": "Vereador",
+          "posicao": 71,
+          "nome_urna": "Raquel das Areias",
+          "numero": 13131,
+          "partido": "PT",
+          "votos": 2,
+          "situacao": "Não eleito",
+          "titulo_eleitor": "226383690256"
+        }
+      ]
+    }
+  },
+  "candidatos_base": {
+    "106688690230": {
+      "titulo_eleitor": "106688690230",
+      "nome_completo": "GERALDO FLAVIO DE ANDRADE",
+      "data_nascimento": "22/08/1965"
+    },
+    "010955560299": {
+      "titulo_eleitor": "010955560299",
+      "nome_completo": "IVAM PEREIRA ALVES PINTO",
+      "data_nascimento": "02/10/1952"
+    },
+    "091405140299": {
+      "titulo_eleitor": "091405140299",
+      "nome_completo": "IBRAHIM LOURENCO DA SILVA",
+      "data_nascimento": "16/07/1972"
+    },
+    "091403840272": {
+      "titulo_eleitor": "091403840272",
+      "nome_completo": "JOSE APARECIDO DE PINHO",
+      "data_nascimento": "11/09/1971"
+    },
+    "004501130264": {
+      "titulo_eleitor": "004501130264",
+      "nome_completo": "JOSE MOREIRA FILHO",
+      "data_nascimento": "08/12/1957"
+    },
+    "086430000299": {
+      "titulo_eleitor": "086430000299",
+      "nome_completo": "WEYNE VIRGILIO DE CARVALHO",
+      "data_nascimento": "22/06/1967"
+    },
+    "004528950264": {
+      "titulo_eleitor": "004528950264",
+      "nome_completo": "DONIZETE EUSTAQUIO DE ANDRADE",
+      "data_nascimento": "31/12/1961"
+    },
+    "037808190221": {
+      "titulo_eleitor": "037808190221",
+      "nome_completo": "MARIA RAMOS ALVES DA SILVA",
+      "data_nascimento": "10/07/1949"
+    },
+    "004507120264": {
+      "titulo_eleitor": "004507120264",
+      "nome_completo": "ANTONIO CAMILO NETO",
+      "data_nascimento": "10/03/1948"
+    },
+    "071441060299": {
+      "titulo_eleitor": "071441060299",
+      "nome_completo": "RUI DE MAGALHAES BARBOSA",
+      "data_nascimento": "15/03/1960"
+    },
+    "071441240272": {
+      "titulo_eleitor": "071441240272",
+      "nome_completo": "RAIMUNDO NUNES DE OLIVEIRA",
+      "data_nascimento": "07/05/1943"
+    },
+    "004506990256": {
+      "titulo_eleitor": "004506990256",
+      "nome_completo": "MARIA GORETE DAS GRACAS SANTOS",
+      "data_nascimento": "09/08/1969"
+    },
+    "106688770248": {
+      "titulo_eleitor": "106688770248",
+      "nome_completo": "ADEILSON MATIAS MOREIRA",
+      "data_nascimento": "09/08/1969"
+    },
+    "071440930230": {
+      "titulo_eleitor": "071440930230",
+      "nome_completo": "CHARLES RENAULT DE ANDRADE",
+      "data_nascimento": "10/07/1968"
+    },
+    "037816720213": {
+      "titulo_eleitor": "037816720213",
+      "nome_completo": "CLESIO FERNANDES CAMARA",
+      "data_nascimento": "08/07/1952"
+    },
+    "106713100281": {
+      "titulo_eleitor": "106713100281",
+      "nome_completo": "JAIR ANTONIO DE SOUZA",
+      "data_nascimento": "10/08/1957"
+    },
+    "091399030230": {
+      "titulo_eleitor": "091399030230",
+      "nome_completo": "WECIO SEABRA BICALHO",
+      "data_nascimento": "13/09/1970"
+    },
+    "063023250230": {
+      "titulo_eleitor": "063023250230",
+      "nome_completo": "DAMASIO ANTONIO DE OLIVEIRA",
+      "data_nascimento": "30/08/1958"
+    },
+    "014651570221": {
+      "titulo_eleitor": "014651570221",
+      "nome_completo": "JOSE ANDRADE MOTA",
+      "data_nascimento": "25/01/1951"
+    },
+    "037816390205": {
+      "titulo_eleitor": "037816390205",
+      "nome_completo": "JOAQUIM BASILIO DE ALMEIDA",
+      "data_nascimento": "04/03/1948"
+    },
+    "004507380205": {
+      "titulo_eleitor": "004507380205",
+      "nome_completo": "JOSE AUGUSTO DE ALMEIDA",
+      "data_nascimento": "06/06/1941"
+    },
+    "004527850221": {
+      "titulo_eleitor": "004527850221",
+      "nome_completo": "JOSE MARTINS DE ANDRADE",
+      "data_nascimento": "09/07/1948"
+    },
+    "091403540256": {
+      "titulo_eleitor": "091403540256",
+      "nome_completo": "WILSON DE MOURA VARGAS",
+      "data_nascimento": "04/06/1954"
+    },
+    "085289600248": {
+      "titulo_eleitor": "085289600248",
+      "nome_completo": "JOSE UILSON ARRUDA DE MENEZES",
+      "data_nascimento": "11/07/1971"
+    },
+    "004474280272": {
+      "titulo_eleitor": "004474280272",
+      "nome_completo": "JOSE GERALDO DE ANDRADE",
+      "data_nascimento": "21/04/1952"
+    },
+    "004482170248": {
+      "titulo_eleitor": "004482170248",
+      "nome_completo": "LAURITA PEREIRA DA COSTA",
+      "data_nascimento": "15/07/1944"
+    },
+    "052476410230": {
+      "titulo_eleitor": "052476410230",
+      "nome_completo": "JOSE RAIMUNDO GARAJAU SOBRINHO",
+      "data_nascimento": "06/11/1956"
+    },
+    "029657980299": {
+      "titulo_eleitor": "029657980299",
+      "nome_completo": "MARIA DO AMPARO DE SOUZA",
+      "data_nascimento": "27/09/1950"
+    },
+    "029003770264": {
+      "titulo_eleitor": "029003770264",
+      "nome_completo": "JOSE EUSTAQUIO ALVES",
+      "data_nascimento": "28/11/1958"
+    },
+    "004474930272": {
+      "titulo_eleitor": "004474930272",
+      "nome_completo": "DIRLENE MARIA DAS DORES PERPETUO",
+      "data_nascimento": "03/09/1965"
+    },
+    "004480450272": {
+      "titulo_eleitor": "004480450272",
+      "nome_completo": "JOSE MATOZINHOS MARQUES",
+      "data_nascimento": "02/11/1958"
+    },
+    "106685200213": {
+      "titulo_eleitor": "106685200213",
+      "nome_completo": "JOSE MOREIRA SOBRINHO",
+      "data_nascimento": "30/10/1935"
+    },
+    "004527920256": {
+      "titulo_eleitor": "004527920256",
+      "nome_completo": "JOSE DO CARMO FARIAS",
+      "data_nascimento": "30/08/1952"
+    },
+    "004481580256": {
+      "titulo_eleitor": "004481580256",
+      "nome_completo": "PETRINA DIAS DE OLIVEIRA",
+      "data_nascimento": "12/06/1936"
+    },
+    "014651300213": {
+      "titulo_eleitor": "014651300213",
+      "nome_completo": "GERALDO MOREIRA SOBRINHO",
+      "data_nascimento": "08/07/1947"
+    },
+    "004473460299": {
+      "titulo_eleitor": "004473460299",
+      "nome_completo": "DAVI RAIMUNDO GARAJAU",
+      "data_nascimento": "13/11/1962"
+    },
+    "037807620256": {
+      "titulo_eleitor": "037807620256",
+      "nome_completo": "LUCIANO IZAIAS PROFETA",
+      "data_nascimento": "06/06/1944"
+    },
+    "104157230221": {
+      "titulo_eleitor": "104157230221",
+      "nome_completo": "MARCIO RODRIGO HIGINO PROCOPIO",
+      "data_nascimento": "02/07/1977"
+    },
+    "078043510248": {
+      "titulo_eleitor": "078043510248",
+      "nome_completo": "MARIA JOSE DE SOUZA BRITO",
+      "data_nascimento": "19/03/1925"
+    },
+    "004476550272": {
+      "titulo_eleitor": "004476550272",
+      "nome_completo": "RUISDAIEL MAURO DIAS",
+      "data_nascimento": "06/01/1958"
+    },
+    "099880280281": {
+      "titulo_eleitor": "099880280281",
+      "nome_completo": "GILSON GERALDO DE CARVALHO",
+      "data_nascimento": "14/04/1971"
+    },
+    "014650810299": {
+      "titulo_eleitor": "014650810299",
+      "nome_completo": "LUCILIA MOREIRA DE ANDRADE FERREIRA",
+      "data_nascimento": "30/11/1957"
+    },
+    "106714170213": {
+      "titulo_eleitor": "106714170213",
+      "nome_completo": "MARIO CESAR DE SOUZA",
+      "data_nascimento": "04/11/1977"
+    },
+    "106698940205": {
+      "titulo_eleitor": "106698940205",
+      "nome_completo": "IRAMIRA DAS DORES GUIMARÃES",
+      "data_nascimento": "17/09/1970"
+    },
+    "004502200256": {
+      "titulo_eleitor": "004502200256",
+      "nome_completo": "JOSÉ LUÍZ FERREIRA",
+      "data_nascimento": "09/08/1929"
+    },
+    "103534100256": {
+      "titulo_eleitor": "103534100256",
+      "nome_completo": "ANTÔNIO RODRIGUES BARBOSA",
+      "data_nascimento": "11/09/1972"
+    },
+    "080580370281": {
+      "titulo_eleitor": "080580370281",
+      "nome_completo": "MARIA AGRIPINA DE ASSIS",
+      "data_nascimento": "19/10/1968"
+    },
+    "106688450264": {
+      "titulo_eleitor": "106688450264",
+      "nome_completo": "ANTÔNIO PEREIRA BATISTA",
+      "data_nascimento": "12/09/1972"
+    },
+    "078043360213": {
+      "titulo_eleitor": "078043360213",
+      "nome_completo": "ROBERTH WAGNER MAGELA DA SILVA",
+      "data_nascimento": "16/10/1956"
+    },
+    "082252730248": {
+      "titulo_eleitor": "082252730248",
+      "nome_completo": "EMILIO DIAS FERNANDES",
+      "data_nascimento": "29/01/1964"
+    },
+    "078043030248": {
+      "titulo_eleitor": "078043030248",
+      "nome_completo": "WILLIAN TANURE SIMAN",
+      "data_nascimento": "18/05/1943"
+    },
+    "127114730248": {
+      "titulo_eleitor": "127114730248",
+      "nome_completo": "FERNANDO KELLEN SIMAN",
+      "data_nascimento": "11/06/1979"
+    },
+    "142082750299": {
+      "titulo_eleitor": "142082750299",
+      "nome_completo": "VITAL VIEIRA DE SOUZA",
+      "data_nascimento": "11/07/1980"
+    },
+    "009682430213": {
+      "titulo_eleitor": "009682430213",
+      "nome_completo": "NAPOLEÃO GLORIA FILHO",
+      "data_nascimento": "19/11/1942"
+    },
+    "117993720272": {
+      "titulo_eleitor": "117993720272",
+      "nome_completo": "EMILSON COELHO DE AZEVEDO",
+      "data_nascimento": "01/05/1979"
+    },
+    "004506540256": {
+      "titulo_eleitor": "004506540256",
+      "nome_completo": "JOSÉ MATIAS GARAJAU",
+      "data_nascimento": "15/08/1941"
+    },
+    "071441230299": {
+      "titulo_eleitor": "071441230299",
+      "nome_completo": "CLEUNICE MARIA MOREIRA",
+      "data_nascimento": "04/03/1966"
+    },
+    "016212310221": {
+      "titulo_eleitor": "016212310221",
+      "nome_completo": "SEBASTIÃO MARTINS GONÇALVES",
+      "data_nascimento": "06/02/1946"
+    },
+    "091399420248": {
+      "titulo_eleitor": "091399420248",
+      "nome_completo": "GILBERTO AFONSO DOS SANTOS",
+      "data_nascimento": "01/11/1970"
+    },
+    "004474130299": {
+      "titulo_eleitor": "004474130299",
+      "nome_completo": "GERALDO LOURENÇO DA SILVA",
+      "data_nascimento": "03/04/1944"
+    },
+    "065538650205": {
+      "titulo_eleitor": "065538650205",
+      "nome_completo": "MARIA DO SOCORRO MACHADO",
+      "data_nascimento": "03/12/1941"
+    },
+    "063024240213": {
+      "titulo_eleitor": "063024240213",
+      "nome_completo": "EPITACIO COELHO DE OLIVEIRA",
+      "data_nascimento": "17/12/1962"
+    },
+    "004480660205": {
+      "titulo_eleitor": "004480660205",
+      "nome_completo": "OTAVIANO MENEZES DA SILVA",
+      "data_nascimento": "28/07/1955"
+    },
+    "118006440248": {
+      "titulo_eleitor": "118006440248",
+      "nome_completo": "WANDERLEI FERREIRA DA SILVA",
+      "data_nascimento": "17/08/1979"
+    },
+    "071441340248": {
+      "titulo_eleitor": "071441340248",
+      "nome_completo": "HORÁCIO GONÇALVES MOREIRA",
+      "data_nascimento": "06/05/1962"
+    },
+    "141589190213": {
+      "titulo_eleitor": "141589190213",
+      "nome_completo": "MARLEIDE APARECIDA DE ALMEIDA",
+      "data_nascimento": "13/06/1980"
+    },
+    "037815060272": {
+      "titulo_eleitor": "037815060272",
+      "nome_completo": "JOSÉ MARIA DE JESUS",
+      "data_nascimento": "08/02/1939"
+    },
+    "106715600272": {
+      "titulo_eleitor": "106715600272",
+      "nome_completo": "NERO MARIA RIBEIRO",
+      "data_nascimento": "03/04/1971"
+    },
+    "042526470272": {
+      "titulo_eleitor": "042526470272",
+      "nome_completo": "JOVANI DUARTE MENEZES",
+      "data_nascimento": "20/03/1967"
+    },
+    "004500790221": {
+      "titulo_eleitor": "004500790221",
+      "nome_completo": "BRENO BRANDÃO PINTO",
+      "data_nascimento": "17/12/1961"
+    },
+    "078042770213": {
+      "titulo_eleitor": "078042770213",
+      "nome_completo": "TEODOLINO DAS GRAÇAS BRANDÃO",
+      "data_nascimento": "03/12/1942"
+    },
+    "004473320299": {
+      "titulo_eleitor": "004473320299",
+      "nome_completo": "TEODORICO AURELIO DE ASSIS",
+      "data_nascimento": "12/11/1941"
+    },
+    "081651410248": {
+      "titulo_eleitor": "081651410248",
+      "nome_completo": "CLAUDIO FERNANDES FIRMINO",
+      "data_nascimento": "26/07/1969"
+    },
+    "004475560299": {
+      "titulo_eleitor": "004475560299",
+      "nome_completo": "ANTONIO GONÇALVES MOREIRA",
+      "data_nascimento": "11/07/1964"
+    },
+    "004528960248": {
+      "titulo_eleitor": "004528960248",
+      "nome_completo": "JOSE FORTUNATO CALDEIRA",
+      "data_nascimento": "30/10/1954"
+    },
+    "099879970221": {
+      "titulo_eleitor": "099879970221",
+      "nome_completo": "JOSÉ GERALDO DE OLIVEIRA",
+      "data_nascimento": "21/01/1973"
+    },
+    "260174350116": {
+      "titulo_eleitor": "260174350116",
+      "nome_completo": "CREUSA MARIA CAETANO ROCHA",
+      "data_nascimento": "20/11/1966"
+    },
+    "026541640353": {
+      "titulo_eleitor": "026541640353",
+      "nome_completo": "ADEMIR NASCIMENTO DOS SANTOS",
+      "data_nascimento": "23/06/1963"
+    },
+    "101462140205": {
+      "titulo_eleitor": "101462140205",
+      "nome_completo": "SERGIO PEREIRA DE OLIVEIRA",
+      "data_nascimento": "11/05/1974"
+    },
+    "004474820213": {
+      "titulo_eleitor": "004474820213",
+      "nome_completo": "JASSY GONCALVES DE SOUZA",
+      "data_nascimento": "07/11/1953"
+    },
+    "117997030205": {
+      "titulo_eleitor": "117997030205",
+      "nome_completo": "MARIVALDA ANGÉLICA DE ALMEIDA",
+      "data_nascimento": "28/07/1978"
+    },
+    "004473640272": {
+      "titulo_eleitor": "004473640272",
+      "nome_completo": "GENEVAL PEREIRA ROSA",
+      "data_nascimento": "12/07/1966"
+    },
+    "091403450264": {
+      "titulo_eleitor": "091403450264",
+      "nome_completo": "AVANI ARRUDA DA SILVA",
+      "data_nascimento": "29/03/1973"
+    },
+    "141578610213": {
+      "titulo_eleitor": "141578610213",
+      "nome_completo": "ADILSON DE ANDRADE",
+      "data_nascimento": "28/05/1981"
+    },
+    "091403500221": {
+      "titulo_eleitor": "091403500221",
+      "nome_completo": "ADALBERTO DA COSTA PASSOS",
+      "data_nascimento": "27/12/1971"
+    },
+    "052490100264": {
+      "titulo_eleitor": "052490100264",
+      "nome_completo": "HELIO XAVIER DE ANDRADE",
+      "data_nascimento": "03/12/1962"
+    },
+    "084509650213": {
+      "titulo_eleitor": "084509650213",
+      "nome_completo": "NEUMA APARECIDA ALVES DA SILVA",
+      "data_nascimento": "25/09/1970"
+    },
+    "004476710299": {
+      "titulo_eleitor": "004476710299",
+      "nome_completo": "SIDNEY GERALDO DE OLIVEIRA",
+      "data_nascimento": "29/04/1964"
+    },
+    "099880310281": {
+      "titulo_eleitor": "099880310281",
+      "nome_completo": "JAZINHO BATISTA DE SOUZA",
+      "data_nascimento": "01/05/1973"
+    },
+    "141590580213": {
+      "titulo_eleitor": "141590580213",
+      "nome_completo": "JOSÉ ROBERTO DA SILVA",
+      "data_nascimento": "26/01/1984"
+    },
+    "062872870272": {
+      "titulo_eleitor": "062872870272",
+      "nome_completo": "MILTON PEREIRA DA SILVA",
+      "data_nascimento": "14/12/1947"
+    },
+    "169487310281": {
+      "titulo_eleitor": "169487310281",
+      "nome_completo": "ANDRÉIA APARECIDA DA SILVA",
+      "data_nascimento": "18/09/1987"
+    },
+    "048268040264": {
+      "titulo_eleitor": "048268040264",
+      "nome_completo": "SEBASTIAO FORTUNATO DE LIMA",
+      "data_nascimento": "15/02/1938"
+    },
+    "003136220310": {
+      "titulo_eleitor": "003136220310",
+      "nome_completo": "NILO MENDES FILHO",
+      "data_nascimento": "16/06/1945"
+    },
+    "118003810205": {
+      "titulo_eleitor": "118003810205",
+      "nome_completo": "RONIVON DIAS DE OLIVEIRA",
+      "data_nascimento": "09/09/1978"
+    },
+    "063022750230": {
+      "titulo_eleitor": "063022750230",
+      "nome_completo": "LUCIO FLÁVIO DE OLIVEIRA",
+      "data_nascimento": "21/12/1957"
+    },
+    "037808380299": {
+      "titulo_eleitor": "037808380299",
+      "nome_completo": "ROSALI DA SILVA AGUIAR GUIMARAES",
+      "data_nascimento": "02/09/1962"
+    },
+    "084193480248": {
+      "titulo_eleitor": "084193480248",
+      "nome_completo": "KIRK ARLEY GLÓRIA",
+      "data_nascimento": "05/02/1970"
+    },
+    "141589520230": {
+      "titulo_eleitor": "141589520230",
+      "nome_completo": "GEZIEL JESSE DE ALMEIDA",
+      "data_nascimento": "03/05/1984"
+    },
+    "118003630213": {
+      "titulo_eleitor": "118003630213",
+      "nome_completo": "LEONE PEREIRA DE ANDRADE",
+      "data_nascimento": "21/01/1979"
+    },
+    "091398990213": {
+      "titulo_eleitor": "091398990213",
+      "nome_completo": "GERACI DE CARVALHO",
+      "data_nascimento": "15/03/1971"
+    },
+    "128643090299": {
+      "titulo_eleitor": "128643090299",
+      "nome_completo": "LUCISLEY DE FÁTIMA LUCAS",
+      "data_nascimento": "08/06/1983"
+    },
+    "038470900205": {
+      "titulo_eleitor": "038470900205",
+      "nome_completo": "WILLIAN FORTUNATO SIMAN",
+      "data_nascimento": "04/11/1959"
+    },
+    "159561200256": {
+      "titulo_eleitor": "159561200256",
+      "nome_completo": "RENER HENDRIKS CARVALHO ANDRADE",
+      "data_nascimento": "13/08/1986"
+    },
+    "089939090230": {
+      "titulo_eleitor": "089939090230",
+      "nome_completo": "RENATO JOSE DE OLIVEIRA",
+      "data_nascimento": "05/03/1971"
+    },
+    "082250950221": {
+      "titulo_eleitor": "082250950221",
+      "nome_completo": "HELIO CAETANO DE SOUZA",
+      "data_nascimento": "01/02/1969"
+    },
+    "004501560205": {
+      "titulo_eleitor": "004501560205",
+      "nome_completo": "RAIMUNDO PINTO DE BRITO",
+      "data_nascimento": "24/05/1956"
+    },
+    "118007690264": {
+      "titulo_eleitor": "118007690264",
+      "nome_completo": "AELESON ALEXANDRE GONÇALVES",
+      "data_nascimento": "25/06/1976"
+    },
+    "004759980221": {
+      "titulo_eleitor": "004759980221",
+      "nome_completo": "RENE MARCOS DA SILVA",
+      "data_nascimento": "18/05/1968"
+    },
+    "010955670248": {
+      "titulo_eleitor": "010955670248",
+      "nome_completo": "SALOMON AVELINO COELHO",
+      "data_nascimento": "23/05/1955"
+    },
+    "103525430221": {
+      "titulo_eleitor": "103525430221",
+      "nome_completo": "JACINTA ANTONIA DA SILVA",
+      "data_nascimento": "14/09/1973"
+    },
+    "086424620299": {
+      "titulo_eleitor": "086424620299",
+      "nome_completo": "MARIA SOCORRO DE ANDRADE",
+      "data_nascimento": "16/10/1969"
+    },
+    "086430960230": {
+      "titulo_eleitor": "086430960230",
+      "nome_completo": "ANTÔNIO FRANCISCO DOS SANTOS",
+      "data_nascimento": "07/01/1970"
+    },
+    "103529370230": {
+      "titulo_eleitor": "103529370230",
+      "nome_completo": "JOSÉ IVANIR DA SILVA",
+      "data_nascimento": "28/11/1973"
+    },
+    "159560730205": {
+      "titulo_eleitor": "159560730205",
+      "nome_completo": "CLAUDINEIA OLIVEIRA",
+      "data_nascimento": "24/08/1986"
+    },
+    "128639960221": {
+      "titulo_eleitor": "128639960221",
+      "nome_completo": "VANISIA MARIA ALVES",
+      "data_nascimento": "06/05/1965"
+    },
+    "149437880299": {
+      "titulo_eleitor": "149437880299",
+      "nome_completo": "SONIA DO CARMO FERREIRA",
+      "data_nascimento": "22/03/1985"
+    },
+    "004502840213": {
+      "titulo_eleitor": "004502840213",
+      "nome_completo": "MOACIR MAGALHÃES DE ANDRADE",
+      "data_nascimento": "18/03/1948"
+    },
+    "195765990213": {
+      "titulo_eleitor": "195765990213",
+      "nome_completo": "GERSINO SOARES DE OLIVEIRA",
+      "data_nascimento": "05/02/1960"
+    },
+    "054506560256": {
+      "titulo_eleitor": "054506560256",
+      "nome_completo": "CIDALIA DE SOUZA AGUIAR E LIMA",
+      "data_nascimento": "14/12/1945"
+    },
+    "078051360230": {
+      "titulo_eleitor": "078051360230",
+      "nome_completo": "CAIO ADRIANO GLÓRIA",
+      "data_nascimento": "24/02/1967"
+    },
+    "106698340264": {
+      "titulo_eleitor": "106698340264",
+      "nome_completo": "ADAIL JOSÉ DE ANDRADE",
+      "data_nascimento": "10/02/1977"
+    },
+    "098590200213": {
+      "titulo_eleitor": "098590200213",
+      "nome_completo": "DARLEIA DA SILVA MOURA",
+      "data_nascimento": "10/10/1971"
+    },
+    "067758730281": {
+      "titulo_eleitor": "067758730281",
+      "nome_completo": "EFREM JOSÉ RAMOS AGUIAR",
+      "data_nascimento": "21/03/1948"
+    },
+    "077374680213": {
+      "titulo_eleitor": "077374680213",
+      "nome_completo": "SILVINO MARTINS DE SOUZA",
+      "data_nascimento": "01/11/1959"
+    },
+    "141591050264": {
+      "titulo_eleitor": "141591050264",
+      "nome_completo": "VANICE CRISTIAM DE OLIVEIRA SILVA",
+      "data_nascimento": "18/11/1983"
+    },
+    "004500390230": {
+      "titulo_eleitor": "004500390230",
+      "nome_completo": "GERALDA SALVADOR GLÓRIA",
+      "data_nascimento": "07/11/1943"
+    },
+    "128644060213": {
+      "titulo_eleitor": "128644060213",
+      "nome_completo": "ADRIANA GONÇALVES DA SILVA",
+      "data_nascimento": "30/05/1980"
+    },
+    "086437710221": {
+      "titulo_eleitor": "086437710221",
+      "nome_completo": "MARIA AUXILIADORA PERPÉTUO",
+      "data_nascimento": "16/11/1970"
+    },
+    "195765200264": {
+      "titulo_eleitor": "195765200264",
+      "nome_completo": "MARCONE CALDEIRA",
+      "data_nascimento": "05/01/1980"
+    },
+    "118007760299": {
+      "titulo_eleitor": "118007760299",
+      "nome_completo": "EDUARDO PEREIRA DA SILVA",
+      "data_nascimento": "10/01/1978"
+    },
+    "118008060248": {
+      "titulo_eleitor": "118008060248",
+      "nome_completo": "CÉLIO APARECIDO ALVES",
+      "data_nascimento": "18/08/1977"
+    },
+    "004473830230": {
+      "titulo_eleitor": "004473830230",
+      "nome_completo": "PLINIO CEZAR PINTO",
+      "data_nascimento": "24/09/1953"
+    },
+    "164125480256": {
+      "titulo_eleitor": "164125480256",
+      "nome_completo": "VINICIUS VICTOR HORTA ALVES",
+      "data_nascimento": "20/08/1988"
+    },
+    "058384260205": {
+      "titulo_eleitor": "058384260205",
+      "nome_completo": "DIOGENES CORREIA PIMENTA",
+      "data_nascimento": "11/10/1958"
+    },
+    "141591390213": {
+      "titulo_eleitor": "141591390213",
+      "nome_completo": "CLAUDIMIR BRAZ DE PAULA",
+      "data_nascimento": "15/05/1984"
+    },
+    "004527770213": {
+      "titulo_eleitor": "004527770213",
+      "nome_completo": "ISMAR FERREIRA DA SILVA",
+      "data_nascimento": "01/12/1967"
+    },
+    "191413000230": {
+      "titulo_eleitor": "191413000230",
+      "nome_completo": "TALISSON RAFAEL CARVALHO",
+      "data_nascimento": "08/12/1992"
+    },
+    "074576540221": {
+      "titulo_eleitor": "074576540221",
+      "nome_completo": "JESUS MATUZINHO DA SILVA",
+      "data_nascimento": "02/06/1967"
+    },
+    "200488360281": {
+      "titulo_eleitor": "200488360281",
+      "nome_completo": "FLÁVIO MATIAS GARAJAU",
+      "data_nascimento": "10/09/1981"
+    },
+    "141591130272": {
+      "titulo_eleitor": "141591130272",
+      "nome_completo": "CLAUDINEY SILVEIRA PINTO",
+      "data_nascimento": "16/02/1983"
+    },
+    "051278620264": {
+      "titulo_eleitor": "051278620264",
+      "nome_completo": "JOSE MARIA MOREIRA",
+      "data_nascimento": "03/06/1963"
+    },
+    "159560370230": {
+      "titulo_eleitor": "159560370230",
+      "nome_completo": "KIVIA REGIANI MOREIRA",
+      "data_nascimento": "29/09/1985"
+    },
+    "187370790264": {
+      "titulo_eleitor": "187370790264",
+      "nome_completo": "JOSE LUIZ DA COSTA",
+      "data_nascimento": "04/10/1962"
+    },
+    "213605700281": {
+      "titulo_eleitor": "213605700281",
+      "nome_completo": "POLIANA MONTEIRO DA SILVA SANTOS",
+      "data_nascimento": "09/12/1987"
+    },
+    "106695850213": {
+      "titulo_eleitor": "106695850213",
+      "nome_completo": "DILZA HELENA DE SOUZA ALVES",
+      "data_nascimento": "10/06/1976"
+    },
+    "066940930213": {
+      "titulo_eleitor": "066940930213",
+      "nome_completo": "JOAQUIM FILOMENO FERREIRA",
+      "data_nascimento": "16/03/1961"
+    },
+    "043036870221": {
+      "titulo_eleitor": "043036870221",
+      "nome_completo": "JOSÉ MARIA SOARES VIANA",
+      "data_nascimento": "09/04/1967"
+    },
+    "127836990230": {
+      "titulo_eleitor": "127836990230",
+      "nome_completo": "LUCIMAR GERALDA DIAS",
+      "data_nascimento": "29/04/1978"
+    },
+    "016212330299": {
+      "titulo_eleitor": "016212330299",
+      "nome_completo": "WILSON MIRANDA DE ANDRADE",
+      "data_nascimento": "02/08/1965"
+    },
+    "028185630230": {
+      "titulo_eleitor": "028185630230",
+      "nome_completo": "MARIA MADALENA PEREIRA DE SOUZA",
+      "data_nascimento": "17/04/1963"
+    },
+    "099879870256": {
+      "titulo_eleitor": "099879870256",
+      "nome_completo": "LUCIANETE APARECIDA COELHO DE CARVALHO",
+      "data_nascimento": "07/11/1971"
+    },
+    "106695990213": {
+      "titulo_eleitor": "106695990213",
+      "nome_completo": "GERSON DE SOUZA AMORIM",
+      "data_nascimento": "10/06/1976"
+    },
+    "118000910281": {
+      "titulo_eleitor": "118000910281",
+      "nome_completo": "JOSIMAR ANDRADE PACHECO",
+      "data_nascimento": "04/08/1980"
+    },
+    "126304690361": {
+      "titulo_eleitor": "126304690361",
+      "nome_completo": "CLAUDINEIA SAMORA",
+      "data_nascimento": "05/06/1987"
+    },
+    "099875480299": {
+      "titulo_eleitor": "099875480299",
+      "nome_completo": "ANDREA CRISTINA GOMES",
+      "data_nascimento": "21/04/1973"
+    },
+    "004528020264": {
+      "titulo_eleitor": "004528020264",
+      "nome_completo": "TEREZINHA MARCELINO PEREIRA",
+      "data_nascimento": "11/05/1954"
+    },
+    "128642650230": {
+      "titulo_eleitor": "128642650230",
+      "nome_completo": "LUCIANA ANASTACIO BESSA",
+      "data_nascimento": "13/12/1979"
+    },
+    "195768370205": {
+      "titulo_eleitor": "195768370205",
+      "nome_completo": "JAIRSON GERALDO DOS SANTOS",
+      "data_nascimento": "26/10/1977"
+    },
+    "063571480205": {
+      "titulo_eleitor": "063571480205",
+      "nome_completo": "HERBERT PINTO TEIXEIRA",
+      "data_nascimento": "18/06/1951"
+    },
+    "118006400213": {
+      "titulo_eleitor": "118006400213",
+      "nome_completo": "SANDRA KARLEM XAVIER MEDEIROS",
+      "data_nascimento": "04/06/1978"
+    },
+    "191411370205": {
+      "titulo_eleitor": "191411370205",
+      "nome_completo": "LUCAS GOMES DE ANDRADE",
+      "data_nascimento": "22/12/1993"
+    },
+    "149433780264": {
+      "titulo_eleitor": "149433780264",
+      "nome_completo": "EDELCIO COSTA MIRANDA",
+      "data_nascimento": "15/02/1985"
+    },
+    "103528770264": {
+      "titulo_eleitor": "103528770264",
+      "nome_completo": "GILMAR MARQUES FERREIRA",
+      "data_nascimento": "11/12/1973"
+    },
+    "189666040281": {
+      "titulo_eleitor": "189666040281",
+      "nome_completo": "STEFEN ARAUJO XAVIER",
+      "data_nascimento": "26/02/1991"
+    },
+    "180929640205": {
+      "titulo_eleitor": "180929640205",
+      "nome_completo": "RÔMULO DO CARMO DE ALMEIDA",
+      "data_nascimento": "11/10/1988"
+    },
+    "209825640221": {
+      "titulo_eleitor": "209825640221",
+      "nome_completo": "BRUNO FLORA MEDEIROS",
+      "data_nascimento": "09/10/1996"
+    },
+    "106695880264": {
+      "titulo_eleitor": "106695880264",
+      "nome_completo": "ELEANE DA CONCEIÇAO ROSA",
+      "data_nascimento": "15/03/1976"
+    },
+    "128636620299": {
+      "titulo_eleitor": "128636620299",
+      "nome_completo": "LUCIANO SOCORRO ANDRADE",
+      "data_nascimento": "08/09/1978"
+    },
+    "026365900213": {
+      "titulo_eleitor": "026365900213",
+      "nome_completo": "JOSE NEWTON FERREIRA PINTO",
+      "data_nascimento": "08/11/1960"
+    },
+    "206056120256": {
+      "titulo_eleitor": "206056120256",
+      "nome_completo": "REINALDO FARIAS BATISTA",
+      "data_nascimento": "13/03/1996"
+    },
+    "136770730281": {
+      "titulo_eleitor": "136770730281",
+      "nome_completo": "RUBENS DA SILVA SANTOS",
+      "data_nascimento": "23/11/1982"
+    },
+    "106687360213": {
+      "titulo_eleitor": "106687360213",
+      "nome_completo": "ALZIRA ANACLETO DE JESUS",
+      "data_nascimento": "09/08/1973"
+    },
+    "007117751422": {
+      "titulo_eleitor": "007117751422",
+      "nome_completo": "DIUSA FERREIRA DA SILVA",
+      "data_nascimento": "05/09/1962"
+    },
+    "084021720213": {
+      "titulo_eleitor": "084021720213",
+      "nome_completo": "RUBENS RAMOS DA SILVA",
+      "data_nascimento": "18/09/1969"
+    },
+    "209825080213": {
+      "titulo_eleitor": "209825080213",
+      "nome_completo": "SABRINA RODRIGUES DOS SANTOS",
+      "data_nascimento": "19/06/1996"
+    },
+    "086430390248": {
+      "titulo_eleitor": "086430390248",
+      "nome_completo": "CARLOS HENRIQUE BRAGA SANT ANNA",
+      "data_nascimento": "26/05/1967"
+    },
+    "108617610116": {
+      "titulo_eleitor": "108617610116",
+      "nome_completo": "CLOVES CAETANO",
+      "data_nascimento": "03/12/1963"
+    },
+    "118743190281": {
+      "titulo_eleitor": "118743190281",
+      "nome_completo": "AMILTON ANTÔNIO JOSÉ PEREIRA",
+      "data_nascimento": "24/09/1978"
+    },
+    "106709060221": {
+      "titulo_eleitor": "106709060221",
+      "nome_completo": "JOSE GERALDO AZEVEDO",
+      "data_nascimento": "27/01/1976"
+    },
+    "195769360281": {
+      "titulo_eleitor": "195769360281",
+      "nome_completo": "RAIANE GONÇALVES SILVA",
+      "data_nascimento": "06/04/1995"
+    },
+    "130251280230": {
+      "titulo_eleitor": "130251280230",
+      "nome_completo": "RENATO GONÇALVES TEIXEIRA",
+      "data_nascimento": "16/09/1979"
+    },
+    "086434140248": {
+      "titulo_eleitor": "086434140248",
+      "nome_completo": "ANA MARIA TOMAZ",
+      "data_nascimento": "12/05/1970"
+    },
+    "164121660281": {
+      "titulo_eleitor": "164121660281",
+      "nome_completo": "RAQUEL PAULA HIGINO CALDEIRA",
+      "data_nascimento": "12/03/1988"
+    },
+    "106698650264": {
+      "titulo_eleitor": "106698650264",
+      "nome_completo": "CELIA APARECIDA DIAS DOS SANTOS",
+      "data_nascimento": "13/10/1976"
+    },
+    "117997110213": {
+      "titulo_eleitor": "117997110213",
+      "nome_completo": "ÂNGELA NUNES DE OLIVEIRA",
+      "data_nascimento": "20/05/1977"
+    },
+    "142615590256": {
+      "titulo_eleitor": "142615590256",
+      "nome_completo": "MICHELE RIBEIRO DOS SANTOS",
+      "data_nascimento": "03/10/1983"
+    },
+    "004480920299": {
+      "titulo_eleitor": "004480920299",
+      "nome_completo": "SEBASTIÃO ANDRADE DE MENEZES",
+      "data_nascimento": "14/08/1967"
+    },
+    "132490240221": {
+      "titulo_eleitor": "132490240221",
+      "nome_completo": "ALISON MARCONI GLORIA",
+      "data_nascimento": "07/08/1980"
+    },
+    "033484791414": {
+      "titulo_eleitor": "033484791414",
+      "nome_completo": "LUIS ARTUR BATISTA DE ANDRADE",
+      "data_nascimento": "07/06/1993"
+    },
+    "086437770213": {
+      "titulo_eleitor": "086437770213",
+      "nome_completo": "WALQUIRIA ALVES",
+      "data_nascimento": "04/01/1973"
+    },
+    "141591080213": {
+      "titulo_eleitor": "141591080213",
+      "nome_completo": "AUXILIADORA DOS SANTOS",
+      "data_nascimento": "04/08/1980"
+    },
+    "191720730299": {
+      "titulo_eleitor": "191720730299",
+      "nome_completo": "LUIZ GUSTAVO PERPETUO",
+      "data_nascimento": "02/12/1993"
+    },
+    "200490210248": {
+      "titulo_eleitor": "200490210248",
+      "nome_completo": "MIGUEL WILK VITOR OLIVEIRA",
+      "data_nascimento": "18/04/1995"
+    },
+    "149127950221": {
+      "titulo_eleitor": "149127950221",
+      "nome_completo": "VANDERLEI DE JESUS PINTO",
+      "data_nascimento": "15/01/1977"
+    },
+    "195769450272": {
+      "titulo_eleitor": "195769450272",
+      "nome_completo": "JOAO VITOR GARAJAU E SILVA",
+      "data_nascimento": "04/07/1996"
+    },
+    "128645830213": {
+      "titulo_eleitor": "128645830213",
+      "nome_completo": "RONIO BRAZ DA SILVA",
+      "data_nascimento": "25/02/1983"
+    },
+    "103525040213": {
+      "titulo_eleitor": "103525040213",
+      "nome_completo": "ISRAEL RIBEIRO DE JESUS",
+      "data_nascimento": "21/08/1972"
+    },
+    "203324470213": {
+      "titulo_eleitor": "203324470213",
+      "nome_completo": "WEBERT FLORÊNCIO",
+      "data_nascimento": "17/06/1994"
+    },
+    "195768420264": {
+      "titulo_eleitor": "195768420264",
+      "nome_completo": "LEONARDO JUNIO RIBEIRO",
+      "data_nascimento": "17/04/1995"
+    },
+    "036977631422": {
+      "titulo_eleitor": "036977631422",
+      "nome_completo": "ELEN FLAVIA PINTO",
+      "data_nascimento": "14/05/1998"
+    },
+    "128642850281": {
+      "titulo_eleitor": "128642850281",
+      "nome_completo": "OLAVIO TOMAZ DIAS NETO",
+      "data_nascimento": "12/05/1983"
+    },
+    "127828140213": {
+      "titulo_eleitor": "127828140213",
+      "nome_completo": "JOZILENE APARECIDA BENTO COSTA",
+      "data_nascimento": "06/06/1981"
+    },
+    "141591310256": {
+      "titulo_eleitor": "141591310256",
+      "nome_completo": "MAURINA CAETANA DA SILVA",
+      "data_nascimento": "17/04/1983"
+    },
+    "186831260299": {
+      "titulo_eleitor": "186831260299",
+      "nome_completo": "FERNANDO MOREIRA DOS SANTOS",
+      "data_nascimento": "22/06/1992"
+    },
+    "086430740221": {
+      "titulo_eleitor": "086430740221",
+      "nome_completo": "JOSE ROBSON DE BRITO",
+      "data_nascimento": "19/11/1969"
+    },
+    "174012610264": {
+      "titulo_eleitor": "174012610264",
+      "nome_completo": "CARLOS EDUARDO DIAS",
+      "data_nascimento": "06/03/1989"
+    },
+    "209827020256": {
+      "titulo_eleitor": "209827020256",
+      "nome_completo": "ROMILDA MARTINS DA SILVA",
+      "data_nascimento": "31/12/1968"
+    },
+    "132507190264": {
+      "titulo_eleitor": "132507190264",
+      "nome_completo": "ALINE FABIANA DE ANDRADE SILVA",
+      "data_nascimento": "19/02/1982"
+    },
+    "163268480272": {
+      "titulo_eleitor": "163268480272",
+      "nome_completo": "CELIA CRISTINA BENTO DO AMARAL NASCIMENTO",
+      "data_nascimento": "21/12/1987"
+    },
+    "131356110299": {
+      "titulo_eleitor": "131356110299",
+      "nome_completo": "CRISTIANO MORAIS REIS",
+      "data_nascimento": "16/07/1981"
+    },
+    "084197360264": {
+      "titulo_eleitor": "084197360264",
+      "nome_completo": "BENJAMIM PEREIRA DE SOUZA",
+      "data_nascimento": "06/06/1956"
+    },
+    "213607300213": {
+      "titulo_eleitor": "213607300213",
+      "nome_completo": "MARILZA DOS SANTOS",
+      "data_nascimento": "05/04/1999"
+    },
+    "141591440272": {
+      "titulo_eleitor": "141591440272",
+      "nome_completo": "GESCIEL MEDEIROS DE ARRUDA",
+      "data_nascimento": "10/05/1983"
+    },
+    "098151020299": {
+      "titulo_eleitor": "098151020299",
+      "nome_completo": "ROSILENE MOREIRA DIAS",
+      "data_nascimento": "20/08/1974"
+    },
+    "298074820167": {
+      "titulo_eleitor": "298074820167",
+      "nome_completo": "JOSE NATALICIO DOS SANTOS",
+      "data_nascimento": "30/07/1960"
+    },
+    "004500600213": {
+      "titulo_eleitor": "004500600213",
+      "nome_completo": "JOZI JOSE DA SILVA",
+      "data_nascimento": "25/08/1962"
+    },
+    "012355591430": {
+      "titulo_eleitor": "012355591430",
+      "nome_completo": "ZULEMAR FATIMA ZANETTI",
+      "data_nascimento": "18/11/1969"
+    },
+    "117989590221": {
+      "titulo_eleitor": "117989590221",
+      "nome_completo": "JACKELINE MADEIRA FELIX",
+      "data_nascimento": "07/09/1966"
+    },
+    "195769430213": {
+      "titulo_eleitor": "195769430213",
+      "nome_completo": "LUANA ADALGISA FERREIRA DOS SANTOS",
+      "data_nascimento": "04/05/1996"
+    },
+    "078048310213": {
+      "titulo_eleitor": "078048310213",
+      "nome_completo": "DIMAS DE PAULA SILVA",
+      "data_nascimento": "08/12/1959"
+    },
+    "099877210205": {
+      "titulo_eleitor": "099877210205",
+      "nome_completo": "EDIMAR FERREIRA ROCHA",
+      "data_nascimento": "14/11/1971"
+    },
+    "213605050281": {
+      "titulo_eleitor": "213605050281",
+      "nome_completo": "GERALDO VENANCIO CAMILO",
+      "data_nascimento": "27/12/1959"
+    },
+    "180929950205": {
+      "titulo_eleitor": "180929950205",
+      "nome_completo": "SAMARA ROSALINA MENDES",
+      "data_nascimento": "26/11/1989"
+    },
+    "080581780213": {
+      "titulo_eleitor": "080581780213",
+      "nome_completo": "MARIA DAS DORES ALVES",
+      "data_nascimento": "25/10/1969"
+    },
+    "082253870213": {
+      "titulo_eleitor": "082253870213",
+      "nome_completo": "DIRCE MEIRE DOS SANTOS",
+      "data_nascimento": "31/07/1967"
+    },
+    "174011330248": {
+      "titulo_eleitor": "174011330248",
+      "nome_completo": "SINTIA FERNANDES DE SOUZA LIMA",
+      "data_nascimento": "10/01/1989"
+    },
+    "231654160221": {
+      "titulo_eleitor": "231654160221",
+      "nome_completo": "THAYSSA KAILA MARTINS MEDEIROS",
+      "data_nascimento": "08/08/2005"
+    },
+    "034179810205": {
+      "titulo_eleitor": "034179810205",
+      "nome_completo": "JOSÉ LÚCIO GARAJAU",
+      "data_nascimento": "15/11/1961"
+    },
+    "200489450230": {
+      "titulo_eleitor": "200489450230",
+      "nome_completo": "GIRLEY APARECIDO MOURA",
+      "data_nascimento": "12/10/1984"
+    },
+    "106698430256": {
+      "titulo_eleitor": "106698430256",
+      "nome_completo": "HERLEI DA SILVA",
+      "data_nascimento": "07/07/1976"
+    },
+    "226383690256": {
+      "titulo_eleitor": "226383690256",
+      "nome_completo": "RAQUEL RIBEIRO DE SOUZA",
+      "data_nascimento": "07/04/1999"
+    }
+  }
+}

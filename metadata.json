@@ -1,0 +1,6 @@
+{
+  "name": "Cloud SQL PostgreSQL - Modelagem Eleições Municipais",
+  "description": "Arquitetura e modelagem relacional DDL para Google Cloud SQL (PostgreSQL) com histórico de eleições municipais (2000 a 2024), índices e gerador de carga.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
