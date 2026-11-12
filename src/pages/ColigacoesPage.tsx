@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Network,
   Plus,
@@ -86,6 +86,23 @@ export const ColigacoesPage: React.FC = () => {
   >([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Party Search / Autocomplete in Coalition Form
+  const [partySearchQuery, setPartySearchQuery] = useState<string>('');
+  const [isPartyDropdownOpen, setIsPartyDropdownOpen] = useState<boolean>(false);
+  const [partySortBy, setPartySortBy] = useState<'numero' | 'sigla'>('numero');
+  const partyDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Close party dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (partyDropdownRef.current && !partyDropdownRef.current.contains(e.target as Node)) {
+        setIsPartyDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load registered elections
   useEffect(() => {
@@ -214,6 +231,8 @@ export const ColigacoesPage: React.FC = () => {
   // Open modal for Create
   const handleOpenCreateModal = () => {
     setEditingColigacao(null);
+    setPartySearchQuery('');
+    setIsPartyDropdownOpen(false);
     setFormAno(selectedAno);
     setFormCargo('Prefeito');
 
@@ -254,6 +273,8 @@ export const ColigacoesPage: React.FC = () => {
   // Open modal for Edit
   const handleOpenEditModal = (col: ColigacaoDto) => {
     setEditingColigacao(col);
+    setPartySearchQuery('');
+    setIsPartyDropdownOpen(false);
     setFormAno(col.ano_eleicao);
     setFormCargo(col.cargo || 'Prefeito');
     setFormNumeroUrna(col.numero_urna);
@@ -270,21 +291,203 @@ export const ColigacoesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Add party to coalition form
-  const handleAddPartidoToForm = (sigla: string) => {
+  // Helper to collect all historical / former acronyms for a party
+  const getPartyHistoricalSiglas = (p: PartidoCadastroDto): string[] => {
+    const siglas = new Set<string>();
+    const currentSiglaUpper = (p.sigla || '').trim().toUpperCase();
+
+    if (p.siglas_anteriores) {
+      p.siglas_anteriores.forEach((s) => {
+        if (s && s.trim().toUpperCase() !== currentSiglaUpper) {
+          siglas.add(s.trim().toUpperCase());
+        }
+      });
+    }
+
+    if (p.historico) {
+      p.historico.forEach((h) => {
+        if (h.sigla && h.sigla.trim().toUpperCase() !== currentSiglaUpper) {
+          siglas.add(h.sigla.trim().toUpperCase());
+        }
+      });
+    }
+
+    // Known TSE historical rebranding aliases as fallback
+    const knownAliases: Record<string, string[]> = {
+      MDB: ['PMDB'],
+      PL: ['PR'],
+      AVANTE: ['PTdoB', 'PT DO B'],
+      UNIÃO: ['DEM', 'PFL', 'PSL'],
+      UNIAO: ['DEM', 'PFL', 'PSL'],
+      DEM: ['PFL'],
+      PP: ['PPB'],
+      REPUBLICANOS: ['PRB'],
+      CIDADANIA: ['PPS'],
+      PODE: ['PTN', 'PHS'],
+      DC: ['PSDC'],
+      SOLIDARIEDADE: ['SD'],
+      PRD: ['PTB', 'PATRIOTA'],
+      MOBILIZA: ['PMN'],
+      AGIR: ['PTC'],
+    };
+
+    const aliases = knownAliases[currentSiglaUpper] || [];
+    aliases.forEach((a) => {
+      if (a.toUpperCase() !== currentSiglaUpper) {
+        siglas.add(a.toUpperCase());
+      }
+    });
+
+    return Array.from(siglas);
+  };
+
+  // Helper to test if a party is already added to the coalition form
+  const isPartyInForm = (p: PartidoCadastroDto): boolean => {
+    const histSiglas = getPartyHistoricalSiglas(p);
+    return formPartidos.some((m) => {
+      const mSigla = m.sigla_partido.toUpperCase();
+      if (mSigla === p.sigla.toUpperCase()) return true;
+      if (p.sigla_atual && mSigla === p.sigla_atual.toUpperCase()) return true;
+      if (histSiglas.includes(mSigla)) return true;
+      if (p.id > 0 && m.id_partido === p.id) return true;
+      if (p.numero > 0 && m.id_partido === p.numero) return true;
+      return false;
+    });
+  };
+
+  // Helper to find which historical sigla (if any) matched the search query
+  const getMatchedFormerSigla = (p: PartidoCadastroDto): string | null => {
+    if (!partySearchQuery.trim()) return null;
+    const queryNoSpaces = partySearchQuery
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, '');
+    const histSiglas = getPartyHistoricalSiglas(p);
+    return (
+      histSiglas.find((h) => {
+        const hNorm = h
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/\s+/g, '');
+        return hNorm.includes(queryNoSpaces);
+      }) || null
+    );
+  };
+
+  // Filtered and sorted parties for the coalition form combobox / dropdown
+  const filteredPartidosCadastrados = useMemo(() => {
+    const rawQuery = partySearchQuery.trim();
+    const cleanQuery = rawQuery
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    const queryNoSpaces = cleanQuery.replace(/\s+/g, '');
+
+    return partidosCadastrados
+      .filter((p) => {
+        if (!rawQuery) return true;
+
+        // 1. Match by TSE electoral number
+        const numStr = String(p.numero);
+        if (numStr === rawQuery || numStr.startsWith(rawQuery) || numStr.includes(queryNoSpaces)) {
+          return true;
+        }
+
+        // 2. Match by current sigla
+        const siglaNorm = (p.sigla || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/\s+/g, '');
+        if (siglaNorm.includes(queryNoSpaces)) return true;
+
+        if (p.sigla_atual) {
+          const siglaAtualNorm = p.sigla_atual
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/\s+/g, '');
+          if (siglaAtualNorm.includes(queryNoSpaces)) return true;
+        }
+
+        // 3. Match by party name
+        const nomeNorm = (p.nome || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+        if (nomeNorm.includes(cleanQuery)) return true;
+
+        if (p.nome_atual) {
+          const nomeAtualNorm = p.nome_atual
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+          if (nomeAtualNorm.includes(cleanQuery)) return true;
+        }
+
+        // 4. Match by historical / former siglas
+        const histSiglas = getPartyHistoricalSiglas(p);
+        const matchedHist = histSiglas.some((h) => {
+          const hNorm = h
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/\s+/g, '');
+          return hNorm.includes(queryNoSpaces);
+        });
+        if (matchedHist) return true;
+
+        // 5. Match by historical names
+        if (p.historico) {
+          const matchedHistName = p.historico.some((h) => {
+            const hNameNorm = (h.nome || '')
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase();
+            return hNameNorm.includes(cleanQuery);
+          });
+          if (matchedHistName) return true;
+        }
+
+        return false;
+      })
+      .sort((a, b) => {
+        if (partySortBy === 'sigla') {
+          return a.sigla.localeCompare(b.sigla);
+        }
+        return a.numero - b.numero;
+      });
+  }, [partidosCadastrados, partySearchQuery, partySortBy]);
+
+  // Add party to coalition form (supports current sigla, historical sigla, or party object)
+  const handleAddPartidoToForm = (sigla: string, partido?: PartidoCadastroDto) => {
     if (!sigla) return;
-    if (formPartidos.some((p) => p.sigla_partido === sigla)) {
+    const cleanSigla = sigla.trim().toUpperCase();
+    if (formPartidos.some((p) => p.sigla_partido.toUpperCase() === cleanSigla)) {
       return;
     }
-    const partidoObj = partidosCadastrados.find((p) => p.sigla === sigla);
+    const partidoObj =
+      partido ||
+      partidosCadastrados.find(
+        (p) =>
+          p.sigla.toUpperCase() === cleanSigla ||
+          p.sigla_atual?.toUpperCase() === cleanSigla ||
+          p.siglas_anteriores?.some((s) => s.toUpperCase() === cleanSigla) ||
+          p.historico?.some((h) => h.sigla.toUpperCase() === cleanSigla)
+      );
+
     setFormPartidos((prev) => [
       ...prev,
       {
-        id_partido: partidoObj ? partidoObj.id : 0,
-        sigla_partido: sigla,
+        id_partido: partidoObj ? partidoObj.numero || partidoObj.id : 0,
+        sigla_partido: cleanSigla,
         papel: prev.length === 0 ? 'Cabeça de Chapa' : prev.length === 1 ? 'Vice-Prefeito' : 'Partido Apoiador',
       },
     ]);
+    setPartySearchQuery('');
   };
 
   // Remove party from form
@@ -295,8 +498,24 @@ export const ColigacoesPage: React.FC = () => {
   // Change party role
   const handleChangePapel = (sigla: string, newPapel: string) => {
     setFormPartidos((prev) =>
-      prev.map((p) => (p.sigla_partido === sigla ? { ...p, papel: newPapel } : p))
+      prev.map((p) => {
+        if (p.sigla_partido === sigla) {
+          return { ...p, papel: newPapel };
+        }
+        // If promoted to Cabeça de Chapa, demote previous Cabeça de Chapa to Partido Apoiador
+        if (newPapel === 'Cabeça de Chapa' && p.papel === 'Cabeça de Chapa') {
+          return { ...p, papel: 'Partido Apoiador' };
+        }
+        // If promoted to Vice-Prefeito, demote previous Vice-Prefeito to Partido Apoiador
+        if (newPapel === 'Vice-Prefeito' && p.papel === 'Vice-Prefeito') {
+          return { ...p, papel: 'Partido Apoiador' };
+        }
+        return p;
+      })
     );
+    if (newPapel === 'Cabeça de Chapa') {
+      setFormSiglaTitular(sigla);
+    }
   };
 
   // Submit modal form
@@ -1417,38 +1636,243 @@ export const ColigacoesPage: React.FC = () => {
 
               {/* Seção de Partidos que compõem a Aliança */}
               <div className="pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Partidos que estavam apoiando esta chapa ({formPartidos.length})
-                  </label>
-                  <span className="text-[11px] text-slate-400">
-                    Defina quem encabeça, quem é vice e os apoiadores
-                  </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700">
+                      Partidos que estavam apoiando esta chapa ({formPartidos.length})
+                    </label>
+                    <span className="text-[11px] text-slate-400">
+                      Pesquise por sigla atual, sigla antiga ou número da legenda
+                    </span>
+                  </div>
+
+                  {/* Ordenação rápida */}
+                  <div className="flex items-center gap-1 self-start sm:self-auto bg-slate-100 p-0.5 rounded-lg text-[11px]">
+                    <span className="text-[10px] text-slate-400 px-1 font-medium hidden sm:inline">Ordem:</span>
+                    <button
+                      type="button"
+                      onClick={() => setPartySortBy('numero')}
+                      className={`px-2 py-0.5 rounded font-medium transition-colors ${
+                        partySortBy === 'numero'
+                          ? 'bg-white text-indigo-700 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Nº Urna
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPartySortBy('sigla')}
+                      className={`px-2 py-0.5 rounded font-medium transition-colors ${
+                        partySortBy === 'sigla'
+                          ? 'bg-white text-indigo-700 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Sigla A-Z
+                    </button>
+                  </div>
                 </div>
 
-                {/* Select from existing registered parties */}
-                <div className="flex items-center gap-2 mb-3">
-                  <select
-                    id="select-add-partido"
-                    defaultValue=""
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleAddPartidoToForm(e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">+ Selecionar partido para incluir na coligação...</option>
-                    {partidosCadastrados
-                      .filter((p) => !formPartidos.some((m) => m.sigla_partido === p.sigla))
-                      .sort((a, b) => a.numero - b.numero)
-                      .map((p) => (
-                        <option key={p.id} value={p.sigla}>
-                          Nº {p.numero} — {p.sigla} ({p.nome})
-                        </option>
-                      ))}
-                  </select>
+                {/* Searchable Combobox Container */}
+                <div ref={partyDropdownRef} className="relative mb-3">
+                  <div className="relative flex items-center">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={partySearchQuery}
+                      onChange={(e) => {
+                        setPartySearchQuery(e.target.value);
+                        setIsPartyDropdownOpen(true);
+                      }}
+                      onFocus={() => setIsPartyDropdownOpen(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          setIsPartyDropdownOpen(false);
+                        } else if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const firstAvailable = filteredPartidosCadastrados.find((p) => !isPartyInForm(p));
+                          if (firstAvailable) {
+                            const matchedFormer = getMatchedFormerSigla(firstAvailable);
+                            handleAddPartidoToForm(matchedFormer || firstAvailable.sigla, firstAvailable);
+                          }
+                        }
+                      }}
+                      placeholder="Pesquisar por sigla atual (ex: MDB), antiga (ex: PMDB) ou número (ex: 15)..."
+                      className="w-full pl-9 pr-20 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all font-medium"
+                    />
+                    <div className="absolute right-2 flex items-center gap-1">
+                      {partySearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setPartySearchQuery('')}
+                          className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                          title="Limpar pesquisa"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsPartyDropdownOpen(!isPartyDropdownOpen)}
+                        className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                        title={isPartyDropdownOpen ? 'Fechar opções' : 'Ver todos os partidos'}
+                      >
+                        {isPartyDropdownOpen ? (
+                          <ChevronUp className="w-4 h-4 text-indigo-600" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Atalhos rápidos para pesquisas frequentes com siglas históricas */}
+                  <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                    <span className="text-[10px] text-slate-400 font-medium">Atalhos:</span>
+                    {[
+                      { label: 'MDB (15/PMDB)', q: '15' },
+                      { label: 'PL (22/PR)', q: '22' },
+                      { label: 'AVANTE (70/PTdoB)', q: '70' },
+                      { label: 'UNIÃO (44/DEM/PFL)', q: '44' },
+                      { label: 'REPUBLICANOS (10/PRB)', q: '10' },
+                      { label: 'PP (11/PPB)', q: '11' },
+                      { label: 'CIDADANIA (23/PPS)', q: '23' },
+                    ].map((shortcut) => (
+                      <button
+                        key={shortcut.label}
+                        type="button"
+                        onClick={() => {
+                          setPartySearchQuery(shortcut.q);
+                          setIsPartyDropdownOpen(true);
+                        }}
+                        className="text-[10px] px-1.5 py-0.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 rounded border border-slate-200/80 transition-colors"
+                      >
+                        {shortcut.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Dropdown de Opções Pesquisáveis */}
+                  {isPartyDropdownOpen && (
+                    <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-slate-100 animate-in fade-in duration-100">
+                      <div className="px-3 py-1.5 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-medium sticky top-0 z-10 border-b border-slate-200/80">
+                        <span>
+                          {filteredPartidosCadastrados.length}{' '}
+                          {filteredPartidosCadastrados.length === 1 ? 'partido encontrado' : 'partidos encontrados'}
+                          {partySearchQuery ? ` para "${partySearchQuery}"` : ''}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsPartyDropdownOpen(false)}
+                          className="text-slate-400 hover:text-slate-600 font-normal"
+                        >
+                          Fechar
+                        </button>
+                      </div>
+
+                      {filteredPartidosCadastrados.length === 0 ? (
+                        <div className="p-4 text-center">
+                          <p className="text-xs text-slate-600 font-medium">Nenhum partido localizado</p>
+                          <p className="text-[11px] text-slate-400 mt-1">
+                            Não encontramos registros para &quot;{partySearchQuery}&quot;. Tente buscar pelo número (ex: 15), sigla atual (ex: MDB) ou denominação histórica anterior (ex: PMDB).
+                          </p>
+                        </div>
+                      ) : (
+                        filteredPartidosCadastrados.map((p) => {
+                          const alreadyIn = isPartyInForm(p);
+                          const histSiglas = getPartyHistoricalSiglas(p);
+                          const matchedFormer = getMatchedFormerSigla(p);
+
+                          return (
+                            <div
+                              key={p.id || p.numero}
+                              className={`p-2.5 transition-colors flex items-center justify-between gap-3 ${
+                                alreadyIn ? 'bg-slate-50/70 opacity-60' : 'hover:bg-indigo-50/40'
+                              }`}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+                                    Nº {p.numero}
+                                  </span>
+                                  <span className="font-bold text-xs text-slate-900">{p.sigla}</span>
+                                  {p.nome && (
+                                    <span className="text-[11px] text-slate-500 truncate max-w-xs">
+                                      — {p.nome}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Linha de Siglas Históricas / Anteriores */}
+                                {histSiglas.length > 0 && (
+                                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                    <span className="text-[10px] text-slate-400">Siglas antigas:</span>
+                                    {histSiglas.map((hSigla) => {
+                                      const isMatch =
+                                        matchedFormer &&
+                                        matchedFormer.toUpperCase() === hSigla.toUpperCase();
+                                      return (
+                                        <span
+                                          key={hSigla}
+                                          className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                                            isMatch
+                                              ? 'bg-amber-100 text-amber-800 border-amber-300 ring-1 ring-amber-300'
+                                              : 'bg-slate-100 text-slate-600 border-slate-200'
+                                          }`}
+                                        >
+                                          {hSigla}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Ações de Inclusão */}
+                              <div className="flex items-center gap-1 shrink-0">
+                                {alreadyIn ? (
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    Na chapa
+                                  </span>
+                                ) : (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        handleAddPartidoToForm(p.sigla, p);
+                                      }}
+                                      className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-semibold transition-colors flex items-center gap-1"
+                                      title={`Incluir legenda como ${p.sigla}`}
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                      {p.sigla}
+                                    </button>
+
+                                    {/* Botão rápido para sigla histórica caso tenha sido pesquisada ou exista */}
+                                    {matchedFormer && matchedFormer.toUpperCase() !== p.sigla.toUpperCase() && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          handleAddPartidoToForm(matchedFormer, p);
+                                        }}
+                                        className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-xs font-semibold transition-colors flex items-center gap-1"
+                                        title={`Incluir com a sigla histórica ${matchedFormer}`}
+                                      >
+                                        <Plus className="w-3 h-3" />
+                                        {matchedFormer} (antiga)
+                                      </button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* List of members with roles */}
@@ -1458,38 +1882,65 @@ export const ColigacoesPage: React.FC = () => {
                       Nenhum partido adicionado à aliança ainda. Adicione pelo menos a legenda titular.
                     </div>
                   ) : (
-                    formPartidos.map((membro) => (
-                      <div
-                        key={membro.sigla_partido}
-                        className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-lg text-xs"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 px-2 py-0.5 bg-white rounded border border-slate-200">
-                            {membro.sigla_partido}
-                          </span>
-                        </div>
+                    formPartidos.map((membro) => {
+                      const pObj = partidosCadastrados.find(
+                        (p) =>
+                          p.sigla.toUpperCase() === membro.sigla_partido.toUpperCase() ||
+                          p.sigla_atual?.toUpperCase() === membro.sigla_partido.toUpperCase() ||
+                          p.siglas_anteriores?.some((s) => s.toUpperCase() === membro.sigla_partido.toUpperCase()) ||
+                          p.historico?.some((h) => h.sigla.toUpperCase() === membro.sigla_partido.toUpperCase())
+                      );
+                      const hasRebranding = pObj && pObj.sigla.toUpperCase() !== membro.sigla_partido.toUpperCase();
 
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={membro.papel}
-                            onChange={(e) => handleChangePapel(membro.sigla_partido, e.target.value)}
-                            className="px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-800 focus:outline-none"
-                          >
-                            <option value="Cabeça de Chapa">Cabeça de Chapa</option>
-                            <option value="Vice-Prefeito">Vice-Prefeito</option>
-                            <option value="Partido Apoiador">Partido Apoiador</option>
-                          </select>
+                      return (
+                        <div
+                          key={membro.sigla_partido}
+                          className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-lg text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900 px-2 py-0.5 bg-white rounded border border-slate-200">
+                              {membro.sigla_partido}
+                            </span>
+                            {pObj?.numero && (
+                              <span className="font-mono text-[11px] text-slate-500 font-semibold">
+                                Nº {pObj.numero}
+                              </span>
+                            )}
+                            {hasRebranding && (
+                              <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200">
+                                atual {pObj.sigla}
+                              </span>
+                            )}
+                            {pObj?.nome && (
+                              <span className="text-[11px] text-slate-400 hidden sm:inline truncate max-w-[150px]">
+                                {pObj.nome}
+                              </span>
+                            )}
+                          </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleRemovePartidoFromForm(membro.sigla_partido)}
-                            className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={membro.papel}
+                              onChange={(e) => handleChangePapel(membro.sigla_partido, e.target.value)}
+                              className="px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-800 focus:outline-none"
+                            >
+                              <option value="Cabeça de Chapa">Cabeça de Chapa</option>
+                              <option value="Vice-Prefeito">Vice-Prefeito</option>
+                              <option value="Partido Apoiador">Partido Apoiador</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePartidoFromForm(membro.sigla_partido)}
+                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                              title="Remover partido da coligação"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>
