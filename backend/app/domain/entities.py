@@ -50,8 +50,7 @@ class DetalhesVotacaoEntity:
 @dataclass
 class PartidoHistoricoEntity:
     id: Optional[int]
-    id_partido: int
-    numero: int
+    partido_numero: int
     sigla: str
     nome: Optional[str] = None
     ano_inicio: Optional[int] = None
@@ -60,68 +59,103 @@ class PartidoHistoricoEntity:
     is_active: bool = True
     is_deleted: bool = False
 
+    @property
+    def numero(self) -> int:
+        return self.partido_numero
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
 
 @dataclass
 class PartidosEntity:
-    id: Optional[int]
     numero: int
-    sigla: str
-    nome: Optional[str] = None
+    sigla_atual: str
+    id: Optional[int] = None
+    nome_atual: Optional[str] = None
+    siglas_anteriores: Optional[List[str]] = None
     historico: Optional[List[PartidoHistoricoEntity]] = None
     is_active: bool = True
     is_deleted: bool = False
 
+    @property
+    def sigla(self) -> str:
+        return self.sigla_atual
+
+    @property
+    def nome(self) -> Optional[str]:
+        return self.nome_atual
+
 
 @dataclass
 class PartidosEleicaoEntity:
-    id: Optional[int]
     id_eleicao: int
-    id_partido: int
-    votos_nominais: int
-    votos_legenda: int
-    total_votos: int
+    partido_numero: int
+    id: Optional[int] = None
+    votos_nominais: int = 0
+    votos_legenda: int = 0
+    total_votos: int = 0
     is_active: bool = True
     is_deleted: bool = False
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
 
 
 @dataclass
 class CandidatosEleicaoEntity:
-    id: Optional[int]
     titulo_eleitor: str
     id_eleicao: int
-    id_partido: int
+    partido_numero: int
     cargo: str
     numero_urna: int
     nome_urna: str
     votos: int
     situacao: str
+    id: Optional[int] = None
+    sigla_epoca: Optional[str] = None
     posicao: Optional[int] = None
     is_active: bool = True
     is_deleted: bool = False
 
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
 
 @dataclass
 class ColigacaoPartidoEntity:
-    id: Optional[int]
     id_coligacao: int
-    id_partido: int
+    partido_numero: int
+    id: Optional[int] = None
     papel: str = "Apoiador"
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
     sigla: Optional[str] = None
+    nome_formatado: Optional[str] = None
     is_active: bool = True
     is_deleted: bool = False
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
 
 
 @dataclass
 class ColigacaoEntity:
-    id: Optional[int]
     id_eleicao: int
     cargo: str
     numero_urna: int
     nome_coligacao: str
     sigla_partido_titular: str
     composicao_siglas: str
+    id: Optional[int] = None
+    partido_numero_titular: Optional[int] = None
     is_active: bool = True
     is_deleted: bool = False
     partidos_membros: Optional[List[ColigacaoPartidoEntity]] = None
     ano: Optional[int] = None
+
 

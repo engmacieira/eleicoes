@@ -384,8 +384,23 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                                   Nº {h.numero_urna}
                                 </span>
                               </div>
-                              <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                                <span>Legenda: <strong className="text-slate-800 font-mono">{h.sigla_partido}</strong></span>
+                              <div className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-0.5">
+                                <span>
+                                  Legenda: <strong className="text-slate-800 font-mono">{h.sigla_epoca || h.sigla_partido}</strong>
+                                </span>
+                                {h.partido_numero && (
+                                  <span className="font-mono text-[10px] text-blue-700 font-semibold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                                    Nº {h.partido_numero}
+                                  </span>
+                                )}
+                                {h.sigla_atual && h.sigla_atual !== (h.sigla_epoca || h.sigla_partido) && (
+                                  <span
+                                    className="text-[10px] font-semibold bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200"
+                                    title={`Legenda atual do partido: ${h.sigla_atual}`}
+                                  >
+                                    atual {h.sigla_atual}
+                                  </span>
+                                )}
                                 <span>·</span>
                                 <span>Colocação: {h.posicao ? `${h.posicao}º lugar` : 'N/D'}</span>
                               </div>

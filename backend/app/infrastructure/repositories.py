@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union, Dict, Any
 from datetime import date
 from sqlalchemy.orm import Session
 from sqlalchemy import select, desc, asc, func
@@ -277,11 +277,14 @@ class SqlAlchemyCandidatoRepository(ICandidatoRepository):
 
     def get_historico_participacoes(
         self, titulo_eleitor: str
-    ) -> List[Tuple[CandidatosEleicaoEntity, int, str]]:
+    ) -> List[Tuple[CandidatosEleicaoEntity, int, str, Optional[str]]]:
         stmt = (
-            select(CandidatosEleicao, Eleicao.ano, Partidos.sigla)
+            select(CandidatosEleicao, Eleicao.ano, Partidos.sigla_atual, Partidos.nome_atual)
             .join(Eleicao, CandidatosEleicao.id_eleicao == Eleicao.id)
-            .join(Partidos, CandidatosEleicao.id_partido == Partidos.id)
+            .outerjoin(
+                Partidos,
+                CandidatosEleicao.partido_numero == Partidos.numero,
+            )
             .where(
                 CandidatosEleicao.titulo_eleitor == titulo_eleitor,
                 CandidatosEleicao.is_deleted.is_(False),
@@ -291,60 +294,110 @@ class SqlAlchemyCandidatoRepository(ICandidatoRepository):
         )
         rows = self.db.execute(stmt).all()
         result = []
-        for cand, ano, sigla in rows:
+        for cand, ano, sigla_atual, _ in rows:
             entity = CandidatosEleicaoEntity(
                 id=cand.id,
                 titulo_eleitor=cand.titulo_eleitor,
                 id_eleicao=cand.id_eleicao,
-                id_partido=cand.id_partido,
+                partido_numero=cand.partido_numero,
                 cargo=cand.cargo,
                 numero_urna=cand.numero_urna,
                 nome_urna=cand.nome_urna,
                 votos=cand.votos,
                 situacao=cand.situacao,
                 posicao=cand.posicao,
+                sigla_epoca=cand.sigla_epoca,
                 is_active=cand.is_active,
                 is_deleted=cand.is_deleted,
             )
-            result.append((entity, ano, sigla))
+            sigla_exibicao = cand.sigla_epoca or sigla_atual or "S/P"
+            result.append((entity, ano, sigla_exibicao, sigla_atual))
         return result
 
     def get_resultados_pleito(
-        self, id_eleicao: int, cargo: str
-    ) -> List[Tuple[CandidatosEleicaoEntity, str, str]]:
+        self, id_eleicao: int, cargo: str, partido_termo: Optional[Union[str, int]] = None
+    ) -> List[Tuple[CandidatosEleicaoEntity, str, str, Optional[str]]]:
         stmt = (
-            select(CandidatosEleicao, DadosCandidato.nome_completo, Partidos.sigla)
+            select(
+                CandidatosEleicao,
+                DadosCandidato.nome_completo,
+                Partidos.sigla_atual,
+                Partidos.nome_atual,
+            )
             .join(DadosCandidato, CandidatosEleicao.titulo_eleitor == DadosCandidato.titulo_eleitor)
-            .join(Partidos, CandidatosEleicao.id_partido == Partidos.id)
+            .outerjoin(
+                Partidos,
+                CandidatosEleicao.partido_numero == Partidos.numero,
+            )
             .where(
                 CandidatosEleicao.id_eleicao == id_eleicao,
                 CandidatosEleicao.cargo.ilike(cargo),
                 CandidatosEleicao.is_deleted.is_(False),
                 DadosCandidato.is_deleted.is_(False),
             )
-            .order_by(
-                asc(CandidatosEleicao.posicao).nulls_last(),
-                desc(CandidatosEleicao.votos),
-            )
+        )
+
+        if partido_termo is not None:
+            termo_str = str(partido_termo).strip()
+            if termo_str.isdigit():
+                num = int(termo_str)
+                stmt = stmt.where(
+                    (CandidatosEleicao.partido_numero == num)
+                    | (Partidos.numero == num)
+                )
+            else:
+                termo_upper = termo_str.upper()
+                termo_clean = termo_upper.replace(" ", "")
+                # Find matching partido numeros
+                p_nums = self.db.scalars(
+                    select(Partidos.numero).where(
+                        (func.upper(Partidos.sigla_atual) == termo_upper)
+                        | (func.replace(func.upper(Partidos.sigla_atual), ' ', '') == termo_clean)
+                        | (func.upper(Partidos.nome_atual).contains(termo_upper)),
+                        Partidos.is_deleted.is_(False),
+                    )
+                ).all()
+                h_nums = self.db.scalars(
+                    select(PartidoHistorico.partido_numero).where(
+                        (func.upper(PartidoHistorico.sigla) == termo_upper)
+                        | (func.replace(func.upper(PartidoHistorico.sigla), ' ', '') == termo_clean)
+                        | (func.upper(PartidoHistorico.nome).contains(termo_upper)),
+                        PartidoHistorico.is_deleted.is_(False),
+                    )
+                ).all()
+                all_nums = list(set([n for n in (list(p_nums) + list(h_nums)) if n is not None]))
+                if all_nums:
+                    stmt = stmt.where(
+                        (CandidatosEleicao.partido_numero.in_(all_nums))
+                        | (CandidatosEleicao.sigla_epoca.ilike(f"%{termo_str}%"))
+                    )
+                else:
+                    stmt = stmt.where(CandidatosEleicao.sigla_epoca.ilike(f"%{termo_str}%"))
+
+        stmt = stmt.order_by(
+            asc(CandidatosEleicao.posicao).nulls_last(),
+            desc(CandidatosEleicao.votos),
         )
         rows = self.db.execute(stmt).all()
         result = []
-        for cand, nome_completo, sigla in rows:
+        for cand, nome_completo, sigla_atual, _ in rows:
             entity = CandidatosEleicaoEntity(
                 id=cand.id,
                 titulo_eleitor=cand.titulo_eleitor,
                 id_eleicao=cand.id_eleicao,
-                id_partido=cand.id_partido,
+                partido_numero=cand.partido_numero,
                 cargo=cand.cargo,
                 numero_urna=cand.numero_urna,
                 nome_urna=cand.nome_urna,
                 votos=cand.votos,
                 situacao=cand.situacao,
                 posicao=cand.posicao,
+                sigla_epoca=cand.sigla_epoca,
                 is_active=cand.is_active,
                 is_deleted=cand.is_deleted,
             )
-            result.append((entity, nome_completo, sigla))
+            sigla_exibicao = cand.sigla_epoca or sigla_atual or "S/P"
+            result.append((entity, nome_completo, sigla_exibicao, sigla_atual))
         return result
 
 
@@ -356,8 +409,7 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
         historico_entities = [
             PartidoHistoricoEntity(
                 id=h.id,
-                id_partido=h.id_partido,
-                numero=h.numero,
+                partido_numero=h.partido_numero or p.numero,
                 sigla=h.sigla,
                 nome=h.nome,
                 ano_inicio=h.ano_inicio,
@@ -369,22 +421,47 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
             for h in (p.historico_nomes or [])
             if not h.is_deleted
         ]
+        siglas_anteriores = [
+            h.sigla for h in historico_entities
+            if h.sigla and h.sigla.strip().upper() != (p.sigla_atual or "").strip().upper()
+        ]
         return PartidosEntity(
             id=p.id,
             numero=p.numero,
-            sigla=p.sigla,
-            nome=p.nome,
+            sigla_atual=p.sigla_atual,
+            nome_atual=p.nome_atual,
+            siglas_anteriores=list(dict.fromkeys(siglas_anteriores)),
             historico=historico_entities,
             is_active=p.is_active,
             is_deleted=p.is_deleted,
         )
 
-    def list_all(self) -> List[PartidosEntity]:
+    def list_all(self, q: Optional[str] = None) -> List[PartidosEntity]:
         stmt = (
             select(Partidos)
             .where(Partidos.is_deleted.is_(False))
             .order_by(asc(Partidos.numero))
         )
+        if q:
+            termo = q.strip()
+            if termo.isdigit():
+                stmt = stmt.where(Partidos.numero == int(termo))
+            else:
+                termo_clean = termo.upper().replace(" ", "")
+                # subquery for partidos with matching history
+                matching_hist_nums = select(PartidoHistorico.partido_numero).where(
+                    (func.upper(PartidoHistorico.sigla).contains(termo.upper()))
+                    | (func.replace(func.upper(PartidoHistorico.sigla), ' ', '').contains(termo_clean))
+                    | (func.upper(PartidoHistorico.nome).contains(termo.upper())),
+                    PartidoHistorico.is_deleted.is_(False),
+                )
+                stmt = stmt.where(
+                    (Partidos.sigla_atual.ilike(f"%{termo}%"))
+                    | (func.replace(func.upper(Partidos.sigla_atual), ' ', '').contains(termo_clean))
+                    | (Partidos.nome_atual.ilike(f"%{termo}%"))
+                    | (Partidos.numero.in_(matching_hist_nums))
+                )
+
         results = self.db.scalars(stmt).all()
         return [self._to_entity(p) for p in results]
 
@@ -396,23 +473,253 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
         p = self.db.scalar(select(Partidos).where(Partidos.numero == numero, Partidos.is_deleted.is_(False)))
         return self._to_entity(p) if p else None
 
+    def resolve_partido(self, termo: Union[str, int]) -> Optional[PartidosEntity]:
+        """Resolve indistintamente número TSE (70), sigla atual (AVANTE) ou sigla histórica (PT do B)."""
+        termo_str = str(termo).strip()
+        if not termo_str:
+            return None
+
+        # 1. Se for numérico, buscar por número exato
+        if termo_str.isdigit():
+            p = self.get_by_numero(int(termo_str))
+            if p:
+                return p
+
+        termo_upper = termo_str.upper()
+        termo_clean = termo_upper.replace(" ", "")
+
+        # 2. Buscar exato por sigla_atual
+        p = self.db.scalar(
+            select(Partidos).where(
+                func.upper(Partidos.sigla_atual) == termo_upper,
+                Partidos.is_deleted.is_(False),
+            )
+        )
+        if p:
+            return self._to_entity(p)
+
+        # 3. Buscar com espaços normalizados por sigla_atual
+        p = self.db.scalar(
+            select(Partidos).where(
+                func.replace(func.upper(Partidos.sigla_atual), ' ', '') == termo_clean,
+                Partidos.is_deleted.is_(False),
+            )
+        )
+        if p:
+            return self._to_entity(p)
+
+        # 4. Buscar exato em PartidoHistorico (sigla)
+        h = self.db.scalar(
+            select(PartidoHistorico).where(
+                (func.upper(PartidoHistorico.sigla) == termo_upper)
+                | (func.replace(func.upper(PartidoHistorico.sigla), ' ', '') == termo_clean),
+                PartidoHistorico.is_deleted.is_(False),
+            )
+        )
+        if h:
+            num = h.partido_numero or h.numero
+            if num:
+                p = self.get_by_numero(num)
+                if p:
+                    return p
+            if h.id_partido:
+                p = self.get_by_id(h.id_partido)
+                if p:
+                    return p
+
+        # 5. Buscar por nome_atual exato ou histórico
+        p = self.db.scalar(
+            select(Partidos).where(
+                func.upper(Partidos.nome_atual) == termo_upper,
+                Partidos.is_deleted.is_(False),
+            )
+        )
+        if p:
+            return self._to_entity(p)
+
+        h_nome = self.db.scalar(
+            select(PartidoHistorico).where(
+                func.upper(PartidoHistorico.nome) == termo_upper,
+                PartidoHistorico.is_deleted.is_(False),
+            )
+        )
+        if h_nome:
+            num = h_nome.partido_numero or h_nome.numero
+            if num:
+                p = self.get_by_numero(num)
+                if p:
+                    return p
+
+        # 6. Fallback com ilike
+        p = self.db.scalar(
+            select(Partidos).where(
+                (Partidos.sigla_atual.ilike(f"%{termo_str}%"))
+                | (Partidos.nome_atual.ilike(f"%{termo_str}%")),
+                Partidos.is_deleted.is_(False),
+            )
+        )
+        if p:
+            return self._to_entity(p)
+
+        return None
+
+    def get_linha_do_tempo(self, termo: Union[str, int]) -> Optional[dict]:
+        partido = self.resolve_partido(termo)
+        if not partido:
+            return None
+
+        # Carregar todas as eleições
+        eleicoes = self.db.scalars(
+            select(Eleicao).where(Eleicao.is_deleted.is_(False)).order_by(asc(Eleicao.ano))
+        ).all()
+
+        linha_do_tempo_eleicoes = []
+        total_votos_historico = 0
+        total_candidatos_historico = 0
+        total_eleitos_historico = 0
+        eleitos_prefeito_historico = 0
+        eleitos_vereador_historico = 0
+
+        for eleicao in eleicoes:
+            # 1. Candidatos do partido nesta eleição
+            cand_rows = self.db.execute(
+                select(CandidatosEleicao, DadosCandidato.nome_completo)
+                .join(DadosCandidato, CandidatosEleicao.titulo_eleitor == DadosCandidato.titulo_eleitor)
+                .where(
+                    CandidatosEleicao.id_eleicao == eleicao.id,
+                    CandidatosEleicao.partido_numero == partido.numero,
+                    CandidatosEleicao.is_deleted.is_(False),
+                )
+                .order_by(asc(CandidatosEleicao.cargo), desc(CandidatosEleicao.votos))
+            ).all()
+
+            # 2. Desempenho do partido nesta eleição
+            desemp = self.db.scalar(
+                select(PartidosEleicao).where(
+                    PartidosEleicao.id_eleicao == eleicao.id,
+                    PartidosEleicao.partido_numero == partido.numero,
+                    PartidosEleicao.is_deleted.is_(False),
+                )
+            )
+
+            # 3. Coligação em que o partido participou nesta eleição
+            colig_membro = self.db.scalar(
+                select(Coligacao)
+                .join(ColigacaoPartidos, ColigacaoPartidos.id_coligacao == Coligacao.id)
+                .where(
+                    Coligacao.id_eleicao == eleicao.id,
+                    (ColigacaoPartidos.partido_numero == partido.numero)
+                    | (Coligacao.partido_numero_titular == partido.numero),
+                    Coligacao.is_deleted.is_(False),
+                )
+            )
+
+            if not cand_rows and not desemp and not colig_membro:
+                continue
+
+            candidatos_list = []
+            siglas_usadas = set()
+            for cand, nome_completo in cand_rows:
+                sigla_c = cand.sigla_epoca or partido.sigla_atual
+                siglas_usadas.add(sigla_c)
+                total_candidatos_historico += 1
+                is_eleito = "ELEITO" in (cand.situacao or "").upper()
+                if is_eleito:
+                    total_eleitos_historico += 1
+                    if "PREFEITO" in (cand.cargo or "").upper():
+                        eleitos_prefeito_historico += 1
+                    elif "VEREADOR" in (cand.cargo or "").upper():
+                        eleitos_vereador_historico += 1
+
+                candidatos_list.append({
+                    "id": cand.id,
+                    "titulo_eleitor": cand.titulo_eleitor,
+                    "nome_completo": nome_completo,
+                    "nome_urna": cand.nome_urna,
+                    "numero_urna": cand.numero_urna,
+                    "cargo": cand.cargo,
+                    "votos": cand.votos,
+                    "situacao": cand.situacao,
+                    "posicao": cand.posicao,
+                    "sigla_epoca": cand.sigla_epoca,
+                })
+
+            votos_nom = desemp.votos_nominais if desemp else sum(c["votos"] for c in candidatos_list)
+            votos_leg = desemp.votos_legenda if desemp else 0
+            tot_votos = desemp.total_votos if desemp else (votos_nom + votos_leg)
+            total_votos_historico += tot_votos
+
+            sigla_vigente = next(iter(siglas_usadas)) if siglas_usadas else partido.sigla_atual
+
+            linha_do_tempo_eleicoes.append({
+                "ano": eleicao.ano,
+                "id_eleicao": eleicao.id,
+                "sigla_vigente": sigla_vigente,
+                "is_rebranded": sigla_vigente.upper() != (partido.sigla_atual or "").upper(),
+                "nome_coligacao": colig_membro.nome_coligacao if colig_membro else None,
+                "composicao_coligacao": colig_membro.composicao_siglas if colig_membro else None,
+                "votos_nominais": votos_nom,
+                "votos_legenda": votos_leg,
+                "total_votos": tot_votos,
+                "total_candidatos": len(candidatos_list),
+                "candidatos": candidatos_list,
+            })
+
+        return {
+            "partido": {
+                "id": partido.id,
+                "numero": partido.numero,
+                "sigla": partido.sigla,
+                "sigla_atual": partido.sigla_atual,
+                "nome": partido.nome,
+                "nome_atual": partido.nome_atual,
+                "siglas_anteriores": partido.siglas_anteriores,
+                "historico": [
+                    {
+                        "id": h.id,
+                        "partido_numero": partido.numero,
+                        "numero": partido.numero,
+                        "sigla": h.sigla,
+                        "nome": h.nome,
+                        "ano_inicio": h.ano_inicio,
+                        "ano_fim": h.ano_fim,
+                        "is_atual": h.is_atual,
+                        "is_active": h.is_active,
+                        "is_deleted": h.is_deleted,
+                    }
+                    for h in (partido.historico or [])
+                ],
+            },
+            "estatisticas_gerais": {
+                "total_votos_historico": total_votos_historico,
+                "total_eleicoes_disputadas": len(linha_do_tempo_eleicoes),
+                "total_candidatos_historico": total_candidatos_historico,
+                "total_eleitos_historico": total_eleitos_historico,
+                "eleitos_prefeito": eleitos_prefeito_historico,
+                "eleitos_vereador": eleitos_vereador_historico,
+            },
+            "eleicoes": linha_do_tempo_eleicoes,
+        }
+
     def create(
         self,
         numero: int,
         sigla: str,
         nome: Optional[str] = None,
+        sigla_atual: Optional[str] = None,
+        nome_atual: Optional[str] = None,
         historico: Optional[List[dict]] = None,
     ) -> PartidosEntity:
-        sigla_clean = sigla.strip().upper()
-        nome_clean = nome.strip() if nome else None
+        sigla_clean = (sigla_atual or sigla).strip().upper()
+        nome_clean = (nome_atual or nome).strip() if (nome_atual or nome) else None
 
         existing_num = self.db.scalar(select(Partidos).where(Partidos.numero == numero))
         if existing_num:
             if existing_num.is_deleted:
                 existing_num.is_deleted = False
                 existing_num.is_active = True
-                existing_num.sigla = sigla_clean
-                existing_num.nome = nome_clean
+                existing_num.sigla_atual = sigla_clean
+                existing_num.nome_atual = nome_clean
                 self.db.commit()
                 self.db.refresh(existing_num)
                 return self._to_entity(existing_num)
@@ -420,8 +727,8 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
 
         obj = Partidos(
             numero=numero,
-            sigla=sigla_clean,
-            nome=nome_clean,
+            sigla_atual=sigla_clean,
+            nome_atual=nome_clean,
             is_active=True,
             is_deleted=False,
         )
@@ -433,6 +740,7 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
             for h in historico:
                 h_obj = PartidoHistorico(
                     id_partido=obj.id,
+                    partido_numero=numero,
                     numero=numero,
                     sigla=h.get("sigla", "").strip().upper(),
                     nome=h.get("nome"),
@@ -454,6 +762,8 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
         numero: Optional[int] = None,
         sigla: Optional[str] = None,
         nome: Optional[str] = None,
+        sigla_atual: Optional[str] = None,
+        nome_atual: Optional[str] = None,
         is_active: Optional[bool] = None,
         historico: Optional[List[dict]] = None,
     ) -> Optional[PartidosEntity]:
@@ -469,17 +779,18 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
                 raise ValueError(f"Já existe outro partido com o número {numero}.")
             obj.numero = numero
 
-        if sigla is not None:
-            obj.sigla = sigla.strip().upper()
+        s_val = sigla_atual if sigla_atual is not None else sigla
+        if s_val is not None:
+            obj.sigla_atual = s_val.strip().upper()
 
-        if nome is not None:
-            obj.nome = nome.strip() if nome else None
+        n_val = nome_atual if nome_atual is not None else nome
+        if n_val is not None:
+            obj.nome_atual = n_val.strip() if n_val else None
 
         if is_active is not None:
             obj.is_active = is_active
 
         if historico is not None:
-            # Replace historical names
             for existing_h in obj.historico_nomes:
                 existing_h.is_deleted = True
                 existing_h.is_active = False
@@ -487,6 +798,7 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
             for h in historico:
                 h_obj = PartidoHistorico(
                     id_partido=obj.id,
+                    partido_numero=obj.numero,
                     numero=obj.numero,
                     sigla=h.get("sigla", "").strip().upper(),
                     nome=h.get("nome"),
@@ -516,10 +828,13 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
 
     def get_desempenho_por_eleicao(
         self, id_eleicao: int
-    ) -> List[Tuple[PartidosEleicaoEntity, str]]:
+    ) -> List[Tuple[PartidosEleicaoEntity, str, Optional[str]]]:
         stmt = (
-            select(PartidosEleicao, Partidos.sigla)
-            .join(Partidos, PartidosEleicao.id_partido == Partidos.id)
+            select(PartidosEleicao, Partidos.sigla_atual, Partidos.nome_atual)
+            .join(
+                Partidos,
+                PartidosEleicao.partido_numero == Partidos.numero,
+            )
             .where(
                 PartidosEleicao.id_eleicao == id_eleicao,
                 PartidosEleicao.is_deleted.is_(False),
@@ -529,18 +844,18 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
         )
         rows = self.db.execute(stmt).all()
         result = []
-        for p, sigla in rows:
+        for p, sigla, nome in rows:
             entity = PartidosEleicaoEntity(
                 id=p.id,
                 id_eleicao=p.id_eleicao,
-                id_partido=p.id_partido,
+                partido_numero=p.partido_numero,
                 votos_nominais=p.votos_nominais,
                 votos_legenda=p.votos_legenda,
                 total_votos=p.total_votos,
                 is_active=p.is_active,
                 is_deleted=p.is_deleted,
             )
-            result.append((entity, sigla))
+            result.append((entity, sigla, nome))
         return result
 
 
@@ -548,7 +863,9 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    def list_by_eleicao(self, ano: Optional[int] = None) -> List[ColigacaoEntity]:
+    def list_by_eleicao(
+        self, ano: Optional[int] = None, partido_termo: Optional[Union[str, int]] = None
+    ) -> List[ColigacaoEntity]:
         stmt = (
             select(Coligacao, Eleicao.ano)
             .join(Eleicao, Coligacao.id_eleicao == Eleicao.id)
@@ -558,33 +875,112 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
         if ano:
             stmt = stmt.where(Eleicao.ano == ano)
 
+        if partido_termo is not None:
+            termo_str = str(partido_termo).strip()
+            if termo_str.isdigit():
+                num = int(termo_str)
+                stmt = stmt.where(
+                    (Coligacao.partido_numero_titular == num)
+                    | (
+                        Coligacao.id.in_(
+                            select(ColigacaoPartidos.id_coligacao).where(
+                                ColigacaoPartidos.partido_numero == num,
+                                ColigacaoPartidos.is_deleted.is_(False),
+                            )
+                        )
+                    )
+                )
+            else:
+                termo_upper = termo_str.upper()
+                termo_clean = termo_upper.replace(" ", "")
+                matching_nums = list(self.db.scalars(
+                    select(Partidos.numero).where(
+                        (func.upper(Partidos.sigla_atual) == termo_upper)
+                        | (func.replace(func.upper(Partidos.sigla_atual), ' ', '') == termo_clean)
+                        | (func.upper(Partidos.nome_atual).contains(termo_upper)),
+                        Partidos.is_deleted.is_(False),
+                    )
+                ).all())
+                hist_nums = list(self.db.scalars(
+                    select(PartidoHistorico.partido_numero).where(
+                        (func.upper(PartidoHistorico.sigla) == termo_upper)
+                        | (func.replace(func.upper(PartidoHistorico.sigla), ' ', '') == termo_clean)
+                        | (func.upper(PartidoHistorico.nome).contains(termo_upper)),
+                        PartidoHistorico.is_deleted.is_(False),
+                    )
+                ).all())
+                all_nums = list(set([n for n in (matching_nums + hist_nums) if n is not None]))
+                if all_nums:
+                    stmt = stmt.where(
+                        (Coligacao.partido_numero_titular.in_(all_nums))
+                        | (Coligacao.sigla_partido_titular.ilike(f"%{termo_str}%"))
+                        | (
+                            Coligacao.id.in_(
+                                select(ColigacaoPartidos.id_coligacao).where(
+                                    ColigacaoPartidos.partido_numero.in_(all_nums),
+                                    ColigacaoPartidos.is_deleted.is_(False),
+                                )
+                            )
+                        )
+                    )
+                else:
+                    stmt = stmt.where(
+                        (Coligacao.sigla_partido_titular.ilike(f"%{termo_str}%"))
+                        | (Coligacao.composicao_siglas.ilike(f"%{termo_str}%"))
+                    )
+
         results = self.db.execute(stmt).all()
         coligacoes = []
 
         for c, ano_val in results:
-            # Load members
+            # Carregar membros com partido_numero, sigla_epoca e dados canônicos de Partidos
             membros_stmt = (
-                select(ColigacaoPartidos, Partidos.sigla)
-                .join(Partidos, ColigacaoPartidos.id_partido == Partidos.id)
+                select(
+                    ColigacaoPartidos,
+                    Partidos.numero,
+                    Partidos.sigla_atual,
+                )
+                .outerjoin(
+                    Partidos,
+                    ColigacaoPartidos.partido_numero == Partidos.numero,
+                )
                 .where(
                     ColigacaoPartidos.id_coligacao == c.id,
                     ColigacaoPartidos.is_deleted.is_(False),
                 )
-                .order_by(asc(Partidos.sigla))
+                .order_by(asc(Partidos.numero), asc(ColigacaoPartidos.sigla_epoca))
             )
             membros_rows = self.db.execute(membros_stmt).all()
-            membros_entities = [
-                ColigacaoPartidoEntity(
-                    id=m.id,
-                    id_coligacao=m.id_coligacao,
-                    id_partido=m.id_partido,
-                    papel=m.papel,
-                    sigla=sigla,
-                    is_active=m.is_active,
-                    is_deleted=m.is_deleted,
+            membros_entities = []
+            for m, p_numero, sigla_atual in membros_rows:
+                num_final = m.partido_numero or p_numero
+                sigla_epoca_final = m.sigla_epoca or sigla_atual or ""
+                sigla_atual_final = sigla_atual or sigla_epoca_final
+
+                # Formatação inteligente do nome:
+                # Se a sigla da época for diferente da atual: "PT do B (atual AVANTE - 70)"
+                # Se for igual ou sem rebranding: "AVANTE (70)"
+                if sigla_epoca_final and sigla_atual_final and sigla_epoca_final.upper() != sigla_atual_final.upper():
+                    nome_formatado = f"{sigla_epoca_final} (atual {sigla_atual_final} - {num_final})"
+                elif num_final:
+                    nome_formatado = f"{sigla_atual_final} ({num_final})"
+                else:
+                    nome_formatado = sigla_epoca_final or "S/P"
+
+                membros_entities.append(
+                    ColigacaoPartidoEntity(
+                        id=m.id,
+                        id_coligacao=m.id_coligacao,
+                        partido_numero=num_final,
+                        papel=m.papel,
+                        sigla_epoca=sigla_epoca_final,
+                        sigla_atual=sigla_atual_final,
+                        nome_formatado=nome_formatado,
+                        sigla=sigla_epoca_final or sigla_atual_final,
+                        is_active=m.is_active,
+                        is_deleted=m.is_deleted,
+                    )
                 )
-                for m, sigla in membros_rows
-            ]
 
             coligacoes.append(
                 ColigacaoEntity(
@@ -593,6 +989,7 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
                     cargo=c.cargo,
                     numero_urna=c.numero_urna,
                     nome_coligacao=c.nome_coligacao,
+                    partido_numero_titular=c.partido_numero_titular,
                     sigla_partido_titular=c.sigla_partido_titular,
                     composicao_siglas=c.composicao_siglas,
                     is_active=c.is_active,
@@ -616,26 +1013,47 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
         c, ano_val = row
 
         membros_stmt = (
-            select(ColigacaoPartidos, Partidos.sigla)
-            .join(Partidos, ColigacaoPartidos.id_partido == Partidos.id)
+            select(
+                ColigacaoPartidos,
+                Partidos.numero,
+                Partidos.sigla_atual,
+            )
+            .outerjoin(
+                Partidos,
+                ColigacaoPartidos.partido_numero == Partidos.numero,
+            )
             .where(
                 ColigacaoPartidos.id_coligacao == c.id,
                 ColigacaoPartidos.is_deleted.is_(False),
             )
         )
         membros_rows = self.db.execute(membros_stmt).all()
-        membros = [
-            ColigacaoPartidoEntity(
-                id=m.id,
-                id_coligacao=m.id_coligacao,
-                id_partido=m.id_partido,
-                papel=m.papel,
-                sigla=sigla,
-                is_active=m.is_active,
-                is_deleted=m.is_deleted,
+        membros = []
+        for m, p_numero, sigla_atual in membros_rows:
+            num_final = m.partido_numero or p_numero
+            sigla_epoca_final = m.sigla_epoca or sigla_atual or ""
+            sigla_atual_final = sigla_atual or sigla_epoca_final
+            if sigla_epoca_final and sigla_atual_final and sigla_epoca_final.upper() != sigla_atual_final.upper():
+                nome_formatado = f"{sigla_epoca_final} (atual {sigla_atual_final} - {num_final})"
+            elif num_final:
+                nome_formatado = f"{sigla_atual_final} ({num_final})"
+            else:
+                nome_formatado = sigla_epoca_final or "S/P"
+
+            membros.append(
+                ColigacaoPartidoEntity(
+                    id=m.id,
+                    id_coligacao=m.id_coligacao,
+                    partido_numero=num_final,
+                    papel=m.papel,
+                    sigla_epoca=sigla_epoca_final,
+                    sigla_atual=sigla_atual_final,
+                    nome_formatado=nome_formatado,
+                    sigla=sigla_epoca_final or sigla_atual_final,
+                    is_active=m.is_active,
+                    is_deleted=m.is_deleted,
+                )
             )
-            for m, sigla in membros_rows
-        ]
 
         return ColigacaoEntity(
             id=c.id,
@@ -643,6 +1061,7 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
             cargo=c.cargo,
             numero_urna=c.numero_urna,
             nome_coligacao=c.nome_coligacao,
+            partido_numero_titular=c.partido_numero_titular,
             sigla_partido_titular=c.sigla_partido_titular,
             composicao_siglas=c.composicao_siglas,
             is_active=c.is_active,
@@ -654,13 +1073,14 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
     def create(
         self,
         entity: ColigacaoEntity,
-        partido_ids_papeis: Optional[List[Tuple[int, str]]] = None,
+        partido_numeros_papeis: Optional[List[Tuple[int, str, Optional[str]]]] = None,
     ) -> ColigacaoEntity:
         colig = Coligacao(
             id_eleicao=entity.id_eleicao,
             cargo=entity.cargo,
             numero_urna=entity.numero_urna,
             nome_coligacao=entity.nome_coligacao.strip().upper(),
+            partido_numero_titular=entity.partido_numero_titular,
             sigla_partido_titular=entity.sigla_partido_titular.strip().upper(),
             composicao_siglas=entity.composicao_siglas.strip().upper(),
             is_active=entity.is_active,
@@ -669,12 +1089,19 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
         self.db.add(colig)
         self.db.flush()
 
-        if partido_ids_papeis:
-            for p_id, papel in partido_ids_papeis:
+        if partido_numeros_papeis:
+            for item in partido_numeros_papeis:
+                if len(item) == 3:
+                    p_num, papel, sigla_epoca = item
+                else:
+                    p_num, papel = item[0], item[1]
+                    sigla_epoca = None
+
                 cp = ColigacaoPartidos(
                     id_coligacao=colig.id,
-                    id_partido=p_id,
+                    partido_numero=p_num,
                     papel=papel,
+                    sigla_epoca=sigla_epoca,
                     is_active=True,
                     is_deleted=False,
                 )
@@ -689,8 +1116,9 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
         id: int,
         nome_coligacao: Optional[str] = None,
         composicao_siglas: Optional[str] = None,
+        partido_numero_titular: Optional[int] = None,
         is_active: Optional[bool] = None,
-        partido_ids_papeis: Optional[List[Tuple[int, str]]] = None,
+        partido_numeros_papeis: Optional[List[Tuple[int, str, Optional[str]]]] = None,
     ) -> Optional[ColigacaoEntity]:
         colig = self.db.scalar(select(Coligacao).where(Coligacao.id == id, Coligacao.is_deleted.is_(False)))
         if not colig:
@@ -700,11 +1128,12 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
             colig.nome_coligacao = nome_coligacao.strip().upper()
         if composicao_siglas is not None:
             colig.composicao_siglas = composicao_siglas.strip().upper()
+        if partido_numero_titular is not None:
+            colig.partido_numero_titular = partido_numero_titular
         if is_active is not None:
             colig.is_active = is_active
 
-        if partido_ids_papeis is not None:
-            # Soft delete old members and add/reactivate
+        if partido_numeros_papeis is not None:
             old_members = self.db.scalars(
                 select(ColigacaoPartidos).where(ColigacaoPartidos.id_coligacao == id)
             ).all()
@@ -712,11 +1141,18 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
                 self.db.delete(m)
             self.db.flush()
 
-            for p_id, papel in partido_ids_papeis:
+            for item in partido_numeros_papeis:
+                if len(item) == 3:
+                    p_num, papel, sigla_epoca = item
+                else:
+                    p_num, papel = item[0], item[1]
+                    sigla_epoca = None
+
                 cp = ColigacaoPartidos(
                     id_coligacao=id,
-                    id_partido=p_id,
+                    partido_numero=p_num,
                     papel=papel,
+                    sigla_epoca=sigla_epoca,
                     is_active=True,
                     is_deleted=False,
                 )
@@ -732,7 +1168,6 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
         colig.is_deleted = True
         colig.is_active = False
 
-        # Soft delete members
         members = self.db.scalars(
             select(ColigacaoPartidos).where(ColigacaoPartidos.id_coligacao == id)
         ).all()
@@ -742,4 +1177,5 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
 
         self.db.commit()
         return True
+
 

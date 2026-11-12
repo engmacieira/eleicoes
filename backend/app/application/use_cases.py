@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from ..domain.repositories import (
     IEleicaoRepository,
     ICandidatoRepository,
@@ -16,6 +16,9 @@ from .dtos import (
     DesempenhoPartidoDto,
     ColigacaoDto,
     ColigacaoPartidoDto,
+    PartidoTimelineDto,
+    PartidoHistoricoSiglaDto,
+    PartidoCandidaturaTimelineDto,
 )
 
 
@@ -60,7 +63,9 @@ class ObterResultadosUseCase:
         self.eleicao_repo = eleicao_repo
         self.candidato_repo = candidato_repo
 
-    def execute(self, ano: int, cargo: str) -> List[ResultadoCandidatoDto]:
+    def execute(
+        self, ano: int, cargo: str, partido: Optional[Union[str, int]] = None
+    ) -> List[ResultadoCandidatoDto]:
         eleicao = self.eleicao_repo.get_by_ano(ano)
         if not eleicao:
             raise ValueError(f"Eleição do ano {ano} não encontrada.")
@@ -68,13 +73,15 @@ class ObterResultadosUseCase:
         detalhes = self.eleicao_repo.get_detalhes(eleicao.id, cargo=cargo)
         validos_totais = detalhes[0].validos if detalhes and detalhes[0].validos > 0 else 0
 
-        candidatos_raw = self.candidato_repo.get_resultados_pleito(eleicao.id, cargo)
+        candidatos_raw = self.candidato_repo.get_resultados_pleito(
+            eleicao.id, cargo, partido_termo=partido
+        )
 
-        soma_votos = sum(cand.votos for cand, _, _ in candidatos_raw) or 1
+        soma_votos = sum(cand.votos for cand, _, _, _ in candidatos_raw) or 1
         divisor = validos_totais if validos_totais > 0 else soma_votos
 
         resultado = []
-        for cand, nome_completo, sigla in candidatos_raw:
+        for cand, nome_completo, sigla_epoca, sigla_atual in candidatos_raw:
             pct = round((cand.votos / divisor) * 100, 2)
             resultado.append(
                 ResultadoCandidatoDto(
@@ -83,10 +90,13 @@ class ObterResultadosUseCase:
                     nome_urna=cand.nome_urna,
                     nome_completo=nome_completo,
                     titulo_eleitor=cand.titulo_eleitor,
-                    sigla_partido=sigla,
+                    sigla_partido=sigla_epoca or sigla_atual or "S/P",
                     cargo=cand.cargo,
                     votos=cand.votos,
                     situacao=cand.situacao,
+                    partido_numero=cand.partido_numero,
+                    sigla_epoca=cand.sigla_epoca or sigla_epoca,
+                    sigla_atual=sigla_atual,
                     percentual_validos=pct,
                 )
             )
@@ -109,9 +119,9 @@ class ObterHistoricoCandidatoUseCase:
         total_mandatos = 0
         historico_list = []
 
-        for cand, ano, sigla in participacoes:
+        for cand, ano, sigla_epoca, sigla_atual in participacoes:
             total_votos += cand.votos
-            situacao_lower = cand.situacao.lower()
+            situacao_lower = (cand.situacao or "").lower()
             if "eleito" in situacao_lower and "não" not in situacao_lower:
                 total_mandatos += 1
 
@@ -121,10 +131,13 @@ class ObterHistoricoCandidatoUseCase:
                     cargo=cand.cargo,
                     numero_urna=cand.numero_urna,
                     nome_urna=cand.nome_urna,
-                    sigla_partido=sigla,
+                    sigla_partido=sigla_epoca or sigla_atual or "S/P",
                     votos=cand.votos,
                     situacao=cand.situacao,
                     posicao=cand.posicao,
+                    partido_numero=cand.partido_numero,
+                    sigla_epoca=cand.sigla_epoca or sigla_epoca,
+                    sigla_atual=sigla_atual,
                 )
             )
 
@@ -150,14 +163,16 @@ class ObterDesempenhoPartidarioUseCase:
             raise ValueError(f"Eleição do ano {ano} não encontrada.")
 
         desempenhos = self.partido_repo.get_desempenho_por_eleicao(eleicao.id)
-        total_geral = sum(p.total_votos for p, _ in desempenhos) or 1
+        total_geral = sum(p.total_votos for p, _, _ in desempenhos) or 1
 
         partidos_dtos = []
-        for p, sigla in desempenhos:
+        for p, sigla_atual, nome_atual in desempenhos:
             pct = round((p.total_votos / total_geral) * 100, 2)
             partidos_dtos.append(
                 DesempenhoPartidoDto(
-                    sigla=sigla,
+                    sigla=sigla_atual,
+                    numero=p.partido_numero,
+                    sigla_atual=sigla_atual,
                     votos_nominais=p.votos_nominais,
                     votos_legenda=p.votos_legenda,
                     total_votos=p.total_votos,
@@ -176,15 +191,21 @@ class ListarColigacoesUseCase:
     def __init__(self, coligacao_repo: IColigacaoRepository):
         self.coligacao_repo = coligacao_repo
 
-    def execute(self, ano: Optional[int] = None) -> List[ColigacaoDto]:
-        entities = self.coligacao_repo.list_by_eleicao(ano)
+    def execute(
+        self, ano: Optional[int] = None, partido: Optional[Union[str, int]] = None
+    ) -> List[ColigacaoDto]:
+        entities = self.coligacao_repo.list_by_eleicao(ano, partido_termo=partido)
         dtos = []
         for e in entities:
             membros = [
                 ColigacaoPartidoDto(
                     id_partido=m.id_partido,
-                    sigla=m.sigla or "",
+                    sigla=m.sigla or m.sigla_epoca or m.sigla_atual or "",
                     papel=m.papel,
+                    partido_numero=m.partido_numero,
+                    sigla_epoca=m.sigla_epoca,
+                    sigla_atual=m.sigla_atual,
+                    nome_formatado=m.nome_formatado,
                 )
                 for m in (e.partidos_membros or [])
             ]
@@ -196,6 +217,7 @@ class ListarColigacoesUseCase:
                     cargo=e.cargo,
                     numero_urna=e.numero_urna,
                     nome_coligacao=e.nome_coligacao,
+                    partido_numero_titular=e.partido_numero_titular,
                     sigla_partido_titular=e.sigla_partido_titular,
                     composicao_siglas=e.composicao_siglas,
                     is_active=e.is_active,
@@ -204,6 +226,14 @@ class ListarColigacoesUseCase:
                 )
             )
         return dtos
+
+
+class ObterLinhaDoTempoPartidoUseCase:
+    def __init__(self, partido_repo: IPartidoRepository):
+        self.partido_repo = partido_repo
+
+    def execute(self, termo: Union[str, int]) -> Optional[dict]:
+        return self.partido_repo.get_linha_do_tempo(termo)
 
 
 class CriarColigacaoUseCase:
@@ -219,7 +249,8 @@ class CriarColigacaoUseCase:
         nome_coligacao: str,
         sigla_partido_titular: str,
         composicao_siglas: str,
-        partido_ids_papeis: Optional[List[tuple]] = None,
+        partido_numero_titular: Optional[int] = None,
+        partido_numeros_papeis: Optional[List[tuple]] = None,
     ) -> ColigacaoDto:
         eleicao = self.eleicao_repo.get_by_ano(ano)
         if not eleicao:
@@ -231,18 +262,23 @@ class CriarColigacaoUseCase:
             cargo=cargo,
             numero_urna=numero_urna,
             nome_coligacao=nome_coligacao,
+            partido_numero_titular=partido_numero_titular,
             sigla_partido_titular=sigla_partido_titular,
             composicao_siglas=composicao_siglas,
             is_active=True,
             is_deleted=False,
         )
 
-        created = self.coligacao_repo.create(entity, partido_ids_papeis)
+        created = self.coligacao_repo.create(entity, partido_numeros_papeis)
         membros = [
             ColigacaoPartidoDto(
                 id_partido=m.id_partido,
-                sigla=m.sigla or "",
+                sigla=m.sigla or m.sigla_epoca or m.sigla_atual or "",
                 papel=m.papel,
+                partido_numero=m.partido_numero,
+                sigla_epoca=m.sigla_epoca,
+                sigla_atual=m.sigla_atual,
+                nome_formatado=m.nome_formatado,
             )
             for m in (created.partidos_membros or [])
         ]
@@ -253,6 +289,7 @@ class CriarColigacaoUseCase:
             cargo=created.cargo,
             numero_urna=created.numero_urna,
             nome_coligacao=created.nome_coligacao,
+            partido_numero_titular=created.partido_numero_titular,
             sigla_partido_titular=created.sigla_partido_titular,
             composicao_siglas=created.composicao_siglas,
             is_active=created.is_active,
@@ -270,15 +307,17 @@ class AtualizarColigacaoUseCase:
         id: int,
         nome_coligacao: Optional[str] = None,
         composicao_siglas: Optional[str] = None,
+        partido_numero_titular: Optional[int] = None,
         is_active: Optional[bool] = None,
-        partido_ids_papeis: Optional[List[tuple]] = None,
+        partido_numeros_papeis: Optional[List[tuple]] = None,
     ) -> ColigacaoDto:
         updated = self.coligacao_repo.update(
             id=id,
             nome_coligacao=nome_coligacao,
             composicao_siglas=composicao_siglas,
+            partido_numero_titular=partido_numero_titular,
             is_active=is_active,
-            partido_ids_papeis=partido_ids_papeis,
+            partido_numeros_papeis=partido_numeros_papeis,
         )
         if not updated:
             raise ValueError(f"Coligação com ID {id} não encontrada.")
@@ -286,8 +325,12 @@ class AtualizarColigacaoUseCase:
         membros = [
             ColigacaoPartidoDto(
                 id_partido=m.id_partido,
-                sigla=m.sigla or "",
+                sigla=m.sigla or m.sigla_epoca or m.sigla_atual or "",
                 papel=m.papel,
+                partido_numero=m.partido_numero,
+                sigla_epoca=m.sigla_epoca,
+                sigla_atual=m.sigla_atual,
+                nome_formatado=m.nome_formatado,
             )
             for m in (updated.partidos_membros or [])
         ]
@@ -298,6 +341,7 @@ class AtualizarColigacaoUseCase:
             cargo=updated.cargo,
             numero_urna=updated.numero_urna,
             nome_coligacao=updated.nome_coligacao,
+            partido_numero_titular=updated.partido_numero_titular,
             sigla_partido_titular=updated.sigla_partido_titular,
             composicao_siglas=updated.composicao_siglas,
             is_active=updated.is_active,

@@ -43,6 +43,9 @@ class ResultadoCandidatoDto:
     cargo: str
     votos: int
     situacao: str
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
     percentual_validos: Optional[float] = None
     vice: Optional[ViceCandidatoDto] = None
 
@@ -65,6 +68,9 @@ class HistoricoParticipacaoDto:
     votos: int
     situacao: str
     posicao: Optional[int]
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
     chapa_parceiro: Optional[ChapaParceiroDto] = None
 
 
@@ -85,7 +91,9 @@ class DesempenhoPartidoDto:
     votos_nominais: int
     votos_legenda: int
     total_votos: int
-    percentual_total: Optional[float]
+    numero: Optional[int] = None
+    sigla_atual: Optional[str] = None
+    percentual_total: Optional[float] = None
 
 
 @dataclass
@@ -100,6 +108,14 @@ class ColigacaoPartidoDto:
     id_partido: int
     sigla: str
     papel: str
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
+    nome_formatado: Optional[str] = None
+
+    @property
+    def sigla_partido(self) -> str:
+        return self.sigla_epoca or self.sigla
 
 
 @dataclass
@@ -115,4 +131,47 @@ class ColigacaoDto:
     is_active: bool
     is_deleted: bool
     partidos_membros: List[ColigacaoPartidoDto]
+    partido_numero_titular: Optional[int] = None
+
+    @property
+    def partidos(self) -> List[ColigacaoPartidoDto]:
+        return self.partidos_membros
+
+
+@dataclass
+class PartidoCandidaturaTimelineDto:
+    ano: int
+    cargo: str
+    numero_urna: int
+    nome_urna: str
+    nome_completo: str
+    titulo_eleitor: str
+    sigla_usada: str
+    votos: int
+    situacao: str
+    posicao: Optional[int] = None
+
+
+@dataclass
+class PartidoHistoricoSiglaDto:
+    sigla: str
+    nome: Optional[str]
+    ano_inicio: Optional[int]
+    ano_fim: Optional[int]
+    is_atual: bool
+
+
+@dataclass
+class PartidoTimelineDto:
+    numero: int
+    sigla_atual: str
+    nome_atual: Optional[str]
+    siglas_anteriores: List[str]
+    historico_siglas: List[PartidoHistoricoSiglaDto]
+    total_candidaturas: int
+    total_votos: int
+    total_eleitos: int
+    candidaturas: List[PartidoCandidaturaTimelineDto]
+    coligacoes: List[ColigacaoDto]
+
 

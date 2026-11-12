@@ -24,13 +24,14 @@ router = APIRouter(prefix="/api/coligacoes", tags=["Coligações Partidárias"])
 @router.get("", response_model=List[ColigacaoResponseSchema])
 def listar_coligacoes(
     ano: Optional[int] = Query(None, description="Filtrar por ano eleitoral (ex: 2024, 2020)"),
+    partido: Optional[str] = Query(None, description="Filtrar por número TSE, sigla atual ou histórica de partido integrante/titular"),
     use_case: ListarColigacoesUseCase = Depends(get_listar_coligacoes_use_case),
 ):
     """
     Retorna as coligações eleitorais formadas em cada pleito municipal,
     incluindo quais partidos estavam coligados e apoiando determinada chapa majoritária.
     """
-    return use_case.execute(ano=ano)
+    return use_case.execute(ano=ano, partido=partido)
 
 
 @router.post("", response_model=ColigacaoResponseSchema, status_code=status.HTTP_201_CREATED)
@@ -43,7 +44,7 @@ def criar_coligacao(
     definindo as legendas de apoio.
     """
     try:
-        papeis = [(p_id, "Apoiador") for p_id in payload.partidos_ids]
+        papeis = [(p_num, "Apoiador") for p_num in payload.partidos_ids]
         comp_siglas = payload.composicao_siglas or payload.sigla_partido_titular
         return use_case.execute(
             ano=payload.ano,
@@ -52,7 +53,8 @@ def criar_coligacao(
             nome_coligacao=payload.nome_coligacao,
             sigla_partido_titular=payload.sigla_partido_titular,
             composicao_siglas=comp_siglas,
-            partido_ids_papeis=papeis,
+            partido_numero_titular=payload.partido_numero_titular,
+            partido_numeros_papeis=papeis,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -69,15 +71,16 @@ def atualizar_coligacao(
     """
     papeis = None
     if payload.partidos_ids is not None:
-        papeis = [(p_id, "Apoiador") for p_id in payload.partidos_ids]
+        papeis = [(p_num, "Apoiador") for p_num in payload.partidos_ids]
 
     try:
         return use_case.execute(
             id=id,
             nome_coligacao=payload.nome_coligacao,
             composicao_siglas=payload.composicao_siglas,
+            partido_numero_titular=payload.partido_numero_titular,
             is_active=payload.is_active,
-            partido_ids_papeis=papeis,
+            partido_numeros_papeis=papeis,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -95,3 +98,4 @@ def deletar_coligacao(
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coligação não encontrada.")
     return None
+

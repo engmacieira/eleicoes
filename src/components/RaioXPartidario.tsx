@@ -213,6 +213,19 @@ export const RaioXPartidario: React.FC<RaioXPartidarioProps> = ({ ano, setAno })
                       <span className="font-mono font-bold text-slate-900 text-sm bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200">
                         {p.sigla}
                       </span>
+                      {p.numero && (
+                        <span className="font-mono text-xs text-blue-700 font-semibold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                          {p.numero}
+                        </span>
+                      )}
+                      {p.sigla_atual && p.sigla_atual !== p.sigla && (
+                        <span
+                          className="text-[10px] font-medium bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200"
+                          title={`Atual denominação do partido: ${p.sigla_atual}`}
+                        >
+                          atual {p.sigla_atual}
+                        </span>
+                      )}
                       <span className="text-slate-500 text-xs hidden sm:inline">
                         ({p.percentual_total}% da votação geral)
                       </span>
@@ -294,7 +307,22 @@ export const RaioXPartidario: React.FC<RaioXPartidarioProps> = ({ ano, setAno })
                   return (
                     <tr key={`${p.sigla}-${index}`} className="hover:bg-slate-50 transition">
                       <td className="py-3 px-4 font-bold text-slate-900 text-sm font-sans">
-                        {p.sigla}
+                        <div className="flex items-center gap-2">
+                          <span>{p.sigla}</span>
+                          {p.numero && (
+                            <span className="font-mono text-xs text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 font-semibold">
+                              {p.numero}
+                            </span>
+                          )}
+                          {p.sigla_atual && p.sigla_atual !== p.sigla && (
+                            <span
+                              className="text-[10px] font-medium bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200"
+                              title={`Atual denominação: ${p.sigla_atual}`}
+                            >
+                              atual {p.sigla_atual}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-right text-blue-700 font-semibold">
                         {p.votos_nominais.toLocaleString('pt-BR')}

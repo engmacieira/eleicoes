@@ -32,7 +32,7 @@ export const DdlViewer: React.FC = () => {
               Script DDL Estrutural (PostgreSQL / Google Cloud SQL)
             </h3>
             <p className="text-sm text-slate-600 mt-1">
-              Modelagem relacional normalizada (3FN) das 6 tabelas com tipos nativos do PostgreSQL, integridade referencial estrita e ordem determinística de execução.
+              Modelagem relacional normalizada com número oficial do TSE como chave canônica perene de partidos, histórico de siglas/rebrandings e coligações majoritárias.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -59,15 +59,17 @@ export const DdlViewer: React.FC = () => {
             <AlertCircle className="w-4 h-4 text-blue-700 mt-0.5 shrink-0" />
             <div className="space-y-1">
               <p className="font-bold text-blue-950">
-                Ordem Rigorosa de Criação das Tabelas para evitar erro de Foreign Key:
+                Ordem Rigorosa de Criação das Tabelas e Integridade Referencial:
               </p>
               <p className="text-blue-900/90 leading-relaxed">
-                1. <strong>dados_candidato</strong> (Pessoa Física — PK Título de Eleitor) ➔ 
+                1. <strong>dados_candidato</strong> (Pessoa Física — PK Título) ➔ 
                 2. <strong>eleicao</strong> (Ano/Pleito) ➔ 
-                3. <strong>partidos</strong> (Catálogo Único de Siglas) ➔ 
-                4. <strong>detalhes_votacao</strong> (FK <em>eleicao</em>) ➔ 
-                5. <strong>partidos_eleicao</strong> (FKs <em>eleicao</em> e <em>partidos</em>) ➔ 
-                6. <strong>candidatos_eleicao</strong> (FKs <em>dados_candidato</em>, <em>eleicao</em> e <em>partidos</em>).
+                3. <strong>partidos</strong> (Catálogo Mestre — Chave Canônica: Número TSE) ➔ 
+                4. <strong>partido_historico</strong> (Histórico de Siglas e Rebrandings) ➔ 
+                5. <strong>detalhes_votacao</strong> (FK <em>eleicao</em>) ➔ 
+                6. <strong>partidos_eleicao</strong> (FKs <em>eleicao</em> e <em>partidos(numero)</em>) ➔ 
+                7. <strong>candidatos_eleicao</strong> (FKs <em>dados_candidato</em>, <em>eleicao</em> e <em>partidos(numero)</em>) ➔ 
+                8. <strong>coligacoes</strong> e <strong>coligacao_partidos</strong> (FK <em>partidos(numero)</em>).
               </p>
             </div>
           </div>
@@ -77,7 +79,7 @@ export const DdlViewer: React.FC = () => {
       {/* Table Cards Grid */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-bold text-slate-900">Detalhamento das 6 Tabelas e Constraints</h4>
+          <h4 className="text-sm font-bold text-slate-900">Detalhamento das Tabelas e Constraints ({SCHEMA_TABLES.length})</h4>
           <div className="flex gap-1 overflow-x-auto text-xs">
             <button
               onClick={() => setSelectedTable('all')}
@@ -87,7 +89,7 @@ export const DdlViewer: React.FC = () => {
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              Todas (6)
+              Todas ({SCHEMA_TABLES.length})
             </button>
             {SCHEMA_TABLES.map((t) => (
               <button

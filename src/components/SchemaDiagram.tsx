@@ -8,14 +8,15 @@ export const SchemaDiagram: React.FC = () => {
   const relationships = [
     { from: 'detalhes_votacao', fromCol: 'id_eleicao', to: 'eleicao', toCol: 'id', type: '1:N', label: 'Estatísticas do pleito' },
     { from: 'partidos_eleicao', fromCol: 'id_eleicao', to: 'eleicao', toCol: 'id', type: '1:N', label: 'Bancada no pleito' },
-    { from: 'partidos_eleicao', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Legenda partidária' },
+    { from: 'partidos_eleicao', fromCol: 'partido_numero', to: 'partidos', toCol: 'numero', type: '1:N', label: 'Legenda partidária (TSE)' },
     { from: 'candidatos_eleicao', fromCol: 'titulo_eleitor', to: 'dados_candidato', toCol: 'titulo_eleitor', type: '1:N', label: 'Pessoa física participante' },
     { from: 'candidatos_eleicao', fromCol: 'id_eleicao', to: 'eleicao', toCol: 'id', type: '1:N', label: 'Ano do pleito concorrido' },
-    { from: 'candidatos_eleicao', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Partido da disputa' },
+    { from: 'candidatos_eleicao', fromCol: 'partido_numero', to: 'partidos', toCol: 'numero', type: '1:N', label: 'Chave Canônica TSE' },
     { from: 'coligacoes', fromCol: 'id_eleicao', to: 'eleicao', toCol: 'id', type: '1:N', label: 'Pleito da coligação' },
+    { from: 'coligacoes', fromCol: 'partido_numero_titular', to: 'partidos', toCol: 'numero', type: '1:N', label: 'Partido titular/cabeça de chapa' },
     { from: 'coligacao_partidos', fromCol: 'id_coligacao', to: 'coligacoes', toCol: 'id', type: '1:N', label: 'Chapa/Coligação' },
-    { from: 'coligacao_partidos', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Partido integrante' },
-    { from: 'partido_historico', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Histórico de siglas e nomes' },
+    { from: 'coligacao_partidos', fromCol: 'partido_numero', to: 'partidos', toCol: 'numero', type: '1:N', label: 'Partido integrante por número TSE' },
+    { from: 'partido_historico', fromCol: 'partido_numero', to: 'partidos', toCol: 'numero', type: '1:N', label: 'Histórico de siglas e rebrandings' },
   ];
 
   return (

@@ -57,6 +57,9 @@ class ResultadoCandidatoSchema(BaseModel):
     cargo: str
     votos: int
     situacao: str
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
     percentual_validos: Optional[float] = None
     vice: Optional[ViceCandidatoSchema] = None
 
@@ -73,6 +76,9 @@ class HistoricoParticipacaoSchema(BaseModel):
     votos: int
     situacao: str
     posicao: Optional[int]
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
     chapa_parceiro: Optional[ChapaParceiroSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -96,6 +102,8 @@ class DesempenhoPartidoSchema(BaseModel):
     votos_nominais: int
     votos_legenda: int
     total_votos: int
+    numero: Optional[int] = None
+    sigla_atual: Optional[str] = None
     percentual_total: Optional[float] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -148,7 +156,7 @@ class CandidatosPaginadosResponse(BaseModel):
 
 class PartidoHistoricoSchema(BaseModel):
     id: Optional[int] = None
-    id_partido: Optional[int] = None
+    partido_numero: Optional[int] = None
     numero: int
     sigla: str
     nome: Optional[str] = None
@@ -165,6 +173,8 @@ class PartidoCreateSchema(BaseModel):
     numero: int
     sigla: str
     nome: Optional[str] = None
+    sigla_atual: Optional[str] = None
+    nome_atual: Optional[str] = None
     historico: Optional[List[dict]] = None
 
 
@@ -172,6 +182,8 @@ class PartidoUpdateSchema(BaseModel):
     numero: Optional[int] = None
     sigla: Optional[str] = None
     nome: Optional[str] = None
+    sigla_atual: Optional[str] = None
+    nome_atual: Optional[str] = None
     is_active: Optional[bool] = None
     historico: Optional[List[dict]] = None
 
@@ -180,7 +192,10 @@ class PartidoItemSchema(BaseModel):
     id: int
     numero: int
     sigla: str
+    sigla_atual: Optional[str] = None
     nome: Optional[str] = None
+    nome_atual: Optional[str] = None
+    siglas_anteriores: Optional[List[str]] = None
     historico: Optional[List[PartidoHistoricoSchema]] = None
     is_active: bool = True
     is_deleted: bool = False
@@ -205,7 +220,13 @@ class EleicaoItemSchema(BaseModel):
 class ColigacaoMembroSchema(BaseModel):
     id_partido: int
     sigla: str
+    sigla_partido: Optional[str] = None
     papel: str = "Apoiador"
+    partido_numero: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+    sigla_atual: Optional[str] = None
+    nome_formatado: Optional[str] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -218,9 +239,12 @@ class ColigacaoResponseSchema(BaseModel):
     nome_coligacao: str
     sigla_partido_titular: str
     composicao_siglas: str
+    partido_numero_titular: Optional[int] = None
     is_active: bool
     is_deleted: bool
     partidos_membros: List[ColigacaoMembroSchema] = []
+    partidos: List[ColigacaoMembroSchema] = []
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -230,6 +254,7 @@ class ColigacaoCreateSchema(BaseModel):
     numero_urna: int
     nome_coligacao: str
     sigla_partido_titular: str
+    partido_numero_titular: Optional[int] = None
     composicao_siglas: Optional[str] = None
     partidos_ids: List[int] = []
 
@@ -237,7 +262,74 @@ class ColigacaoCreateSchema(BaseModel):
 class ColigacaoUpdateSchema(BaseModel):
     nome_coligacao: Optional[str] = None
     composicao_siglas: Optional[str] = None
+    partido_numero_titular: Optional[int] = None
     is_active: Optional[bool] = None
     partidos_ids: Optional[List[int]] = None
+
+
+# --- Schemas da Linha do Tempo Unificada de Partido ---
+class CandidatoNaLinhaTempoSchema(BaseModel):
+    id: Optional[int] = None
+    titulo_eleitor: str
+    nome_completo: str
+    nome_urna: str
+    numero_urna: int
+    cargo: str
+    votos: int
+    situacao: str
+    posicao: Optional[int] = None
+    sigla_epoca: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EleicaoLinhaTempoSchema(BaseModel):
+    ano: int
+    id_eleicao: int
+    sigla_vigente: str
+    is_rebranded: bool = False
+    nome_coligacao: Optional[str] = None
+    composicao_coligacao: Optional[str] = None
+    votos_nominais: int = 0
+    votos_legenda: int = 0
+    total_votos: int = 0
+    total_candidatos: int = 0
+    candidatos: List[CandidatoNaLinhaTempoSchema] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EstatisticasGeraisPartidoSchema(BaseModel):
+    total_votos_historico: int = 0
+    total_eleicoes_disputadas: int = 0
+    total_candidatos_historico: int = 0
+    total_eleitos_historico: int = 0
+    eleitos_prefeito: int = 0
+    eleitos_vereador: int = 0
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PartidoHistoricoSiglaSchema(BaseModel):
+    sigla: str
+    nome: Optional[str] = None
+    ano_inicio: Optional[int] = None
+    ano_fim: Optional[int] = None
+    is_atual: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PartidoTimelineResponse(BaseModel):
+    partido: PartidoItemSchema
+    estatisticas_gerais: EstatisticasGeraisPartidoSchema
+    eleicoes: List[EleicaoLinhaTempoSchema] = []
+    numero: Optional[int] = None
+    sigla_atual: Optional[str] = None
+    nome_atual: Optional[str] = None
+    siglas_anteriores: List[str] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 

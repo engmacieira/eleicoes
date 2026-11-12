@@ -158,7 +158,11 @@ export const ColigacoesPage: React.FC = () => {
   // Helper to compute councilor votes (nominal + legenda) for a given coalition
   const getCoalitionCouncilStats = (c: ColigacaoDto) => {
     const partyStats = c.partidos.map((membro) => {
-      const found = partidosDesempenho.find((p) => matchPartidos(p.sigla, membro.sigla_partido));
+      const found = partidosDesempenho.find(
+        (p) =>
+          (membro.partido_numero && p.numero && membro.partido_numero === p.numero) ||
+          matchPartidos(p.sigla, membro.sigla_partido)
+      );
       return {
         sigla: membro.sigla_partido,
         papel: membro.papel,
@@ -367,13 +371,21 @@ export const ColigacoesPage: React.FC = () => {
   // Filtered coalitions based on search query
   const filteredColigacoes = useMemo(() => {
     if (!searchTerm.trim()) return coligacoes;
-    const q = searchTerm.toLowerCase();
+    const q = searchTerm.toLowerCase().trim();
     return coligacoes.filter(
       (c) =>
         c.nome_coligacao.toLowerCase().includes(q) ||
         c.sigla_partido_titular.toLowerCase().includes(q) ||
         c.composicao_siglas.toLowerCase().includes(q) ||
         String(c.numero_urna).includes(q) ||
+        (c.partido_numero_titular && String(c.partido_numero_titular).includes(q)) ||
+        c.partidos.some(
+          (p) =>
+            p.sigla_partido.toLowerCase().includes(q) ||
+            (p.sigla_atual && p.sigla_atual.toLowerCase().includes(q)) ||
+            (p.partido_numero && String(p.partido_numero).includes(q)) ||
+            (p.nome_formatado && p.nome_formatado.toLowerCase().includes(q))
+        ) ||
         (c.candidato_nome && c.candidato_nome.toLowerCase().includes(q)) ||
         (c.vice_nome && c.vice_nome.toLowerCase().includes(q))
     );
@@ -882,6 +894,9 @@ export const ColigacoesPage: React.FC = () => {
                       {col.partidos.map((membro) => {
                         const isTitular = membro.papel === 'Cabeça de Chapa';
                         const isVice = membro.papel === 'Vice-Prefeito';
+                        const hasRebranding =
+                          membro.sigla_atual && membro.sigla_atual !== membro.sigla_partido;
+
                         return (
                           <div
                             key={membro.id}
@@ -892,8 +907,24 @@ export const ColigacoesPage: React.FC = () => {
                                 ? 'bg-purple-50 text-purple-800 border-purple-200'
                                 : 'bg-slate-50 text-slate-700 border-slate-200'
                             }`}
+                            title={
+                              membro.nome_formatado ||
+                              (hasRebranding
+                                ? `${membro.sigla_partido} (atual ${membro.sigla_atual} - nº ${membro.partido_numero})`
+                                : `${membro.sigla_partido} (nº ${membro.partido_numero || ''})`)
+                            }
                           >
                             <span className="font-bold">{membro.sigla_partido}</span>
+                            {membro.partido_numero && (
+                              <span className="font-mono text-[10px] text-slate-500 font-semibold">
+                                {membro.partido_numero}
+                              </span>
+                            )}
+                            {hasRebranding && (
+                              <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1 py-0.5 rounded border border-amber-200">
+                                atual {membro.sigla_atual}
+                              </span>
+                            )}
                             <span className="text-[10px] opacity-75">({membro.papel})</span>
                           </div>
                         );
