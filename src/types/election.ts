@@ -176,11 +176,55 @@ export interface CandidatoCadastroDto {
   is_deleted?: boolean;
 }
 
-export interface PartidoCadastroDto {
+export interface PartidoHistoricoDto {
   id: number;
+  id_partido: number;
+  numero: number;
   sigla: string;
+  nome?: string;
+  ano_inicio?: number;
+  ano_fim?: number;
+  is_atual: boolean;
   is_active?: boolean;
   is_deleted?: boolean;
+}
+
+export interface PartidoCadastroDto {
+  id: number;
+  numero: number;
+  sigla: string;
+  nome?: string;
+  historico?: PartidoHistoricoDto[];
+  is_active?: boolean;
+  is_deleted?: boolean;
+}
+
+export interface CreatePartidoPayload {
+  numero: number;
+  sigla: string;
+  nome?: string;
+  historico?: Array<{
+    sigla: string;
+    nome?: string;
+    ano_inicio?: number;
+    ano_fim?: number;
+    is_atual?: boolean;
+  }>;
+}
+
+export interface UpdatePartidoPayload {
+  numero?: number;
+  sigla?: string;
+  nome?: string;
+  is_active?: boolean;
+  historico?: Array<{
+    id?: number;
+    sigla: string;
+    nome?: string;
+    ano_inicio?: number;
+    ano_fim?: number;
+    is_atual?: boolean;
+  }>;
 }
 
 export interface EleicaoCadastroDto {

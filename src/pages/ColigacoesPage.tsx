@@ -1411,9 +1411,10 @@ export const ColigacoesPage: React.FC = () => {
                     <option value="">+ Selecionar partido para incluir na coligação...</option>
                     {partidosCadastrados
                       .filter((p) => !formPartidos.some((m) => m.sigla_partido === p.sigla))
+                      .sort((a, b) => a.numero - b.numero)
                       .map((p) => (
                         <option key={p.id} value={p.sigla}>
-                          {p.sigla}
+                          Nº {p.numero} — {p.sigla} ({p.nome})
                         </option>
                       ))}
                   </select>

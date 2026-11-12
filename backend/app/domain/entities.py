@@ -48,9 +48,26 @@ class DetalhesVotacaoEntity:
 
 
 @dataclass
+class PartidoHistoricoEntity:
+    id: Optional[int]
+    id_partido: int
+    numero: int
+    sigla: str
+    nome: Optional[str] = None
+    ano_inicio: Optional[int] = None
+    ano_fim: Optional[int] = None
+    is_atual: bool = False
+    is_active: bool = True
+    is_deleted: bool = False
+
+
+@dataclass
 class PartidosEntity:
     id: Optional[int]
+    numero: int
     sigla: str
+    nome: Optional[str] = None
+    historico: Optional[List[PartidoHistoricoEntity]] = None
     is_active: bool = True
     is_deleted: bool = False
 

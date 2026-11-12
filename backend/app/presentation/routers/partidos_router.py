@@ -17,12 +17,15 @@ router = APIRouter(prefix="/api/partidos", tags=["Partidos"])
 def listar_partidos(
     partido_repo: IPartidoRepository = Depends(get_partido_repo),
 ):
-    """Lista todos os partidos ativos cadastrados na base de dados."""
+    """Lista todos os partidos ativos cadastrados na base de dados ordenados pelo número TSE."""
     entities = partido_repo.list_all()
     return [
         PartidoItemSchema(
             id=p.id,
+            numero=p.numero,
             sigla=p.sigla,
+            nome=p.nome,
+            historico=p.historico,
             is_active=p.is_active,
             is_deleted=p.is_deleted,
         )
@@ -35,12 +38,20 @@ def cadastrar_partido(
     payload: PartidoCreateSchema,
     partido_repo: IPartidoRepository = Depends(get_partido_repo),
 ):
-    """Cadastra uma nova agremiação partidária."""
+    """Cadastra uma nova agremiação partidária com número TSE como indicador perene."""
     try:
-        created = partido_repo.create(payload.sigla)
+        created = partido_repo.create(
+            numero=payload.numero,
+            sigla=payload.sigla,
+            nome=payload.nome,
+            historico=payload.historico,
+        )
         return PartidoItemSchema(
             id=created.id,
+            numero=created.numero,
             sigla=created.sigla,
+            nome=created.nome,
+            historico=created.historico,
             is_active=created.is_active,
             is_deleted=created.is_deleted,
         )
@@ -54,9 +65,16 @@ def atualizar_partido(
     payload: PartidoUpdateSchema,
     partido_repo: IPartidoRepository = Depends(get_partido_repo),
 ):
-    """Atualiza as informações de uma agremiação partidária."""
+    """Atualiza as informações de uma agremiação partidária (número, sigla, nome e histórico)."""
     try:
-        updated = partido_repo.update(id=id, sigla=payload.sigla, is_active=payload.is_active)
+        updated = partido_repo.update(
+            id=id,
+            numero=payload.numero,
+            sigla=payload.sigla,
+            nome=payload.nome,
+            is_active=payload.is_active,
+            historico=payload.historico,
+        )
         if not updated:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -64,7 +82,10 @@ def atualizar_partido(
             )
         return PartidoItemSchema(
             id=updated.id,
+            numero=updated.numero,
             sigla=updated.sigla,
+            nome=updated.nome,
+            historico=updated.historico,
             is_active=updated.is_active,
             is_deleted=updated.is_deleted,
         )

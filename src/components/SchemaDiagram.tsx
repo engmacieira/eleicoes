@@ -15,6 +15,7 @@ export const SchemaDiagram: React.FC = () => {
     { from: 'coligacoes', fromCol: 'id_eleicao', to: 'eleicao', toCol: 'id', type: '1:N', label: 'Pleito da coligação' },
     { from: 'coligacao_partidos', fromCol: 'id_coligacao', to: 'coligacoes', toCol: 'id', type: '1:N', label: 'Chapa/Coligação' },
     { from: 'coligacao_partidos', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Partido integrante' },
+    { from: 'partido_historico', fromCol: 'id_partido', to: 'partidos', toCol: 'id', type: '1:N', label: 'Histórico de siglas e nomes' },
   ];
 
   return (
@@ -26,7 +27,7 @@ export const SchemaDiagram: React.FC = () => {
           <span>Diagrama Entidade-Relacionamento (ER) Conceitual & Físico</span>
         </h3>
         <p className="text-sm text-slate-600 mt-1">
-          Visualização gráfica das 8 tabelas relacionais com Soft Delete Universal, chaves primárias (PK), chaves estrangeiras (FK) e integridade referencial.
+          Visualização gráfica das 9 tabelas relacionais com Soft Delete Universal, chaves primárias (PK), chaves estrangeiras (FK) e integridade referencial.
           Passe o mouse sobre qualquer tabela para destacar seus relacionamentos ativos.
         </p>
 

@@ -7,6 +7,7 @@ from ..domain.entities import (
     EleicaoEntity,
     DetalhesVotacaoEntity,
     PartidosEntity,
+    PartidoHistoricoEntity,
     PartidosEleicaoEntity,
     CandidatosEleicaoEntity,
     ColigacaoEntity,
@@ -23,6 +24,7 @@ from .models import (
     Eleicao,
     DetalhesVotacao,
     Partidos,
+    PartidoHistorico,
     PartidosEleicao,
     CandidatosEleicao,
     Coligacao,
@@ -350,57 +352,155 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    def list_all(self) -> List[PartidosEntity]:
-        stmt = select(Partidos).where(Partidos.is_deleted.is_(False)).order_by(asc(Partidos.sigla))
-        results = self.db.scalars(stmt).all()
-        return [
-            PartidosEntity(
-                id=p.id,
-                sigla=p.sigla,
-                is_active=p.is_active,
-                is_deleted=p.is_deleted,
+    def _to_entity(self, p: Partidos) -> PartidosEntity:
+        historico_entities = [
+            PartidoHistoricoEntity(
+                id=h.id,
+                id_partido=h.id_partido,
+                numero=h.numero,
+                sigla=h.sigla,
+                nome=h.nome,
+                ano_inicio=h.ano_inicio,
+                ano_fim=h.ano_fim,
+                is_atual=h.is_atual,
+                is_active=h.is_active,
+                is_deleted=h.is_deleted,
             )
-            for p in results
+            for h in (p.historico_nomes or [])
+            if not h.is_deleted
         ]
+        return PartidosEntity(
+            id=p.id,
+            numero=p.numero,
+            sigla=p.sigla,
+            nome=p.nome,
+            historico=historico_entities,
+            is_active=p.is_active,
+            is_deleted=p.is_deleted,
+        )
 
-    def create(self, sigla: str) -> PartidosEntity:
+    def list_all(self) -> List[PartidosEntity]:
+        stmt = (
+            select(Partidos)
+            .where(Partidos.is_deleted.is_(False))
+            .order_by(asc(Partidos.numero))
+        )
+        results = self.db.scalars(stmt).all()
+        return [self._to_entity(p) for p in results]
+
+    def get_by_id(self, id: int) -> Optional[PartidosEntity]:
+        p = self.db.scalar(select(Partidos).where(Partidos.id == id, Partidos.is_deleted.is_(False)))
+        return self._to_entity(p) if p else None
+
+    def get_by_numero(self, numero: int) -> Optional[PartidosEntity]:
+        p = self.db.scalar(select(Partidos).where(Partidos.numero == numero, Partidos.is_deleted.is_(False)))
+        return self._to_entity(p) if p else None
+
+    def create(
+        self,
+        numero: int,
+        sigla: str,
+        nome: Optional[str] = None,
+        historico: Optional[List[dict]] = None,
+    ) -> PartidosEntity:
         sigla_clean = sigla.strip().upper()
-        existing = self.db.scalar(select(Partidos).where(Partidos.sigla == sigla_clean))
-        if existing:
-            if existing.is_deleted:
-                existing.is_deleted = False
-                existing.is_active = True
-                self.db.commit()
-                self.db.refresh(existing)
-                return PartidosEntity(id=existing.id, sigla=existing.sigla, is_active=existing.is_active, is_deleted=existing.is_deleted)
-            raise ValueError(f"Partido com sigla {sigla_clean} já está cadastrado.")
+        nome_clean = nome.strip() if nome else None
 
-        obj = Partidos(sigla=sigla_clean, is_active=True, is_deleted=False)
+        existing_num = self.db.scalar(select(Partidos).where(Partidos.numero == numero))
+        if existing_num:
+            if existing_num.is_deleted:
+                existing_num.is_deleted = False
+                existing_num.is_active = True
+                existing_num.sigla = sigla_clean
+                existing_num.nome = nome_clean
+                self.db.commit()
+                self.db.refresh(existing_num)
+                return self._to_entity(existing_num)
+            raise ValueError(f"Partido com o número eleitoral {numero} já está cadastrado.")
+
+        obj = Partidos(
+            numero=numero,
+            sigla=sigla_clean,
+            nome=nome_clean,
+            is_active=True,
+            is_deleted=False,
+        )
         self.db.add(obj)
+        self.db.flush()
+
+        # Add historical names if provided
+        if historico:
+            for h in historico:
+                h_obj = PartidoHistorico(
+                    id_partido=obj.id,
+                    numero=numero,
+                    sigla=h.get("sigla", "").strip().upper(),
+                    nome=h.get("nome"),
+                    ano_inicio=h.get("ano_inicio"),
+                    ano_fim=h.get("ano_fim"),
+                    is_atual=h.get("is_atual", False),
+                    is_active=True,
+                    is_deleted=False,
+                )
+                self.db.add(h_obj)
+
         self.db.commit()
         self.db.refresh(obj)
-        return PartidosEntity(id=obj.id, sigla=obj.sigla, is_active=obj.is_active, is_deleted=obj.is_deleted)
+        return self._to_entity(obj)
 
     def update(
-        self, id: int, sigla: Optional[str] = None, is_active: Optional[bool] = None
+        self,
+        id: int,
+        numero: Optional[int] = None,
+        sigla: Optional[str] = None,
+        nome: Optional[str] = None,
+        is_active: Optional[bool] = None,
+        historico: Optional[List[dict]] = None,
     ) -> Optional[PartidosEntity]:
         obj = self.db.scalar(select(Partidos).where(Partidos.id == id, Partidos.is_deleted.is_(False)))
         if not obj:
             return None
 
+        if numero is not None and numero != obj.numero:
+            existing_num = self.db.scalar(
+                select(Partidos).where(Partidos.numero == numero, Partidos.id != id, Partidos.is_deleted.is_(False))
+            )
+            if existing_num:
+                raise ValueError(f"Já existe outro partido com o número {numero}.")
+            obj.numero = numero
+
         if sigla is not None:
-            sigla_clean = sigla.strip().upper()
-            existing = self.db.scalar(select(Partidos).where(Partidos.sigla == sigla_clean, Partidos.id != id, Partidos.is_deleted.is_(False)))
-            if existing:
-                raise ValueError(f"Já existe outro partido com a sigla {sigla_clean}.")
-            obj.sigla = sigla_clean
+            obj.sigla = sigla.strip().upper()
+
+        if nome is not None:
+            obj.nome = nome.strip() if nome else None
 
         if is_active is not None:
             obj.is_active = is_active
 
+        if historico is not None:
+            # Replace historical names
+            for existing_h in obj.historico_nomes:
+                existing_h.is_deleted = True
+                existing_h.is_active = False
+
+            for h in historico:
+                h_obj = PartidoHistorico(
+                    id_partido=obj.id,
+                    numero=obj.numero,
+                    sigla=h.get("sigla", "").strip().upper(),
+                    nome=h.get("nome"),
+                    ano_inicio=h.get("ano_inicio"),
+                    ano_fim=h.get("ano_fim"),
+                    is_atual=h.get("is_atual", False),
+                    is_active=True,
+                    is_deleted=False,
+                )
+                self.db.add(h_obj)
+
         self.db.commit()
         self.db.refresh(obj)
-        return PartidosEntity(id=obj.id, sigla=obj.sigla, is_active=obj.is_active, is_deleted=obj.is_deleted)
+        return self._to_entity(obj)
 
     def soft_delete(self, id: int) -> bool:
         obj = self.db.scalar(select(Partidos).where(Partidos.id == id, Partidos.is_deleted.is_(False)))
@@ -408,6 +508,9 @@ class SqlAlchemyPartidoRepository(IPartidoRepository):
             return False
         obj.is_deleted = True
         obj.is_active = False
+        for h in obj.historico_nomes:
+            h.is_deleted = True
+            h.is_active = False
         self.db.commit()
         return True
 

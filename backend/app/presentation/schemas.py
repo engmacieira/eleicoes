@@ -146,18 +146,42 @@ class CandidatosPaginadosResponse(BaseModel):
     items: List[CandidatoItemSchema]
 
 
-class PartidoCreateSchema(BaseModel):
+class PartidoHistoricoSchema(BaseModel):
+    id: Optional[int] = None
+    id_partido: Optional[int] = None
+    numero: int
     sigla: str
+    nome: Optional[str] = None
+    ano_inicio: Optional[int] = None
+    ano_fim: Optional[int] = None
+    is_atual: bool = False
+    is_active: bool = True
+    is_deleted: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PartidoCreateSchema(BaseModel):
+    numero: int
+    sigla: str
+    nome: Optional[str] = None
+    historico: Optional[List[dict]] = None
 
 
 class PartidoUpdateSchema(BaseModel):
+    numero: Optional[int] = None
     sigla: Optional[str] = None
+    nome: Optional[str] = None
     is_active: Optional[bool] = None
+    historico: Optional[List[dict]] = None
 
 
 class PartidoItemSchema(BaseModel):
     id: int
+    numero: int
     sigla: str
+    nome: Optional[str] = None
+    historico: Optional[List[PartidoHistoricoSchema]] = None
     is_active: bool = True
     is_deleted: bool = False
 

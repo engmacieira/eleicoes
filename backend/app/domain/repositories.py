@@ -87,12 +87,32 @@ class IPartidoRepository(ABC):
         pass
 
     @abstractmethod
-    def create(self, sigla: str) -> PartidosEntity:
+    def get_by_id(self, id: int) -> Optional[PartidosEntity]:
+        pass
+
+    @abstractmethod
+    def get_by_numero(self, numero: int) -> Optional[PartidosEntity]:
+        pass
+
+    @abstractmethod
+    def create(
+        self,
+        numero: int,
+        sigla: str,
+        nome: Optional[str] = None,
+        historico: Optional[List[dict]] = None,
+    ) -> PartidosEntity:
         pass
 
     @abstractmethod
     def update(
-        self, id: int, sigla: Optional[str] = None, is_active: Optional[bool] = None
+        self,
+        id: int,
+        numero: Optional[int] = None,
+        sigla: Optional[str] = None,
+        nome: Optional[str] = None,
+        is_active: Optional[bool] = None,
+        historico: Optional[List[dict]] = None,
     ) -> Optional[PartidosEntity]:
         pass
 

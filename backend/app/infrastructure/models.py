@@ -82,11 +82,13 @@ class DetalhesVotacao(Base):
 
 
 class Partidos(Base):
-    """Cadastro único de siglas partidárias."""
+    """Cadastro perene de legendas partidárias indexado pelo número oficial do TSE."""
     __tablename__ = "partidos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    sigla: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
+    numero: Mapped[int] = mapped_column(Integer, unique=True, nullable=False, index=True)
+    sigla: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    nome: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
 
     # Soft Delete Universal
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -98,6 +100,31 @@ class Partidos(Base):
     candidatos: Mapped[List["CandidatosEleicao"]] = relationship(
         "CandidatosEleicao", back_populates="partido"
     )
+    historico_nomes: Mapped[List["PartidoHistorico"]] = relationship(
+        "PartidoHistorico", back_populates="partido", cascade="all, delete-orphan"
+    )
+
+
+class PartidoHistorico(Base):
+    """Tabela auxiliar de denominações anteriores, siglas e rebrandings partidários."""
+    __tablename__ = "partido_historico"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_partido: Mapped[int] = mapped_column(
+        ForeignKey("partidos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    numero: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    sigla: Mapped[str] = mapped_column(String(20), nullable=False)
+    nome: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    ano_inicio: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    ano_fim: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    is_atual: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Soft Delete Universal
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="historico_nomes")
 
 
 class PartidosEleicao(Base):

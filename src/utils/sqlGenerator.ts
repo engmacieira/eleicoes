@@ -105,7 +105,7 @@ export const SCHEMA_TABLES: TableSchema[] = [
     id: 'partidos',
     name: 'partidos',
     category: 'dimensao',
-    description: 'Catálogo mestre dos partidos políticos para evitar redundâncias textuais e inconsistências.',
+    description: 'Catálogo mestre dos partidos políticos indexado pelo número eleitoral perene do TSE.',
     columns: [
       {
         name: 'id',
@@ -115,17 +115,37 @@ export const SCHEMA_TABLES: TableSchema[] = [
         description: 'Identificador único do partido.',
       },
       {
+        name: 'numero',
+        type: 'INTEGER',
+        nullable: false,
+        constraint: 'UNIQUE, CHECK (numero >= 10 AND numero <= 99)',
+        description: 'Número eleitoral oficial atribuído pelo TSE (identificador perene da agremiação, ex: 70, 15, 45, 13, 22).',
+      },
+      {
         name: 'sigla',
         type: 'VARCHAR(20)',
         nullable: false,
-        constraint: 'UNIQUE',
-        description: 'Sigla oficial registrada no TSE (ex: MDB, PT, PSDB, PL, SOLIDARIEDADE).',
+        description: 'Sigla oficial atual registrada no TSE (ex: AVANTE, MDB, PT, PSDB, PL).',
       },
       {
         name: 'nome_completo',
         type: 'VARCHAR(150)',
         nullable: true,
-        description: 'Nome por extenso da agremiação partidária (opcional).',
+        description: 'Nome por extenso atual da agremiação partidária (ex: Avante, Movimento Democrático Brasileiro).',
+      },
+      {
+        name: 'is_active',
+        type: 'BOOLEAN',
+        nullable: false,
+        constraint: 'DEFAULT TRUE',
+        description: 'Universal Soft Delete.',
+      },
+      {
+        name: 'is_deleted',
+        type: 'BOOLEAN',
+        nullable: false,
+        constraint: 'DEFAULT FALSE',
+        description: 'Universal Soft Delete.',
       },
       {
         name: 'criado_em',
@@ -136,11 +156,102 @@ export const SCHEMA_TABLES: TableSchema[] = [
       },
     ],
     indexes: [
-      'CREATE UNIQUE INDEX idx_partidos_sigla ON partidos(sigla);',
+      'CREATE UNIQUE INDEX idx_partidos_numero ON partidos(numero);',
+      'CREATE INDEX idx_partidos_sigla ON partidos(sigla);',
     ],
     constraints: [
       'PRIMARY KEY (id)',
-      'CONSTRAINT uq_partidos_sigla UNIQUE (sigla)',
+      'CONSTRAINT uq_partidos_numero UNIQUE (numero)',
+    ],
+  },
+  {
+    id: 'partido_historico',
+    name: 'partido_historico',
+    category: 'dimensao',
+    description: 'Tabela auxiliar de histórico de denominações, siglas antigas e rebrandings partidários ao longo do tempo (ex: 70 era PTdoB e virou AVANTE).',
+    columns: [
+      {
+        name: 'id',
+        type: 'BIGINT GENERATED ALWAYS AS IDENTITY',
+        isPk: true,
+        nullable: false,
+        description: 'Identificador único da denominação histórica.',
+      },
+      {
+        name: 'id_partido',
+        type: 'INTEGER',
+        isFk: true,
+        fkTarget: 'partidos(id)',
+        nullable: false,
+        description: 'Chave estrangeira do partido perene.',
+      },
+      {
+        name: 'numero',
+        type: 'INTEGER',
+        nullable: false,
+        description: 'Número oficial do partido no TSE.',
+      },
+      {
+        name: 'sigla',
+        type: 'VARCHAR(20)',
+        nullable: false,
+        description: 'Sigla utilizada no período (ex: PTdoB, PMDB, PFL, PRB, PPB, PTN).',
+      },
+      {
+        name: 'nome_completo',
+        type: 'VARCHAR(150)',
+        nullable: true,
+        description: 'Nome por extenso da legenda na época (ex: Partido Trabalhista do Brasil).',
+      },
+      {
+        name: 'ano_inicio',
+        type: 'SMALLINT',
+        nullable: true,
+        description: 'Ano de início da denominação.',
+      },
+      {
+        name: 'ano_fim',
+        type: 'SMALLINT',
+        nullable: true,
+        description: 'Ano final da denominação (NULL se for a denominação vigente).',
+      },
+      {
+        name: 'is_atual',
+        type: 'BOOLEAN',
+        nullable: false,
+        constraint: 'DEFAULT FALSE',
+        description: 'Indica se esta é a denominação oficial corrente.',
+      },
+      {
+        name: 'is_active',
+        type: 'BOOLEAN',
+        nullable: false,
+        constraint: 'DEFAULT TRUE',
+        description: 'Universal Soft Delete.',
+      },
+      {
+        name: 'is_deleted',
+        type: 'BOOLEAN',
+        nullable: false,
+        constraint: 'DEFAULT FALSE',
+        description: 'Universal Soft Delete.',
+      },
+      {
+        name: 'criado_em',
+        type: 'TIMESTAMPTZ',
+        nullable: false,
+        constraint: 'DEFAULT CURRENT_TIMESTAMP',
+        description: 'Timestamp de inserção.',
+      },
+    ],
+    indexes: [
+      'CREATE INDEX idx_partido_hist_partido ON partido_historico(id_partido);',
+      'CREATE INDEX idx_partido_hist_numero ON partido_historico(numero);',
+      'CREATE INDEX idx_partido_hist_sigla ON partido_historico(sigla);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_partido_hist_partido FOREIGN KEY (id_partido) REFERENCES partidos(id) ON DELETE CASCADE',
     ],
   },
   {
@@ -517,20 +628,49 @@ COMMENT ON TABLE eleicao IS 'Catálogo temporal de pleitos eleitorais municipais
 COMMENT ON COLUMN eleicao.ano IS 'Ano de realização da eleição municipal (ex: 2000, 2004, ..., 2024)';
 
 
--- 3. TABELA: partidos (Dimensão de Siglas Partidárias)
--- Cadastro padronizado único das legendas partidárias para evitar redundâncias textuais.
+-- 3. TABELA: partidos (Dimensão Partidária Perene)
+-- Cadastro padronizado único dos partidos políticos indexado pelo número eleitoral perene do TSE.
 CREATE TABLE IF NOT EXISTS partidos (
     id              INTEGER GENERATED ALWAYS AS IDENTITY,
+    numero          INTEGER NOT NULL,
     sigla           VARCHAR(20) NOT NULL,
     nome_completo   VARCHAR(150) NULL,
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted      BOOLEAN NOT NULL DEFAULT FALSE,
     criado_em       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_partidos PRIMARY KEY (id),
-    CONSTRAINT uq_partidos_sigla UNIQUE (sigla)
+    CONSTRAINT uq_partidos_numero UNIQUE (numero)
 );
 
-COMMENT ON TABLE partidos IS 'Cadastro único de legendas e agremiações partidárias';
-COMMENT ON COLUMN partidos.sigla IS 'Sigla oficial registrada no TSE (ex: MDB, PT, PSDB, PL)';
+COMMENT ON TABLE partidos IS 'Catálogo perene de partidos políticos indexado pelo número eleitoral do TSE';
+COMMENT ON COLUMN partidos.numero IS 'Número oficial de urna atribuído pelo TSE (ex: 70, 15, 45, 13, 22)';
+COMMENT ON COLUMN partidos.sigla IS 'Sigla atual da agremiação registrada no TSE (ex: AVANTE, MDB, PT, PSDB)';
+
+
+-- 3.1 TABELA: partido_historico (Tabela Auxiliar de Histórico de Nomes e Siglas Anteriores)
+-- Registra as transformações, rebrandings e fusões (ex: 70 era PTdoB e virou AVANTE; 15 era PMDB e virou MDB).
+CREATE TABLE IF NOT EXISTS partido_historico (
+    id              BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_partido      INTEGER NOT NULL,
+    numero          INTEGER NOT NULL,
+    sigla           VARCHAR(20) NOT NULL,
+    nome_completo   VARCHAR(150) NULL,
+    ano_inicio      SMALLINT NULL,
+    ano_fim         SMALLINT NULL,
+    is_atual        BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted      BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_partido_historico PRIMARY KEY (id),
+    CONSTRAINT fk_partido_hist_partido 
+        FOREIGN KEY (id_partido) 
+        REFERENCES partidos(id) 
+        ON DELETE CASCADE
+);
+
+COMMENT ON TABLE partido_historico IS 'Histórico de denominações, siglas antigas e rebrandings partidários';
 
 
 -- 4. TABELA: detalhes_votacao (Estatísticas Gerais da Urna)
@@ -714,9 +854,19 @@ CREATE INDEX IF NOT EXISTS idx_candidatos_eleicao_ranking
 CREATE INDEX IF NOT EXISTS idx_candidatos_eleicao_partido 
     ON candidatos_eleicao(id_partido);
 
--- 6. Busca Rápida de Partidos por Sigla
+-- 6. Busca Rápida de Partidos por Número e Sigla
+CREATE INDEX IF NOT EXISTS idx_partidos_numero 
+    ON partidos(numero);
 CREATE INDEX IF NOT EXISTS idx_partidos_sigla 
     ON partidos(sigla);
+
+-- 6.1 Histórico de Denominações Partidárias (Rebrandings e Siglas Anteriores)
+CREATE INDEX IF NOT EXISTS idx_partido_hist_partido 
+    ON partido_historico(id_partido);
+CREATE INDEX IF NOT EXISTS idx_partido_hist_numero 
+    ON partido_historico(numero);
+CREATE INDEX IF NOT EXISTS idx_partido_hist_sigla 
+    ON partido_historico(sigla);
 
 -- 7. Desempenho Partidário por Pleito
 CREATE INDEX IF NOT EXISTS idx_partidos_eleicao_pleito 

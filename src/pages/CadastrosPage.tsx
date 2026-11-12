@@ -19,6 +19,9 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  History,
+  Hash,
+  ArrowRight,
 } from 'lucide-react';
 import {
   getCandidatosCadastrados,
@@ -33,6 +36,7 @@ import {
   createEleicao,
   deleteEleicao,
 } from '../services/api';
+import { PartidoCadastroDto, PartidoHistoricoDto } from '../types/election';
 import { useAppRouter } from '../router/RouterContext';
 
 type CadastroTab = 'candidatos' | 'partidos' | 'eleicoes';
@@ -45,12 +49,7 @@ interface CandidatoItem {
   is_deleted: boolean;
 }
 
-interface PartidoItem {
-  id: number;
-  sigla: string;
-  is_active: boolean;
-  is_deleted: boolean;
-}
+export type PartidoItem = PartidoCadastroDto;
 
 interface EleicaoItem {
   id: number;
@@ -121,13 +120,44 @@ export const CadastrosPage: React.FC = () => {
     is_active: true,
   });
 
-  const [formPartido, setFormPartido] = useState({
+  const [formPartido, setFormPartido] = useState<{
+    numero: string;
+    sigla: string;
+    nome: string;
+    historico: Array<{ sigla: string; nome: string; ano_inicio: string; ano_fim: string }>;
+  }>({
+    numero: '',
     sigla: '',
+    nome: '',
+    historico: [],
   });
 
-  const [formEditPartido, setFormEditPartido] = useState({
+  const [novoHistCriar, setNovoHistCriar] = useState({
     sigla: '',
+    nome: '',
+    ano_inicio: '',
+    ano_fim: '',
+  });
+
+  const [formEditPartido, setFormEditPartido] = useState<{
+    numero: string;
+    sigla: string;
+    nome: string;
+    is_active: boolean;
+    historico: Array<{ id?: number; sigla: string; nome: string; ano_inicio: string; ano_fim: string }>;
+  }>({
+    numero: '',
+    sigla: '',
+    nome: '',
     is_active: true,
+    historico: [],
+  });
+
+  const [novoHistEditar, setNovoHistEditar] = useState({
+    sigla: '',
+    nome: '',
+    ano_inicio: '',
+    ano_fim: '',
   });
 
   const [formEleicao, setFormEleicao] = useState({
@@ -248,15 +278,35 @@ export const CadastrosPage: React.FC = () => {
   // Handle Create Partido
   const handleCreatePartido = async (e: React.FormEvent) => {
     e.preventDefault();
+    const num = parseInt(formPartido.numero, 10);
+    if (isNaN(num) || num <= 0 || num > 99) {
+      showFeedback('error', 'O Número Eleitoral deve ser um número válido de 2 dígitos (ex: 70, 15, 25).');
+      return;
+    }
     if (!formPartido.sigla.trim()) {
       showFeedback('error', 'A sigla do partido é obrigatória.');
       return;
     }
+    if (!formPartido.nome.trim()) {
+      showFeedback('error', 'O nome oficial do partido é obrigatório.');
+      return;
+    }
 
     try {
-      await createPartido({ sigla: formPartido.sigla.trim() });
-      showFeedback('success', `Partido ${formPartido.sigla.toUpperCase()} cadastrado com sucesso!`);
-      setFormPartido({ sigla: '' });
+      await createPartido({
+        numero: num,
+        sigla: formPartido.sigla.trim().toUpperCase(),
+        nome: formPartido.nome.trim(),
+        historico: formPartido.historico.map((h) => ({
+          sigla: h.sigla.trim().toUpperCase(),
+          nome: h.nome?.trim() || undefined,
+          ano_inicio: h.ano_inicio ? parseInt(h.ano_inicio, 10) : undefined,
+          ano_fim: h.ano_fim ? parseInt(h.ano_fim, 10) : undefined,
+        })),
+      });
+      showFeedback('success', `Partido Nº ${num} - ${formPartido.sigla.toUpperCase()} cadastrado com sucesso!`);
+      setFormPartido({ numero: '', sigla: '', nome: '', historico: [] });
+      setNovoHistCriar({ sigla: '', nome: '', ano_inicio: '', ano_fim: '' });
       setModalNovoPartidoOpen(false);
       fetchPartidos();
     } catch (err: any) {
@@ -269,17 +319,35 @@ export const CadastrosPage: React.FC = () => {
     e.preventDefault();
     if (!partidoEditing) return;
 
+    const num = parseInt(formEditPartido.numero, 10);
+    if (isNaN(num) || num <= 0 || num > 99) {
+      showFeedback('error', 'O Número Eleitoral deve ser um número válido de 2 dígitos (ex: 70, 15, 25).');
+      return;
+    }
     if (!formEditPartido.sigla.trim()) {
       showFeedback('error', 'A sigla do partido é obrigatória.');
+      return;
+    }
+    if (!formEditPartido.nome.trim()) {
+      showFeedback('error', 'O nome oficial do partido é obrigatório.');
       return;
     }
 
     try {
       await updatePartido(partidoEditing.id, {
-        sigla: formEditPartido.sigla.trim(),
+        numero: num,
+        sigla: formEditPartido.sigla.trim().toUpperCase(),
+        nome: formEditPartido.nome.trim(),
         is_active: formEditPartido.is_active,
+        historico: formEditPartido.historico.map((h) => ({
+          id: h.id,
+          sigla: h.sigla.trim().toUpperCase(),
+          nome: h.nome?.trim() || undefined,
+          ano_inicio: h.ano_inicio ? parseInt(String(h.ano_inicio), 10) : undefined,
+          ano_fim: h.ano_fim ? parseInt(String(h.ano_fim), 10) : undefined,
+        })),
       });
-      showFeedback('success', `Partido ${formEditPartido.sigla.toUpperCase()} atualizado com sucesso!`);
+      showFeedback('success', `Partido Nº ${num} - ${formEditPartido.sigla.toUpperCase()} atualizado com sucesso!`);
       setModalEditarPartidoOpen(false);
       setPartidoEditing(null);
       fetchPartidos();
@@ -336,11 +404,19 @@ export const CadastrosPage: React.FC = () => {
   const candidatosStartRecord = candidatosTotal === 0 ? 0 : (candidatosPage - 1) * PAGE_SIZE + 1;
   const candidatosEndRecord = Math.min(candidatosTotal, candidatosPage * PAGE_SIZE);
 
-  // Partidos Filter & Pagination
+  // Partidos Filter & Pagination (pesquisa por número, sigla atual, nome oficial ou siglas históricas antigas como PTdoB, PMDB, etc)
   const filteredPartidos = useMemo(() => {
     if (!partidosSearch.trim()) return partidos;
     const term = partidosSearch.toLowerCase().trim();
-    return partidos.filter((p) => p.sigla.toLowerCase().includes(term));
+    return partidos.filter((p) => {
+      const matchNum = String(p.numero).includes(term);
+      const matchSigla = p.sigla.toLowerCase().includes(term);
+      const matchNome = (p.nome || '').toLowerCase().includes(term);
+      const matchHist = (p.historico || []).some(
+        (h) => h.sigla.toLowerCase().includes(term) || (h.nome || '').toLowerCase().includes(term)
+      );
+      return matchNum || matchSigla || matchNome || matchHist;
+    });
   }, [partidos, partidosSearch]);
 
   const totalPartidosPages = Math.max(1, Math.ceil(filteredPartidos.length / PAGE_SIZE));
@@ -712,17 +788,17 @@ export const CadastrosPage: React.FC = () => {
         <div className="bg-white rounded-b-xl rounded-tr-xl border border-slate-200/90 shadow-xs overflow-hidden -mt-6">
           {/* Partidos Filter Bar */}
           <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="relative w-full sm:w-80">
+            <div className="relative w-full sm:w-96">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Filtrar partido por sigla..."
+                placeholder="Buscar por número (ex: 70), sigla ou histórico (PTdoB, PMDB)..."
                 value={partidosSearch}
                 onChange={(e) => {
                   setPartidosSearch(e.target.value);
                   setPartidosPage(1);
                 }}
-                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder-slate-400 uppercase font-mono"
+                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder-slate-400"
               />
               {partidosSearch && (
                 <button
@@ -755,7 +831,11 @@ export const CadastrosPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setModalNovoPartidoOpen(true)}
+                onClick={() => {
+                  setFormPartido({ numero: '', sigla: '', nome: '', historico: [] });
+                  setNovoHistCriar({ sigla: '', nome: '', ano_inicio: '', ano_fim: '' });
+                  setModalNovoPartidoOpen(true);
+                }}
                 className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-xs transition cursor-pointer shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -768,36 +848,68 @@ export const CadastrosPage: React.FC = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
-                  <th className="py-3 px-4">ID</th>
-                  <th className="py-3 px-4">Sigla do Partido</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Ações</th>
+                  <th className="py-3 px-4 text-center w-24">Nº TSE</th>
+                  <th className="py-3 px-4 w-32">Sigla Atual</th>
+                  <th className="py-3 px-4">Nome Oficial do Partido</th>
+                  <th className="py-3 px-4">Histórico / Siglas Anteriores</th>
+                  <th className="py-3 px-4 text-center w-24">Status</th>
+                  <th className="py-3 px-4 text-right w-24">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loadingPartidos ? (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-slate-400">
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
                       <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                       Carregando partidos...
                     </td>
                   </tr>
                 ) : partidosPaginated.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-slate-400">
-                      Nenhum partido cadastrado.
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                      Nenhum partido cadastrado correspondente aos filtros.
                     </td>
                   </tr>
                 ) : (
                   partidosPaginated.map((p) => (
                     <tr key={p.id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3 px-4 font-mono text-slate-500">
-                        {p.id}
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center justify-center font-mono font-bold text-xs bg-blue-50 text-blue-800 px-2.5 py-1 rounded-md border border-blue-200">
+                          {p.numero}
+                        </span>
                       </td>
                       <td className="py-3 px-4">
                         <span className="font-mono font-bold text-xs bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-200">
                           {p.sigla}
                         </span>
+                      </td>
+                      <td className="py-3 px-4 font-medium text-slate-800">
+                        {p.nome || '—'}
+                      </td>
+                      <td className="py-3 px-4">
+                        {p.historico && p.historico.length > 0 ? (
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {p.historico.map((h, hIdx) => (
+                              <span
+                                key={h.id || hIdx}
+                                className="inline-flex items-center gap-1 text-[11px] font-mono bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-200"
+                                title={h.nome ? `${h.sigla} - ${h.nome}` : h.sigla}
+                              >
+                                <History className="w-3 h-3 text-amber-600" />
+                                <strong>{h.sigla}</strong>
+                                {(h.ano_inicio || h.ano_fim) && (
+                                  <span className="text-[10px] text-amber-700">
+                                    ({h.ano_inicio || '…'}–{h.ano_fim || '…'})
+                                  </span>
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic text-[11px]">
+                            Sem alterações (denominação original)
+                          </span>
+                        )}
                       </td>
                       <td className="py-3 px-4 text-center">
                         {p.is_active ? (
@@ -815,13 +927,23 @@ export const CadastrosPage: React.FC = () => {
                           onClick={() => {
                             setPartidoEditing(p);
                             setFormEditPartido({
+                              numero: String(p.numero),
                               sigla: p.sigla,
-                              is_active: p.is_active,
+                              nome: p.nome || '',
+                              is_active: p.is_active ?? true,
+                              historico: (p.historico || []).map((h) => ({
+                                id: h.id,
+                                sigla: h.sigla,
+                                nome: h.nome || '',
+                                ano_inicio: h.ano_inicio ? String(h.ano_inicio) : '',
+                                ano_fim: h.ano_fim ? String(h.ano_fim) : '',
+                              })),
                             });
+                            setNovoHistEditar({ sigla: '', nome: '', ano_inicio: '', ano_fim: '' });
                             setModalEditarPartidoOpen(true);
                           }}
                           className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
-                          title="Editar Partido"
+                          title="Editar Partido e Histórico"
                         >
                           <Edit2 className="w-4 h-4 inline" />
                         </button>
@@ -830,7 +952,7 @@ export const CadastrosPage: React.FC = () => {
                             setItemToDelete({
                               type: 'partido',
                               id: p.id,
-                              title: `Partido ${p.sigla}`,
+                              title: `Nº ${p.numero} (${p.sigla})`,
                             })
                           }
                           className="p-1 rounded text-red-600 hover:bg-red-50 transition cursor-pointer"
@@ -1289,13 +1411,13 @@ export const CadastrosPage: React.FC = () => {
       {/* MODAL 3: NOVO PARTIDO */}
       {/* ========================================================= */}
       {modalNovoPartidoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-6">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center space-x-2">
                 <Flag className="w-4 h-4 text-blue-700" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Cadastrar Novo Partido
+                  Cadastrar Novo Partido Político
                 </h3>
               </div>
               <button
@@ -1308,26 +1430,180 @@ export const CadastrosPage: React.FC = () => {
 
             <form onSubmit={handleCreatePartido} className="p-5 space-y-4 text-xs">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-[11px] leading-relaxed flex items-start gap-2">
-                <Flag className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                <Hash className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold">Dimensão Partidária (Partidos): </span>
-                  Cadastro único da sigla da agremiação política (UNIQUE - VARCHAR 20) para integridade relacional. Evita duplicidade e viabiliza comparativos eleitorais.
+                  <span className="font-bold">Número Canônico do TSE como Fonte da Verdade: </span>
+                  O número eleitoral (ex: 70, 15, 25) é a referência imutável da agremiação no TSE. O sistema mantém o histórico de renomeações e siglas passadas (ex: PTdoB → AVANTE) para que dados de eleições antigas se vinculem automaticamente.
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Nº TSE (Canônico) *
+                  </label>
+                  <input
+                    type="number"
+                    min={10}
+                    max={99}
+                    required
+                    placeholder="Ex: 70"
+                    value={formPartido.numero}
+                    onChange={(e) => setFormPartido({ ...formPartido, numero: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono font-bold text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Sigla Atual do Partido *
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    required
+                    placeholder="Ex: AVANTE, MDB, PSD"
+                    value={formPartido.sigla}
+                    onChange={(e) => setFormPartido({ ...formPartido, sigla: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono font-bold text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden uppercase"
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Sigla do Partido (Ex: PDT, MDB, PSD, PT) *
+                  Nome Oficial Registrado no TSE *
                 </label>
                 <input
                   type="text"
-                  maxLength={20}
+                  maxLength={150}
                   required
-                  placeholder="Ex: REPUBLICANOS"
-                  value={formPartido.sigla}
-                  onChange={(e) => setFormPartido({ sigla: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden uppercase"
+                  placeholder="Ex: Avante"
+                  value={formPartido.nome}
+                  onChange={(e) => setFormPartido({ ...formPartido, nome: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
                 />
+              </div>
+
+              {/* Sub-form: Histórico de Denominações Anteriores */}
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-[11px]">
+                    <History className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Siglas Anteriores / Histórico (Ex: PTdoB, PMDB, PFL)</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500">
+                    {formPartido.historico.length} registrada(s)
+                  </span>
+                </div>
+
+                {/* Lista de siglas passadas cadastradas */}
+                {formPartido.historico.length > 0 && (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                    {formPartido.historico.map((h, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded border border-slate-200 text-[11px]"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                            {h.sigla}
+                          </span>
+                          {h.nome && <span className="text-slate-600">{h.nome}</span>}
+                          {(h.ano_inicio || h.ano_fim) && (
+                            <span className="text-slate-400 text-[10px]">
+                              ({h.ano_inicio || '…'} a {h.ano_fim || '…'})
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormPartido({
+                              ...formPartido,
+                              historico: formPartido.historico.filter((_, i) => i !== idx),
+                            });
+                          }}
+                          className="text-red-500 hover:text-red-700 p-0.5 cursor-pointer"
+                          title="Remover denominação anterior"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Inputs para adicionar uma nova denominação anterior */}
+                <div className="pt-2 border-t border-slate-200/80 space-y-2">
+                  <div className="text-[10px] font-semibold text-slate-600 uppercase">
+                    Adicionar Denominação Passada:
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Sigla (PTdoB)"
+                        value={novoHistCriar.sigla}
+                        onChange={(e) => setNovoHistCriar({ ...novoHistCriar, sigla: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono uppercase text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Nome anterior"
+                        value={novoHistCriar.nome}
+                        onChange={(e) => setNovoHistCriar({ ...novoHistCriar, nome: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="De (ano)"
+                        value={novoHistCriar.ano_inicio}
+                        onChange={(e) => setNovoHistCriar({ ...novoHistCriar, ano_inicio: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="Até (ano)"
+                        value={novoHistCriar.ano_fim}
+                        onChange={(e) => setNovoHistCriar({ ...novoHistCriar, ano_fim: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!novoHistCriar.sigla.trim()) {
+                        showFeedback('error', 'Informe a sigla anterior antes de adicionar.');
+                        return;
+                      }
+                      setFormPartido({
+                        ...formPartido,
+                        historico: [
+                          ...formPartido.historico,
+                          {
+                            sigla: novoHistCriar.sigla.trim().toUpperCase(),
+                            nome: novoHistCriar.nome.trim(),
+                            ano_inicio: novoHistCriar.ano_inicio,
+                            ano_fim: novoHistCriar.ano_fim,
+                          },
+                        ],
+                      });
+                      setNovoHistCriar({ sigla: '', nome: '', ano_inicio: '', ano_fim: '' });
+                    }}
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-[11px] transition cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Adicionar ao Histórico</span>
+                  </button>
+                </div>
               </div>
 
               <div className="pt-2 flex items-center justify-end space-x-2 border-t border-slate-100">
@@ -1355,13 +1631,13 @@ export const CadastrosPage: React.FC = () => {
       {/* MODAL 3B: EDITAR PARTIDO */}
       {/* ========================================================= */}
       {modalEditarPartidoOpen && partidoEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-6">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center space-x-2">
                 <Edit2 className="w-4 h-4 text-blue-700" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Editar Partido Político
+                  Editar Partido Político & Histórico (Nº {partidoEditing.numero})
                 </h3>
               </div>
               <button
@@ -1373,30 +1649,168 @@ export const CadastrosPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSaveEditPartido} className="p-5 space-y-4 text-xs">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  ID do Partido (Chave Primária)
-                </label>
-                <input
-                  type="text"
-                  disabled
-                  value={partidoEditing.id}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono text-xs bg-slate-100 text-slate-500 cursor-not-allowed"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Nº TSE (Canônico) *
+                  </label>
+                  <input
+                    type="number"
+                    min={10}
+                    max={99}
+                    required
+                    value={formEditPartido.numero}
+                    onChange={(e) => setFormEditPartido({ ...formEditPartido, numero: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono font-bold text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Sigla Atual *
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    required
+                    value={formEditPartido.sigla}
+                    onChange={(e) => setFormEditPartido({ ...formEditPartido, sigla: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono font-bold text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden uppercase"
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Sigla do Partido *
+                  Nome Oficial Registrado no TSE *
                 </label>
                 <input
                   type="text"
-                  maxLength={20}
+                  maxLength={150}
                   required
-                  value={formEditPartido.sigla}
-                  onChange={(e) => setFormEditPartido({ ...formEditPartido, sigla: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden uppercase"
+                  value={formEditPartido.nome}
+                  onChange={(e) => setFormEditPartido({ ...formEditPartido, nome: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
                 />
+              </div>
+
+              {/* Sub-form: Histórico de Denominações Anteriores */}
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-[11px]">
+                    <History className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Siglas Anteriores / Histórico (Ex: PTdoB, PMDB, PFL)</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500">
+                    {formEditPartido.historico.length} registrada(s)
+                  </span>
+                </div>
+
+                {formEditPartido.historico.length > 0 && (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                    {formEditPartido.historico.map((h, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded border border-slate-200 text-[11px]"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                            {h.sigla}
+                          </span>
+                          {h.nome && <span className="text-slate-600">{h.nome}</span>}
+                          {(h.ano_inicio || h.ano_fim) && (
+                            <span className="text-slate-400 text-[10px]">
+                              ({h.ano_inicio || '…'} a {h.ano_fim || '…'})
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormEditPartido({
+                              ...formEditPartido,
+                              historico: formEditPartido.historico.filter((_, i) => i !== idx),
+                            });
+                          }}
+                          className="text-red-500 hover:text-red-700 p-0.5 cursor-pointer"
+                          title="Remover denominação anterior"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-slate-200/80 space-y-2">
+                  <div className="text-[10px] font-semibold text-slate-600 uppercase">
+                    Adicionar Denominação Passada:
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Sigla (ex: PTdoB)"
+                        value={novoHistEditar.sigla}
+                        onChange={(e) => setNovoHistEditar({ ...novoHistEditar, sigla: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono uppercase text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Nome anterior"
+                        value={novoHistEditar.nome}
+                        onChange={(e) => setNovoHistEditar({ ...novoHistEditar, nome: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="De (ano)"
+                        value={novoHistEditar.ano_inicio}
+                        onChange={(e) => setNovoHistEditar({ ...novoHistEditar, ano_inicio: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="Até (ano)"
+                        value={novoHistEditar.ano_fim}
+                        onChange={(e) => setNovoHistEditar({ ...novoHistEditar, ano_fim: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded border border-slate-200 font-mono text-[11px] focus:ring-1 focus:ring-blue-600 focus:outline-hidden"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!novoHistEditar.sigla.trim()) {
+                        showFeedback('error', 'Informe a sigla anterior antes de adicionar.');
+                        return;
+                      }
+                      setFormEditPartido({
+                        ...formEditPartido,
+                        historico: [
+                          ...formEditPartido.historico,
+                          {
+                            sigla: novoHistEditar.sigla.trim().toUpperCase(),
+                            nome: novoHistEditar.nome.trim(),
+                            ano_inicio: novoHistEditar.ano_inicio,
+                            ano_fim: novoHistEditar.ano_fim,
+                          },
+                        ],
+                      });
+                      setNovoHistEditar({ sigla: '', nome: '', ano_inicio: '', ano_fim: '' });
+                    }}
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-[11px] transition cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Adicionar ao Histórico</span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center space-x-2 pt-1">

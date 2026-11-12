@@ -11,6 +11,10 @@ import {
   ColigacaoMembroDto,
   CreateColigacaoPayload,
   UpdateColigacaoPayload,
+  PartidoCadastroDto,
+  PartidoHistoricoDto,
+  CreatePartidoPayload,
+  UpdatePartidoPayload,
 } from '../types/election';
 
 let cachedDataset: RawElectionDataset | null = null;
@@ -980,9 +984,243 @@ const CADASTRO_STORAGE_KEY = 'vigiminas_cadastros_v1';
 
 interface DynamicCadastrosState {
   candidatosCustom: Record<string, { titulo_eleitor: string; nome_completo: string; data_nascimento?: string | null; is_active: boolean; is_deleted: boolean }>;
-  partidosCustom: Array<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }>;
+  partidosCustom: PartidoCadastroDto[];
   eleicoesCustom: Array<{ id: number; ano: number; is_active: boolean; is_deleted: boolean }>;
 }
+
+export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
+  {
+    id: 10,
+    numero: 10,
+    sigla: 'REPUBLICANOS',
+    nome: 'Republicanos',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1001, id_partido: 10, numero: 10, sigla: 'PRB', nome: 'Partido Republicano Brasileiro', ano_inicio: 2005, ano_fim: 2019, is_atual: false, is_active: true, is_deleted: false },
+      { id: 1002, id_partido: 10, numero: 10, sigla: 'REPUBLICANOS', nome: 'Republicanos', ano_inicio: 2019, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 11,
+    numero: 11,
+    sigla: 'PP',
+    nome: 'Progressistas',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1101, id_partido: 11, numero: 11, sigla: 'PPB', nome: 'Partido Progressista Brasileiro', ano_inicio: 1995, ano_fim: 2003, is_atual: false, is_active: true, is_deleted: false },
+      { id: 1102, id_partido: 11, numero: 11, sigla: 'PP', nome: 'Progressistas', ano_inicio: 2003, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 12,
+    numero: 12,
+    sigla: 'PDT',
+    nome: 'Partido Democrático Trabalhista',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1201, id_partido: 12, numero: 12, sigla: 'PDT', nome: 'Partido Democrático Trabalhista', ano_inicio: 1979, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 13,
+    numero: 13,
+    sigla: 'PT',
+    nome: 'Partido dos Trabalhadores',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1301, id_partido: 13, numero: 13, sigla: 'PT', nome: 'Partido dos Trabalhadores', ano_inicio: 1980, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 14,
+    numero: 14,
+    sigla: 'PTB',
+    nome: 'Partido Trabalhista Brasileiro',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1401, id_partido: 14, numero: 14, sigla: 'PTB', nome: 'Partido Trabalhista Brasileiro', ano_inicio: 1979, ano_fim: 2023, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 15,
+    numero: 15,
+    sigla: 'MDB',
+    nome: 'Movimento Democrático Brasileiro',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1501, id_partido: 15, numero: 15, sigla: 'PMDB', nome: 'Partido do Movimento Democrático Brasileiro', ano_inicio: 1980, ano_fim: 2017, is_atual: false, is_active: true, is_deleted: false },
+      { id: 1502, id_partido: 15, numero: 15, sigla: 'MDB', nome: 'Movimento Democrático Brasileiro', ano_inicio: 2017, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 19,
+    numero: 19,
+    sigla: 'PODE',
+    nome: 'Podemos',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1901, id_partido: 19, numero: 19, sigla: 'PTN', nome: 'Partido Trabalhista Nacional', ano_inicio: 1995, ano_fim: 2016, is_atual: false, is_active: true, is_deleted: false },
+      { id: 1902, id_partido: 19, numero: 19, sigla: 'PODE', nome: 'Podemos', ano_inicio: 2016, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 20,
+    numero: 20,
+    sigla: 'PSC',
+    nome: 'Partido Social Cristão',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 2001, id_partido: 20, numero: 20, sigla: 'PSC', nome: 'Partido Social Cristão', ano_inicio: 1985, ano_fim: 2023, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 22,
+    numero: 22,
+    sigla: 'PL',
+    nome: 'Partido Liberal',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 2201, id_partido: 22, numero: 22, sigla: 'PL', nome: 'Partido Liberal', ano_inicio: 1985, ano_fim: 2006, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2202, id_partido: 22, numero: 22, sigla: 'PR', nome: 'Partido da República', ano_inicio: 2006, ano_fim: 2019, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2203, id_partido: 22, numero: 22, sigla: 'PL', nome: 'Partido Liberal', ano_inicio: 2019, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 23,
+    numero: 23,
+    sigla: 'CIDADANIA',
+    nome: 'Cidadania',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 2301, id_partido: 23, numero: 23, sigla: 'PPS', nome: 'Partido Popular Socialista', ano_inicio: 1992, ano_fim: 2019, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2302, id_partido: 23, numero: 23, sigla: 'CIDADANIA', nome: 'Cidadania', ano_inicio: 2019, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 25,
+    numero: 25,
+    sigla: 'DEM',
+    nome: 'Democratas / União Brasil',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 2501, id_partido: 25, numero: 25, sigla: 'PFL', nome: 'Partido da Frente Liberal', ano_inicio: 1985, ano_fim: 2007, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2502, id_partido: 25, numero: 25, sigla: 'DEM', nome: 'Democratas', ano_inicio: 2007, ano_fim: 2022, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 27,
+    numero: 27,
+    sigla: 'DC',
+    nome: 'Democracia Cristã',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 2701, id_partido: 27, numero: 27, sigla: 'PSDC', nome: 'Partido Social Democrata Cristão', ano_inicio: 1997, ano_fim: 2018, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2702, id_partido: 27, numero: 27, sigla: 'DC', nome: 'Democracia Cristã', ano_inicio: 2018, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 40,
+    numero: 40,
+    sigla: 'PSB',
+    nome: 'Partido Socialista Brasileiro',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 4001, id_partido: 40, numero: 40, sigla: 'PSB', nome: 'Partido Socialista Brasileiro', ano_inicio: 1985, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 43,
+    numero: 43,
+    sigla: 'PV',
+    nome: 'Partido Verde',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 4301, id_partido: 43, numero: 43, sigla: 'PV', nome: 'Partido Verde', ano_inicio: 1986, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 44,
+    numero: 44,
+    sigla: 'UNIÃO',
+    nome: 'União Brasil',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 4401, id_partido: 44, numero: 44, sigla: 'UNIÃO', nome: 'União Brasil', ano_inicio: 2022, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 45,
+    numero: 45,
+    sigla: 'PSDB',
+    nome: 'Partido da Social Democracia Brasileira',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 4501, id_partido: 45, numero: 45, sigla: 'PSDB', nome: 'Partido da Social Democracia Brasileira', ano_inicio: 1988, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 55,
+    numero: 55,
+    sigla: 'PSD',
+    nome: 'Partido Social Democrático',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 5501, id_partido: 55, numero: 55, sigla: 'PSD', nome: 'Partido Social Democrático', ano_inicio: 2011, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 65,
+    numero: 65,
+    sigla: 'PCdoB',
+    nome: 'Partido Comunista do Brasil',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 6501, id_partido: 65, numero: 65, sigla: 'PCdoB', nome: 'Partido Comunista do Brasil', ano_inicio: 1962, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 70,
+    numero: 70,
+    sigla: 'AVANTE',
+    nome: 'Avante',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 7001, id_partido: 70, numero: 70, sigla: 'PTdoB', nome: 'Partido Trabalhista do Brasil', ano_inicio: 1989, ano_fim: 2017, is_atual: false, is_active: true, is_deleted: false },
+      { id: 7002, id_partido: 70, numero: 70, sigla: 'AVANTE', nome: 'Avante', ano_inicio: 2017, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 77,
+    numero: 77,
+    sigla: 'SOLIDARIEDADE',
+    nome: 'Solidariedade',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 7701, id_partido: 77, numero: 77, sigla: 'SD', nome: 'Solidariedade', ano_inicio: 2013, ano_fim: 2023, is_atual: false, is_active: true, is_deleted: false },
+      { id: 7702, id_partido: 77, numero: 77, sigla: 'SOLIDARIEDADE', nome: 'Solidariedade', ano_inicio: 2023, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+];
 
 function loadDynamicCadastros(): DynamicCadastrosState {
   try {
@@ -1102,78 +1340,146 @@ export async function deleteCandidato(titulo_eleitor: string): Promise<void> {
   saveDynamicCadastros(dynamic);
 }
 
-export async function getPartidosCadastrados(): Promise<Array<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }>> {
+export async function getPartidosCadastrados(): Promise<PartidoCadastroDto[]> {
+  // Try backend first
+  try {
+    const res = await fetch('/api/partidos', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      const backendPartidos: PartidoCadastroDto[] = await res.json();
+      if (backendPartidos && backendPartidos.length > 0) {
+        return backendPartidos.sort((a, b) => a.numero - b.numero);
+      }
+    }
+  } catch {}
+
   const dynamic = loadDynamicCadastros();
-  const ds = await loadFallbackDataset();
 
-  // Aggregate base partidos from all elections
-  const siglas = new Set<string>();
-  Object.values(ds.eleicoes).forEach((el) => {
-    el.partidos_vereador?.forEach((p) => siglas.add(p.partido));
-    el.resultados?.forEach((r) => siglas.add(r.partido));
+  // Merge canonical TSE parties with local storage custom overrides
+  const mapPartidos = new Map<number, PartidoCadastroDto>();
+
+  // Base TSE
+  PARTIDOS_BASE_TSE.forEach((p) => {
+    mapPartidos.set(p.numero, { ...p, historico: [...(p.historico || [])] });
   });
 
-  let idCounter = 1;
-  const mapPartidos = new Map<string, { id: number; sigla: string; is_active: boolean; is_deleted: boolean }>();
-
-  Array.from(siglas).sort().forEach((sigla) => {
-    mapPartidos.set(sigla, {
-      id: idCounter++,
-      sigla,
-      is_active: true,
-      is_deleted: false,
-    });
-  });
-
-  // Apply custom partidos
+  // Custom / overrides from localStorage
   dynamic.partidosCustom.forEach((p) => {
-    mapPartidos.set(p.sigla, p);
+    mapPartidos.set(p.numero, p);
   });
 
   return Array.from(mapPartidos.values())
     .filter((p) => !p.is_deleted)
-    .sort((a, b) => a.sigla.localeCompare(b.sigla));
+    .sort((a, b) => a.numero - b.numero);
+}
+
+export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroDto | null {
+  const dynamic = loadDynamicCadastros();
+  const all: PartidoCadastroDto[] = [];
+  const mapPartidos = new Map<number, PartidoCadastroDto>();
+
+  PARTIDOS_BASE_TSE.forEach((p) => mapPartidos.set(p.numero, p));
+  dynamic.partidosCustom.forEach((p) => mapPartidos.set(p.numero, p));
+  all.push(...mapPartidos.values());
+
+  const num = typeof siglaOuNumero === 'number' ? siglaOuNumero : parseInt(String(siglaOuNumero), 10);
+  if (!isNaN(num) && num > 0) {
+    const byNum = all.find((p) => p.numero === num);
+    if (byNum) return byNum;
+  }
+
+  const s = String(siglaOuNumero).trim().toUpperCase();
+
+  // 1. Direct match with current acronym
+  const direct = all.find((p) => p.sigla.toUpperCase() === s);
+  if (direct) return direct;
+
+  // 2. Match with historical names/acronyms in the auxiliary table
+  for (const p of all) {
+    if (p.historico && p.historico.some((h) => h.sigla.toUpperCase() === s)) {
+      return p;
+    }
+  }
+
+  return null;
 }
 
 export async function updatePartido(
   id: number,
-  payload: { sigla?: string; is_active?: boolean }
-): Promise<void> {
+  payload: UpdatePartidoPayload
+): Promise<PartidoCadastroDto> {
   try {
-    await fetch(`/api/partidos/${id}`, {
+    const res = await fetch(`/api/partidos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(3000),
     });
+    if (res.ok) {
+      return await res.json();
+    }
   } catch {}
 
   const dynamic = loadDynamicCadastros();
-  const match = dynamic.partidosCustom.find((p) => p.id === id);
-  if (match) {
-    if (payload.sigla !== undefined) match.sigla = payload.sigla.trim().toUpperCase();
-    if (payload.is_active !== undefined) match.is_active = payload.is_active;
-  } else {
-    // If it was a base partido, add it to custom overrides
-    dynamic.partidosCustom.push({
-      id,
-      sigla: payload.sigla ? payload.sigla.trim().toUpperCase() : '',
-      is_active: payload.is_active !== undefined ? payload.is_active : true,
-      is_deleted: false,
-    });
+  const allPartidos = await getPartidosCadastrados();
+  let match = dynamic.partidosCustom.find((p) => p.id === id);
+
+  if (!match) {
+    const baseMatch = allPartidos.find((p) => p.id === id);
+    if (baseMatch) {
+      match = { ...baseMatch, historico: [...(baseMatch.historico || [])] };
+      dynamic.partidosCustom.push(match);
+    }
   }
+
+  if (!match) {
+    throw new Error(`Partido de ID ${id} não encontrado.`);
+  }
+
+  if (payload.numero !== undefined) match.numero = payload.numero;
+  if (payload.sigla !== undefined) match.sigla = payload.sigla.trim().toUpperCase();
+  if (payload.nome !== undefined) match.nome = payload.nome.trim();
+  if (payload.is_active !== undefined) match.is_active = payload.is_active;
+
+  if (payload.historico) {
+    match.historico = payload.historico.map((h, idx) => ({
+      id: h.id || match!.numero * 100 + idx + 1,
+      id_partido: match!.id,
+      numero: match!.numero,
+      sigla: h.sigla.trim().toUpperCase(),
+      nome: h.nome?.trim(),
+      ano_inicio: h.ano_inicio,
+      ano_fim: h.ano_fim,
+      is_atual: h.is_atual || false,
+      is_active: true,
+      is_deleted: false,
+    }));
+  }
+
   saveDynamicCadastros(dynamic);
+  return match;
 }
 
 export async function deletePartido(id: number): Promise<void> {
+  try {
+    await fetch(`/api/partidos/${id}`, {
+      method: 'DELETE',
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {}
+
   const dynamic = loadDynamicCadastros();
-  const match = dynamic.partidosCustom.find((p) => p.id === id);
-  if (match) {
+  const allPartidos = await getPartidosCadastrados();
+  let match = dynamic.partidosCustom.find((p) => p.id === id);
+
+  if (!match) {
+    const baseMatch = allPartidos.find((p) => p.id === id);
+    if (baseMatch) {
+      match = { ...baseMatch, is_deleted: true, is_active: false };
+      dynamic.partidosCustom.push(match);
+    }
+  } else {
     match.is_deleted = true;
     match.is_active = false;
-  } else {
-    // Track deleted base id
-    dynamic.partidosCustom.push({ id, sigla: '', is_active: false, is_deleted: true });
   }
   saveDynamicCadastros(dynamic);
 }
@@ -1255,7 +1561,7 @@ export async function createCandidato(payload: {
   return newItem;
 }
 
-export async function createPartido(payload: { sigla: string }): Promise<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }> {
+export async function createPartido(payload: CreatePartidoPayload): Promise<PartidoCadastroDto> {
   // Attempt backend API if live
   try {
     const res = await fetch(`/api/partidos`, {
@@ -1270,26 +1576,44 @@ export async function createPartido(payload: { sigla: string }): Promise<{ id: n
   } catch {}
 
   const dynamic = loadDynamicCadastros();
+  const allPartidos = await getPartidosCadastrados();
   const siglaUpper = payload.sigla.trim().toUpperCase();
+  const nomeTrimmed = payload.nome ? payload.nome.trim() : siglaUpper;
+  const numeroNum = Number(payload.numero);
 
-  const existing = dynamic.partidosCustom.find((p) => p.sigla.toUpperCase() === siglaUpper);
-  if (existing) {
-    if (existing.is_deleted) {
-      existing.is_deleted = false;
-      existing.is_active = true;
-      saveDynamicCadastros(dynamic);
-      return existing;
-    }
-    throw new Error(`A agremiação partidária com sigla '${siglaUpper}' já se encontra cadastrada.`);
+  // Check if numero or sigla already exists
+  const existingNum = allPartidos.find((p) => p.numero === numeroNum);
+  if (existingNum) {
+    throw new Error(`O número eleitoral '${numeroNum}' já está atribuído ao partido ${existingNum.sigla} (${existingNum.nome}).`);
+  }
+
+  const existingSigla = allPartidos.find((p) => p.sigla.toUpperCase() === siglaUpper);
+  if (existingSigla) {
+    throw new Error(`A agremiação com sigla '${siglaUpper}' já existe (Nº ${existingSigla.numero}).`);
   }
 
   const newId = 1000 + dynamic.partidosCustom.length + 1;
-  const newItem = {
+  const newItem: PartidoCadastroDto = {
     id: newId,
+    numero: numeroNum,
     sigla: siglaUpper,
+    nome: nomeTrimmed,
     is_active: true,
     is_deleted: false,
+    historico: (payload.historico || []).map((h, idx) => ({
+      id: newId * 100 + idx + 1,
+      id_partido: newId,
+      numero: numeroNum,
+      sigla: h.sigla.trim().toUpperCase(),
+      nome: h.nome?.trim(),
+      ano_inicio: h.ano_inicio,
+      ano_fim: h.ano_fim,
+      is_atual: h.is_atual || false,
+      is_active: true,
+      is_deleted: false,
+    })),
   };
+
   dynamic.partidosCustom.push(newItem);
   saveDynamicCadastros(dynamic);
   return newItem;
