@@ -111,6 +111,9 @@ export interface ResultadoCandidatoDto {
   cargo: string;
   votos: number;
   situacao: string;
+  partido_numero?: number;
+  sigla_epoca?: string;
+  sigla_atual?: string;
   percentual_validos?: number;
   vice?: ViceCandidatoDto | null;
 }
@@ -131,6 +134,9 @@ export interface HistoricoParticipacaoDto {
   votos: number;
   situacao: string;
   posicao: number | null;
+  partido_numero?: number;
+  sigla_epoca?: string;
+  sigla_atual?: string;
   chapa_parceiro?: ChapaParceiroDto | null;
 }
 
@@ -146,6 +152,8 @@ export interface CandidatoHistoricoDto {
 
 export interface DesempenhoPartidoDto {
   sigla: string;
+  numero?: number;
+  sigla_atual?: string;
   votos_nominais: number;
   votos_legenda: number;
   total_votos: number;
@@ -177,8 +185,9 @@ export interface CandidatoCadastroDto {
 }
 
 export interface PartidoHistoricoDto {
-  id: number;
-  id_partido: number;
+  id?: number;
+  id_partido?: number;
+  partido_numero?: number;
   numero: number;
   sigla: string;
   nome?: string;
@@ -193,7 +202,10 @@ export interface PartidoCadastroDto {
   id: number;
   numero: number;
   sigla: string;
+  sigla_atual?: string;
   nome?: string;
+  nome_atual?: string;
+  siglas_anteriores?: string[];
   historico?: PartidoHistoricoDto[];
   is_active?: boolean;
   is_deleted?: boolean;
@@ -203,6 +215,8 @@ export interface CreatePartidoPayload {
   numero: number;
   sigla: string;
   nome?: string;
+  sigla_atual?: string;
+  nome_atual?: string;
   historico?: Array<{
     sigla: string;
     nome?: string;
@@ -216,6 +230,8 @@ export interface UpdatePartidoPayload {
   numero?: number;
   sigla?: string;
   nome?: string;
+  sigla_atual?: string;
+  nome_atual?: string;
   is_active?: boolean;
   historico?: Array<{
     id?: number;
@@ -240,6 +256,10 @@ export interface ColigacaoMembroDto {
   id_partido: number;
   sigla_partido: string;
   papel: 'Cabeça de Chapa' | 'Vice-Prefeito' | 'Partido Apoiador' | string;
+  partido_numero?: number;
+  sigla_epoca?: string;
+  sigla_atual?: string;
+  nome_formatado?: string;
   is_active?: boolean;
   is_deleted?: boolean;
 }
@@ -253,6 +273,7 @@ export interface ColigacaoDto {
   nome_coligacao: string;
   sigla_partido_titular: string;
   composicao_siglas: string;
+  partido_numero_titular?: number;
   is_active: boolean;
   is_deleted: boolean;
   partidos: ColigacaoMembroDto[];
@@ -270,6 +291,7 @@ export interface CreateColigacaoPayload {
   numero_urna: number;
   nome_coligacao: string;
   sigla_partido_titular: string;
+  partido_numero_titular?: number;
   composicao_siglas?: string;
   partidos?: Array<{
     id_partido: number;
@@ -283,6 +305,7 @@ export interface UpdateColigacaoPayload {
   numero_urna?: number;
   nome_coligacao?: string;
   sigla_partido_titular?: string;
+  partido_numero_titular?: number;
   composicao_siglas?: string;
   is_active?: boolean;
   partidos?: Array<{
@@ -291,4 +314,52 @@ export interface UpdateColigacaoPayload {
     papel: string;
   }>;
 }
+
+// --- Interfaces para Linha do Tempo e Resolução Partidária ---
+export interface CandidatoNaLinhaTempoDto {
+  id?: number;
+  titulo_eleitor: string;
+  nome_completo: string;
+  nome_urna: string;
+  numero_urna: number;
+  cargo: string;
+  votos: number;
+  situacao: string;
+  posicao?: number | null;
+  sigla_epoca?: string;
+}
+
+export interface EleicaoLinhaTempoDto {
+  ano: number;
+  id_eleicao: number;
+  sigla_vigente: string;
+  is_rebranded: boolean;
+  nome_coligacao?: string | null;
+  composicao_coligacao?: string | null;
+  votos_nominais: number;
+  votos_legenda: number;
+  total_votos: number;
+  total_candidatos: number;
+  candidatos: CandidatoNaLinhaTempoDto[];
+}
+
+export interface EstatisticasGeraisPartidoDto {
+  total_votos_historico: number;
+  total_eleicoes_disputadas: number;
+  total_candidatos_historico: number;
+  total_eleitos_historico: number;
+  eleitos_prefeito: number;
+  eleitos_vereador: number;
+}
+
+export interface PartidoTimelineResponse {
+  partido: PartidoCadastroDto;
+  estatisticas_gerais: EstatisticasGeraisPartidoDto;
+  eleicoes: EleicaoLinhaTempoDto[];
+  numero?: number;
+  sigla_atual?: string;
+  nome_atual?: string;
+  siglas_anteriores?: string[];
+}
+
 

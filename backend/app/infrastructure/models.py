@@ -8,7 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 from .database import Base
 
 
@@ -82,27 +82,37 @@ class DetalhesVotacao(Base):
 
 
 class Partidos(Base):
-    """Cadastro perene de legendas partidárias indexado pelo número oficial do TSE."""
+    """Cadastro perene de legendas partidárias indexado pelo número oficial do TSE como chave canônica."""
     __tablename__ = "partidos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     numero: Mapped[int] = mapped_column(Integer, unique=True, nullable=False, index=True)
-    sigla: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
-    nome: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    sigla_atual: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    nome_atual: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+
+    sigla = synonym("sigla_atual")
+    nome = synonym("nome_atual")
 
     # Soft Delete Universal
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     partidos_eleicao: Mapped[List["PartidosEleicao"]] = relationship(
-        "PartidosEleicao", back_populates="partido"
+        "PartidosEleicao", back_populates="partido", cascade="all, delete-orphan", foreign_keys="[PartidosEleicao.partido_numero]"
     )
     candidatos: Mapped[List["CandidatosEleicao"]] = relationship(
-        "CandidatosEleicao", back_populates="partido"
+        "CandidatosEleicao", back_populates="partido", foreign_keys="[CandidatosEleicao.partido_numero]"
     )
     historico_nomes: Mapped[List["PartidoHistorico"]] = relationship(
-        "PartidoHistorico", back_populates="partido", cascade="all, delete-orphan"
+        "PartidoHistorico", back_populates="partido", cascade="all, delete-orphan", foreign_keys="[PartidoHistorico.partido_numero]"
     )
+
+    @property
+    def siglas_anteriores(self) -> List[str]:
+        return [
+            h.sigla for h in (self.historico_nomes or [])
+            if not h.is_atual and not h.is_deleted and h.sigla.upper() != self.sigla_atual.upper()
+        ]
 
 
 class PartidoHistorico(Base):
@@ -110,11 +120,10 @@ class PartidoHistorico(Base):
     __tablename__ = "partido_historico"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    id_partido: Mapped[int] = mapped_column(
-        ForeignKey("partidos.id", ondelete="CASCADE"), nullable=False, index=True
+    partido_numero: Mapped[int] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="CASCADE"), nullable=False, index=True
     )
-    numero: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    sigla: Mapped[str] = mapped_column(String(20), nullable=False)
+    sigla: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     nome: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     ano_inicio: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     ano_fim: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
@@ -124,7 +133,23 @@ class PartidoHistorico(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="historico_nomes")
+    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="historico_nomes", foreign_keys=[partido_numero])
+
+    @property
+    def numero(self) -> int:
+        return self.partido_numero
+
+    @numero.setter
+    def numero(self, val: int):
+        self.partido_numero = val
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
+    @id_partido.setter
+    def id_partido(self, val: int):
+        self.partido_numero = val
 
 
 class PartidosEleicao(Base):
@@ -135,8 +160,8 @@ class PartidosEleicao(Base):
     id_eleicao: Mapped[int] = mapped_column(
         ForeignKey("eleicao.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    id_partido: Mapped[int] = mapped_column(
-        ForeignKey("partidos.id", ondelete="CASCADE"), nullable=False, index=True
+    partido_numero: Mapped[int] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="CASCADE"), nullable=False, index=True
     )
     votos_nominais: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     votos_legenda: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -147,11 +172,20 @@ class PartidosEleicao(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("id_eleicao", "id_partido", name="uq_partidos_eleicao"),
+        UniqueConstraint("id_eleicao", "partido_numero", name="uq_partidos_eleicao"),
     )
 
     eleicao: Mapped["Eleicao"] = relationship("Eleicao", back_populates="partidos_desempenho")
-    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="partidos_eleicao")
+    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="partidos_eleicao", foreign_keys=[partido_numero])
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
+    @id_partido.setter
+    def id_partido(self, val: int):
+        if val is not None and not self.partido_numero:
+            self.partido_numero = val
 
 
 class CandidatosEleicao(Base):
@@ -167,9 +201,10 @@ class CandidatosEleicao(Base):
     id_eleicao: Mapped[int] = mapped_column(
         ForeignKey("eleicao.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    id_partido: Mapped[int] = mapped_column(
-        ForeignKey("partidos.id", ondelete="RESTRICT"), nullable=False, index=True
+    partido_numero: Mapped[int] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="RESTRICT"), nullable=False, index=True
     )
+    sigla_epoca: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     cargo: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     numero_urna: Mapped[int] = mapped_column(Integer, nullable=False)
     nome_urna: Mapped[str] = mapped_column(String(150), nullable=False)
@@ -187,7 +222,16 @@ class CandidatosEleicao(Base):
 
     candidato: Mapped["DadosCandidato"] = relationship("DadosCandidato", back_populates="candidaturas")
     eleicao: Mapped["Eleicao"] = relationship("Eleicao", back_populates="candidatos")
-    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="candidatos")
+    partido: Mapped["Partidos"] = relationship("Partidos", back_populates="candidatos", foreign_keys=[partido_numero])
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
+    @id_partido.setter
+    def id_partido(self, val: int):
+        if val is not None and not self.partido_numero:
+            self.partido_numero = val
 
 
 class Coligacao(Base):
@@ -201,6 +245,9 @@ class Coligacao(Base):
     cargo: Mapped[str] = mapped_column(String(50), nullable=False, default="Prefeito")
     numero_urna: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     nome_coligacao: Mapped[str] = mapped_column(String(150), nullable=False)
+    partido_numero_titular: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="RESTRICT"), nullable=True, index=True
+    )
     sigla_partido_titular: Mapped[str] = mapped_column(String(20), nullable=False)
     composicao_siglas: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -226,9 +273,10 @@ class ColigacaoPartidos(Base):
     id_coligacao: Mapped[int] = mapped_column(
         ForeignKey("coligacoes.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    id_partido: Mapped[int] = mapped_column(
-        ForeignKey("partidos.id", ondelete="CASCADE"), nullable=False, index=True
+    partido_numero: Mapped[int] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="CASCADE"), nullable=False, index=True
     )
+    sigla_epoca: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     papel: Mapped[str] = mapped_column(String(50), nullable=False, default="Apoiador")
 
     # Soft Delete Universal
@@ -236,9 +284,19 @@ class ColigacaoPartidos(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("id_coligacao", "id_partido", name="uq_coligacao_partido"),
+        UniqueConstraint("id_coligacao", "partido_numero", name="uq_coligacao_partido"),
     )
 
     coligacao: Mapped["Coligacao"] = relationship("Coligacao", back_populates="partidos_membros")
-    partido: Mapped["Partidos"] = relationship("Partidos")
+    partido: Mapped["Partidos"] = relationship("Partidos", foreign_keys=[partido_numero])
+
+    @property
+    def id_partido(self) -> int:
+        return self.partido_numero
+
+    @id_partido.setter
+    def id_partido(self, val: int):
+        if val is not None and not self.partido_numero:
+            self.partido_numero = val
+
 

@@ -16,6 +16,7 @@ from ..application.use_cases import (
     CriarColigacaoUseCase,
     AtualizarColigacaoUseCase,
     DeletarColigacaoUseCase,
+    ObterLinhaDoTempoPartidoUseCase,
 )
 
 
@@ -61,6 +62,12 @@ def get_obter_desempenho_use_case(
     return ObterDesempenhoPartidarioUseCase(eleicao_repo, partido_repo)
 
 
+def get_obter_linha_do_tempo_use_case(
+    partido_repo: SqlAlchemyPartidoRepository = Depends(get_partido_repo),
+) -> ObterLinhaDoTempoPartidoUseCase:
+    return ObterLinhaDoTempoPartidoUseCase(partido_repo)
+
+
 def get_listar_coligacoes_use_case(
     coligacao_repo: SqlAlchemyColigacaoRepository = Depends(get_coligacao_repo),
 ) -> ListarColigacoesUseCase:
@@ -84,4 +91,5 @@ def get_deletar_coligacao_use_case(
     coligacao_repo: SqlAlchemyColigacaoRepository = Depends(get_coligacao_repo),
 ) -> DeletarColigacaoUseCase:
     return DeletarColigacaoUseCase(coligacao_repo)
+
 

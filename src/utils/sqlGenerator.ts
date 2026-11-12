@@ -366,12 +366,12 @@ export const SCHEMA_TABLES: TableSchema[] = [
         description: 'Chave estrangeira do pleito.',
       },
       {
-        name: 'id_partido',
+        name: 'partido_numero',
         type: 'INTEGER',
         isFk: true,
-        fkTarget: 'partidos(id)',
+        fkTarget: 'partidos(numero)',
         nullable: false,
-        description: 'Chave estrangeira do partido.',
+        description: 'Chave estrangeira apontando para o número oficial canônico do partido no TSE.',
       },
       {
         name: 'votos_nominais',
@@ -403,14 +403,14 @@ export const SCHEMA_TABLES: TableSchema[] = [
       },
     ],
     indexes: [
-      'CREATE UNIQUE INDEX uq_partidos_eleicao_legenda ON partidos_eleicao(id_eleicao, id_partido);',
+      'CREATE UNIQUE INDEX uq_partidos_eleicao_legenda ON partidos_eleicao(id_eleicao, partido_numero);',
       'CREATE INDEX idx_partidos_eleicao_busca ON partidos_eleicao(id_eleicao, total_votos DESC);',
     ],
     constraints: [
       'PRIMARY KEY (id)',
       'CONSTRAINT fk_partidos_eleicao_eleicao FOREIGN KEY (id_eleicao) REFERENCES eleicao(id) ON DELETE CASCADE',
-      'CONSTRAINT fk_partidos_eleicao_partido FOREIGN KEY (id_partido) REFERENCES partidos(id) ON DELETE RESTRICT',
-      'CONSTRAINT uq_partidos_eleicao_legenda UNIQUE (id_eleicao, id_partido)',
+      'CONSTRAINT fk_partidos_eleicao_partido FOREIGN KEY (partido_numero) REFERENCES partidos(numero) ON DELETE RESTRICT',
+      'CONSTRAINT uq_partidos_eleicao_legenda UNIQUE (id_eleicao, partido_numero)',
       'CONSTRAINT chk_partidos_eleicao_votos CHECK (votos_nominais >= 0 AND votos_legenda >= 0 AND total_votos >= 0)',
     ],
   },
@@ -444,12 +444,18 @@ export const SCHEMA_TABLES: TableSchema[] = [
         description: 'Chave estrangeira do pleito.',
       },
       {
-        name: 'id_partido',
+        name: 'partido_numero',
         type: 'INTEGER',
         isFk: true,
-        fkTarget: 'partidos(id)',
+        fkTarget: 'partidos(numero)',
         nullable: false,
-        description: 'Chave estrangeira do partido pelo qual o candidato disputou o pleito.',
+        description: 'Chave estrangeira canônica para o número oficial do partido no TSE.',
+      },
+      {
+        name: 'sigla_epoca',
+        type: 'VARCHAR(20)',
+        nullable: true,
+        description: 'Sigla descritiva vigente utilizada pelo candidato naquele pleito específico (ex: PT do B, PFL).',
       },
       {
         name: 'cargo',
@@ -463,7 +469,7 @@ export const SCHEMA_TABLES: TableSchema[] = [
         type: 'INTEGER',
         nullable: false,
         constraint: 'CHECK (numero_urna > 0)',
-        description: 'Número oficial na urna eletrônica (ex: 45, 12345).',
+        description: 'Número oficial na urna eletrônica (ex: 70123, 15).',
       },
       {
         name: 'nome_urna',
@@ -482,7 +488,7 @@ export const SCHEMA_TABLES: TableSchema[] = [
         name: 'situacao',
         type: 'VARCHAR(50)',
         nullable: false,
-        description: 'Desfecho da candidatura (Eleito, Eleito por QP, Eleito por média, Suplente, Não eleito).',
+        description: 'Desfecho da candidatura (Eleito, Suplente, Não eleito).',
       },
       {
         name: 'posicao',
@@ -503,14 +509,14 @@ export const SCHEMA_TABLES: TableSchema[] = [
       'CREATE INDEX idx_candidatos_eleicao_titulo ON candidatos_eleicao(titulo_eleitor);',
       'CREATE INDEX idx_candidatos_eleicao_pleito_cargo ON candidatos_eleicao(id_eleicao, cargo);',
       'CREATE INDEX idx_candidatos_eleicao_ranking ON candidatos_eleicao(id_eleicao, cargo, votos DESC);',
-      'CREATE INDEX idx_candidatos_eleicao_partido ON candidatos_eleicao(id_partido);',
+      'CREATE INDEX idx_candidatos_eleicao_partido ON candidatos_eleicao(partido_numero);',
       'CREATE UNIQUE INDEX uq_candidato_eleicao_cargo ON candidatos_eleicao(id_eleicao, cargo, titulo_eleitor);',
     ],
     constraints: [
       'PRIMARY KEY (id)',
       'CONSTRAINT fk_cand_eleicao_candidato FOREIGN KEY (titulo_eleitor) REFERENCES dados_candidato(titulo_eleitor) ON UPDATE CASCADE ON DELETE RESTRICT',
       'CONSTRAINT fk_cand_eleicao_eleicao FOREIGN KEY (id_eleicao) REFERENCES eleicao(id) ON DELETE CASCADE',
-      'CONSTRAINT fk_cand_eleicao_partido FOREIGN KEY (id_partido) REFERENCES partidos(id) ON DELETE RESTRICT',
+      'CONSTRAINT fk_cand_eleicao_partido FOREIGN KEY (partido_numero) REFERENCES partidos(numero) ON DELETE RESTRICT',
       'CONSTRAINT uq_candidato_eleicao_cargo UNIQUE (id_eleicao, cargo, titulo_eleitor)',
       'CONSTRAINT chk_cargo_candidato CHECK (cargo IN (\'Prefeito\', \'Vereador\', \'Vice-Prefeito\'))',
       'CONSTRAINT chk_votos_candidato CHECK (votos >= 0)',
@@ -527,6 +533,7 @@ export const SCHEMA_TABLES: TableSchema[] = [
       { name: 'cargo', type: 'VARCHAR(20)', nullable: false, constraint: "DEFAULT 'Prefeito'", description: 'Cargo da chapa (Prefeito).' },
       { name: 'numero_urna', type: 'INTEGER', nullable: false, description: 'Número oficial da chapa nas urnas.' },
       { name: 'nome_coligacao', type: 'VARCHAR(150)', nullable: false, description: 'Nome de registro da coligação ou partido isolado.' },
+      { name: 'partido_numero_titular', type: 'INTEGER', isFk: true, fkTarget: 'partidos(numero)', nullable: true, description: 'Número TSE do partido cabeça de chapa.' },
       { name: 'sigla_partido_titular', type: 'VARCHAR(20)', nullable: false, description: 'Sigla do partido cabeça de chapa.' },
       { name: 'composicao_siglas', type: 'VARCHAR(200)', nullable: false, description: 'Composição completa das siglas participantes.' },
       { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
@@ -540,17 +547,19 @@ export const SCHEMA_TABLES: TableSchema[] = [
     constraints: [
       'PRIMARY KEY (id)',
       'CONSTRAINT fk_coligacoes_eleicao FOREIGN KEY (id_eleicao) REFERENCES eleicao(id) ON DELETE CASCADE',
+      'CONSTRAINT fk_coligacoes_titular FOREIGN KEY (partido_numero_titular) REFERENCES partidos(numero) ON DELETE RESTRICT',
     ],
   },
   {
     id: 'coligacao_partidos',
     name: 'coligacao_partidos',
     category: 'fato',
-    description: 'Tabela associativa relacionando quais agremiações partidárias compõem cada coligação e seus respectivos papéis.',
+    description: 'Tabela associativa relacionando quais agremiações partidárias compõem cada coligação pelo seu número canônico.',
     columns: [
       { name: 'id', type: 'BIGINT GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária associativa.' },
       { name: 'id_coligacao', type: 'BIGINT', isFk: true, fkTarget: 'coligacoes(id)', nullable: false, description: 'Chave estrangeira da coligação.' },
-      { name: 'id_partido', type: 'INTEGER', isFk: true, fkTarget: 'partidos(id)', nullable: false, description: 'Chave estrangeira do partido membro.' },
+      { name: 'partido_numero', type: 'INTEGER', isFk: true, fkTarget: 'partidos(numero)', nullable: false, description: 'Número TSE do partido membro.' },
+      { name: 'sigla_epoca', type: 'VARCHAR(20)', nullable: true, description: 'Sigla do partido na época do pleito.' },
       { name: 'papel', type: 'VARCHAR(50)', nullable: false, constraint: "DEFAULT 'Partido Apoiador'", description: 'Papel na chapa: Cabeça de Chapa, Vice-Prefeito, Partido Apoiador.' },
       { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
       { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
@@ -558,14 +567,14 @@ export const SCHEMA_TABLES: TableSchema[] = [
     ],
     indexes: [
       'CREATE INDEX idx_coligacao_partidos_coligacao ON coligacao_partidos(id_coligacao);',
-      'CREATE INDEX idx_coligacao_partidos_partido ON coligacao_partidos(id_partido);',
-      'CREATE UNIQUE INDEX uq_coligacao_partido ON coligacao_partidos(id_coligacao, id_partido);',
+      'CREATE INDEX idx_coligacao_partidos_partido ON coligacao_partidos(partido_numero);',
+      'CREATE UNIQUE INDEX uq_coligacao_partido ON coligacao_partidos(id_coligacao, partido_numero);',
     ],
     constraints: [
       'PRIMARY KEY (id)',
       'CONSTRAINT fk_cp_coligacao FOREIGN KEY (id_coligacao) REFERENCES coligacoes(id) ON DELETE CASCADE',
-      'CONSTRAINT fk_cp_partido FOREIGN KEY (id_partido) REFERENCES partidos(id) ON DELETE RESTRICT',
-      'CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, id_partido)',
+      'CONSTRAINT fk_cp_partido FOREIGN KEY (partido_numero) REFERENCES partidos(numero) ON DELETE RESTRICT',
+      'CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, partido_numero)',
     ],
   },
 ];
@@ -712,7 +721,7 @@ COMMENT ON TABLE detalhes_votacao IS 'Totais de comparecimento, abstenção e vo
 CREATE TABLE IF NOT EXISTS partidos_eleicao (
     id              BIGINT GENERATED ALWAYS AS IDENTITY,
     id_eleicao      INTEGER NOT NULL,
-    id_partido      INTEGER NOT NULL,
+    partido_numero  INTEGER NOT NULL,
     votos_nominais  INTEGER NOT NULL DEFAULT 0,
     votos_legenda   INTEGER NOT NULL DEFAULT 0,
     total_votos     INTEGER NOT NULL DEFAULT 0,
@@ -724,10 +733,10 @@ CREATE TABLE IF NOT EXISTS partidos_eleicao (
         REFERENCES eleicao(id) 
         ON DELETE CASCADE,
     CONSTRAINT fk_partidos_eleicao_partido 
-        FOREIGN KEY (id_partido) 
-        REFERENCES partidos(id) 
+        FOREIGN KEY (partido_numero) 
+        REFERENCES partidos(numero) 
         ON DELETE RESTRICT,
-    CONSTRAINT uq_partidos_eleicao UNIQUE (id_eleicao, id_partido),
+    CONSTRAINT uq_partidos_eleicao UNIQUE (id_eleicao, partido_numero),
     CONSTRAINT chk_partidos_eleicao_votos CHECK (
         votos_nominais >= 0 AND 
         votos_legenda >= 0 AND 
@@ -744,7 +753,8 @@ CREATE TABLE IF NOT EXISTS candidatos_eleicao (
     id              BIGINT GENERATED ALWAYS AS IDENTITY,
     titulo_eleitor  VARCHAR(12) NOT NULL,
     id_eleicao      INTEGER NOT NULL,
-    id_partido      INTEGER NOT NULL,
+    partido_numero  INTEGER NOT NULL,
+    sigla_epoca     VARCHAR(20) NULL,
     cargo           VARCHAR(20) NOT NULL,
     numero_urna     INTEGER NOT NULL,
     nome_urna       VARCHAR(100) NOT NULL,
@@ -764,8 +774,8 @@ CREATE TABLE IF NOT EXISTS candidatos_eleicao (
         REFERENCES eleicao(id) 
         ON DELETE CASCADE,
     CONSTRAINT fk_cand_eleicao_partido 
-        FOREIGN KEY (id_partido) 
-        REFERENCES partidos(id) 
+        FOREIGN KEY (partido_numero) 
+        REFERENCES partidos(numero) 
         ON DELETE RESTRICT,
     CONSTRAINT uq_candidato_eleicao_cargo UNIQUE (id_eleicao, cargo, titulo_eleitor),
     CONSTRAINT chk_cargo_candidato CHECK (cargo IN ('Prefeito', 'Vereador', 'Vice-Prefeito')),
@@ -784,6 +794,7 @@ CREATE TABLE IF NOT EXISTS coligacoes (
     cargo                   VARCHAR(20) NOT NULL DEFAULT 'Prefeito',
     numero_urna             INTEGER NOT NULL,
     nome_coligacao          VARCHAR(150) NOT NULL,
+    partido_numero_titular  INTEGER NULL,
     sigla_partido_titular   VARCHAR(20) NOT NULL,
     composicao_siglas       VARCHAR(200) NOT NULL,
     is_active               BOOLEAN NOT NULL DEFAULT TRUE,
@@ -794,7 +805,11 @@ CREATE TABLE IF NOT EXISTS coligacoes (
     CONSTRAINT fk_coligacoes_eleicao 
         FOREIGN KEY (id_eleicao) 
         REFERENCES eleicao(id) 
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_coligacoes_titular 
+        FOREIGN KEY (partido_numero_titular) 
+        REFERENCES partidos(numero) 
+        ON DELETE RESTRICT
 );
 
 COMMENT ON TABLE coligacoes IS 'Alianças e chapas partidárias registradas por pleito com Soft Delete universal';
@@ -805,7 +820,8 @@ COMMENT ON TABLE coligacoes IS 'Alianças e chapas partidárias registradas por 
 CREATE TABLE IF NOT EXISTS coligacao_partidos (
     id                      BIGINT GENERATED ALWAYS AS IDENTITY,
     id_coligacao            BIGINT NOT NULL,
-    id_partido              INTEGER NOT NULL,
+    partido_numero          INTEGER NOT NULL,
+    sigla_epoca             VARCHAR(20) NULL,
     papel                   VARCHAR(50) NOT NULL DEFAULT 'Partido Apoiador',
     is_active               BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted              BOOLEAN NOT NULL DEFAULT FALSE,
@@ -817,10 +833,10 @@ CREATE TABLE IF NOT EXISTS coligacao_partidos (
         REFERENCES coligacoes(id) 
         ON DELETE CASCADE,
     CONSTRAINT fk_cp_partido 
-        FOREIGN KEY (id_partido) 
-        REFERENCES partidos(id) 
+        FOREIGN KEY (partido_numero) 
+        REFERENCES partidos(numero) 
         ON DELETE RESTRICT,
-    CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, id_partido)
+    CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, partido_numero)
 );
 
 COMMENT ON TABLE coligacao_partidos IS 'Partidos integrantes de cada chapa/coligação com Soft Delete universal';
@@ -979,17 +995,39 @@ export function generateSeedSql(dataset: RawElectionDataset): string {
   }
   lines.push('');
 
-  // 2. Coletar partidos únicos de todas as eleições e inserir partidos
-  lines.push('-- 2. INSERINDO PARTIDOS ÚNICOS');
-  const distinctPartidos = new Set<string>();
-  for (const ano of Object.keys(dataset.eleicoes)) {
-    const el = dataset.eleicoes[ano];
-    el.partidos_vereador.forEach((p) => distinctPartidos.add(p.partido));
-    el.resultados.forEach((r) => distinctPartidos.add(r.partido));
-  }
-  for (const sigla of Array.from(distinctPartidos).sort()) {
+  // 2. Inserir catálogo mestre de partidos com número TSE canônico
+  lines.push('-- 2. INSERINDO CATÁLOGO CANÔNICO DE PARTIDOS (CHAVE: NÚMERO TSE)');
+  const CANONICAL_PARTIES = [
+    { numero: 10, sigla: 'REPUBLICANOS', nome: 'Republicanos' },
+    { numero: 11, sigla: 'PP', nome: 'Progressistas' },
+    { numero: 12, sigla: 'PDT', nome: 'Partido Democrático Trabalhista' },
+    { numero: 13, sigla: 'PT', nome: 'Partido dos Trabalhadores' },
+    { numero: 14, sigla: 'PTB', nome: 'Partido Trabalhista Brasileiro' },
+    { numero: 15, sigla: 'MDB', nome: 'Movimento Democrático Brasileiro' },
+    { numero: 18, sigla: 'REDE', nome: 'Rede Sustentabilidade' },
+    { numero: 19, sigla: 'PODE', nome: 'Podemos' },
+    { numero: 20, sigla: 'PSC', nome: 'Partido Social Cristão' },
+    { numero: 22, sigla: 'PL', nome: 'Partido Liberal' },
+    { numero: 23, sigla: 'CIDADANIA', nome: 'Cidadania' },
+    { numero: 25, sigla: 'PRD', nome: 'Partido Renovação Democrática' },
+    { numero: 27, sigla: 'DC', nome: 'Democracia Cristã' },
+    { numero: 31, sigla: 'PHS', nome: 'Partido Humanista da Solidariedade' },
+    { numero: 36, sigla: 'AGIR', nome: 'Agir' },
+    { numero: 40, sigla: 'PSB', nome: 'Partido Socialista Brasileiro' },
+    { numero: 43, sigla: 'PV', nome: 'Partido Verde' },
+    { numero: 44, sigla: 'UNIÃO', nome: 'União Brasil' },
+    { numero: 45, sigla: 'PSDB', nome: 'Partido da Social Democracia Brasileira' },
+    { numero: 51, sigla: 'PATRIOTA', nome: 'Patriota' },
+    { numero: 55, sigla: 'PSD', nome: 'Partido Social Democrático' },
+    { numero: 70, sigla: 'AVANTE', nome: 'Avante' },
+    { numero: 77, sigla: 'SOLIDARIEDADE', nome: 'Solidariedade' },
+    { numero: 90, sigla: 'PROS', nome: 'Partido Republicano da Ordem Social' },
+  ];
+
+  for (const p of CANONICAL_PARTIES) {
     lines.push(
-      `INSERT INTO partidos (sigla) VALUES ('${sigla.replace(/'/g, "''")}') ON CONFLICT (sigla) DO NOTHING;`
+      `INSERT INTO partidos (numero, sigla, nome_completo) VALUES (${p.numero}, '${p.sigla}', '${p.nome}') ` +
+        `ON CONFLICT (numero) DO UPDATE SET sigla = EXCLUDED.sigla, nome_completo = EXCLUDED.nome_completo;`
     );
   }
   lines.push('');
@@ -1033,38 +1071,82 @@ export function generateSeedSql(dataset: RawElectionDataset): string {
   }
   lines.push('');
 
+  const SIGLA_NUM_MAP: Record<string, number> = {
+    'PT DO B': 70,
+    PTDOB: 70,
+    AVANTE: 70,
+    PMDB: 15,
+    MDB: 15,
+    PFL: 25,
+    DEM: 25,
+    PRD: 25,
+    PPB: 11,
+    PP: 11,
+    PDT: 12,
+    PT: 13,
+    PTB: 14,
+    REDE: 18,
+    PODE: 19,
+    PTN: 19,
+    PSC: 20,
+    PR: 22,
+    PL: 22,
+    PPS: 23,
+    CIDADANIA: 23,
+    DC: 27,
+    PSDC: 27,
+    PHS: 31,
+    PTC: 36,
+    AGIR: 36,
+    PSB: 40,
+    PV: 43,
+    PSDB: 45,
+    PATRIOTA: 51,
+    PEN: 51,
+    PSD: 55,
+    SD: 77,
+    SOLIDARIEDADE: 77,
+    PROS: 90,
+  };
+
   // 5. Inserir partidos_eleicao
-  lines.push('-- 5. INSERINDO PARTIDOS_ELEICAO (DESEMPENHO PARTIDÁRIO VEREADOR)');
+  lines.push('-- 5. INSERINDO PARTIDOS_ELEICAO (DESEMPENHO PARTIDÁRIO VEREADOR COM PARTIDO_NUMERO)');
   for (const anoStr of anos) {
     const el = dataset.eleicoes[anoStr];
     for (const pv of el.partidos_vereador) {
-      lines.push(
-        `INSERT INTO partidos_eleicao (id_eleicao, id_partido, votos_nominais, votos_legenda, total_votos) ` +
-          `SELECT e.id, p.id, ${pv.votos_nominais}, ${pv.votos_legenda}, ${pv.total_votos} ` +
-          `FROM eleicao e, partidos p ` +
-          `WHERE e.ano = ${el.ano} AND p.sigla = '${pv.partido.replace(/'/g, "''")}' ` +
-          `ON CONFLICT (id_eleicao, id_partido) DO UPDATE SET votos_nominais = EXCLUDED.votos_nominais, votos_legenda = EXCLUDED.votos_legenda, total_votos = EXCLUDED.total_votos;`
-      );
+      const siglaUp = pv.partido.trim().toUpperCase();
+      const numTse = SIGLA_NUM_MAP[siglaUp] || 0;
+      if (numTse > 0) {
+        lines.push(
+          `INSERT INTO partidos_eleicao (id_eleicao, partido_numero, votos_nominais, votos_legenda, total_votos) ` +
+            `SELECT e.id, ${numTse}, ${pv.votos_nominais}, ${pv.votos_legenda}, ${pv.total_votos} ` +
+            `FROM eleicao e ` +
+            `WHERE e.ano = ${el.ano} ` +
+            `ON CONFLICT (id_eleicao, partido_numero) DO UPDATE SET votos_nominais = EXCLUDED.votos_nominais, votos_legenda = EXCLUDED.votos_legenda, total_votos = EXCLUDED.total_votos;`
+        );
+      }
     }
   }
   lines.push('');
 
-  // 6. Inserir candidatos_eleicao
-  lines.push('-- 6. INSERINDO CANDIDATOS_ELEICAO (FATO DE CANDIDATURAS)');
+  // 6. Inserir candidatos_eleicao com dedução automática via 2 primeiros dígitos do número de urna
+  lines.push('-- 6. INSERINDO CANDIDATOS_ELEICAO (VALIDAÇÃO CANÔNICA VIA 2 PRIMEIROS DÍGITOS DO NÚMERO)');
   for (const anoStr of anos) {
     const el = dataset.eleicoes[anoStr];
     for (const res of el.resultados) {
       const safeNomeUrna = res.nome_urna.replace(/'/g, "''");
       const safeSituacao = res.situacao.replace(/'/g, "''");
+      const safeSiglaEpoca = res.partido.replace(/'/g, "''");
       const posicaoVal = res.posicao ? res.posicao : 'NULL';
+      const numPartidoDeduzido = parseInt(String(res.numero).slice(0, 2), 10);
 
       lines.push(
-        `INSERT INTO candidatos_eleicao (titulo_eleitor, id_eleicao, id_partido, cargo, numero_urna, nome_urna, votos, situacao, posicao) ` +
-          `SELECT '${res.titulo_eleitor}', e.id, p.id, '${res.cargo}', ${res.numero}, '${safeNomeUrna}', ${res.votos}, '${safeSituacao}', ${posicaoVal} ` +
-          `FROM eleicao e, partidos p ` +
-          `WHERE e.ano = ${el.ano} AND p.sigla = '${res.partido.replace(/'/g, "''")}' ` +
+        `INSERT INTO candidatos_eleicao (titulo_eleitor, id_eleicao, partido_numero, sigla_epoca, cargo, numero_urna, nome_urna, votos, situacao, posicao) ` +
+          `SELECT '${res.titulo_eleitor}', e.id, ${numPartidoDeduzido}, '${safeSiglaEpoca}', '${res.cargo}', ${res.numero}, '${safeNomeUrna}', ${res.votos}, '${safeSituacao}', ${posicaoVal} ` +
+          `FROM eleicao e ` +
+          `WHERE e.ano = ${el.ano} ` +
           `ON CONFLICT (id_eleicao, cargo, titulo_eleitor) DO UPDATE ` +
-          `SET votos = EXCLUDED.votos, situacao = EXCLUDED.situacao, posicao = EXCLUDED.posicao, numero_urna = EXCLUDED.numero_urna;`
+          `SET votos = EXCLUDED.votos, situacao = EXCLUDED.situacao, posicao = EXCLUDED.posicao, numero_urna = EXCLUDED.numero_urna, partido_numero = EXCLUDED.partido_numero, sigla_epoca = EXCLUDED.sigla_epoca;`
       );
     }
   }

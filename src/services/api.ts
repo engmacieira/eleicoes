@@ -1340,10 +1340,11 @@ export async function deleteCandidato(titulo_eleitor: string): Promise<void> {
   saveDynamicCadastros(dynamic);
 }
 
-export async function getPartidosCadastrados(): Promise<PartidoCadastroDto[]> {
+export async function getPartidosCadastrados(q?: string): Promise<PartidoCadastroDto[]> {
   // Try backend first
   try {
-    const res = await fetch('/api/partidos', { signal: AbortSignal.timeout(3000) });
+    const url = q ? `/api/partidos?q=${encodeURIComponent(q)}` : '/api/partidos';
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     if (res.ok) {
       const backendPartidos: PartidoCadastroDto[] = await res.json();
       if (backendPartidos && backendPartidos.length > 0) {
@@ -1359,7 +1360,15 @@ export async function getPartidosCadastrados(): Promise<PartidoCadastroDto[]> {
 
   // Base TSE
   PARTIDOS_BASE_TSE.forEach((p) => {
-    mapPartidos.set(p.numero, { ...p, historico: [...(p.historico || [])] });
+    mapPartidos.set(p.numero, {
+      ...p,
+      sigla_atual: p.sigla,
+      nome_atual: p.nome,
+      siglas_anteriores: (p.historico || [])
+        .filter((h) => !h.is_atual && h.sigla.toUpperCase() !== p.sigla.toUpperCase())
+        .map((h) => h.sigla),
+      historico: [...(p.historico || [])],
+    });
   });
 
   // Custom / overrides from localStorage
@@ -1367,9 +1376,21 @@ export async function getPartidosCadastrados(): Promise<PartidoCadastroDto[]> {
     mapPartidos.set(p.numero, p);
   });
 
-  return Array.from(mapPartidos.values())
-    .filter((p) => !p.is_deleted)
-    .sort((a, b) => a.numero - b.numero);
+  let list = Array.from(mapPartidos.values())
+    .filter((p) => !p.is_deleted);
+
+  if (q) {
+    const qClean = q.trim().toUpperCase().replace(/\s+/g, '');
+    list = list.filter((p) => {
+      if (String(p.numero) === q.trim()) return true;
+      if (p.sigla.toUpperCase().replace(/\s+/g, '').includes(qClean)) return true;
+      if (p.nome && p.nome.toUpperCase().includes(q.trim().toUpperCase())) return true;
+      if (p.historico?.some((h) => h.sigla.toUpperCase().replace(/\s+/g, '').includes(qClean))) return true;
+      return false;
+    });
+  }
+
+  return list.sort((a, b) => a.numero - b.numero);
 }
 
 export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroDto | null {
@@ -1377,7 +1398,15 @@ export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroD
   const all: PartidoCadastroDto[] = [];
   const mapPartidos = new Map<number, PartidoCadastroDto>();
 
-  PARTIDOS_BASE_TSE.forEach((p) => mapPartidos.set(p.numero, p));
+  PARTIDOS_BASE_TSE.forEach((p) => mapPartidos.set(p.numero, {
+    ...p,
+    sigla_atual: p.sigla,
+    nome_atual: p.nome,
+    siglas_anteriores: (p.historico || [])
+      .filter((h) => !h.is_atual && h.sigla.toUpperCase() !== p.sigla.toUpperCase())
+      .map((h) => h.sigla),
+    historico: [...(p.historico || [])],
+  }));
   dynamic.partidosCustom.forEach((p) => mapPartidos.set(p.numero, p));
   all.push(...mapPartidos.values());
 
@@ -1387,20 +1416,121 @@ export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroD
     if (byNum) return byNum;
   }
 
-  const s = String(siglaOuNumero).trim().toUpperCase();
+  const rawStr = String(siglaOuNumero).trim().toUpperCase();
+  const sClean = rawStr.replace(/\s+/g, '');
 
   // 1. Direct match with current acronym
-  const direct = all.find((p) => p.sigla.toUpperCase() === s);
+  const direct = all.find((p) => p.sigla.toUpperCase().replace(/\s+/g, '') === sClean);
   if (direct) return direct;
 
   // 2. Match with historical names/acronyms in the auxiliary table
   for (const p of all) {
-    if (p.historico && p.historico.some((h) => h.sigla.toUpperCase() === s)) {
+    if (p.historico && p.historico.some((h) => h.sigla.toUpperCase().replace(/\s+/g, '') === sClean)) {
       return p;
     }
   }
 
+  // 3. Match with party name
+  const byName = all.find((p) => p.nome && p.nome.toUpperCase().includes(rawStr));
+  if (byName) return byName;
+
   return null;
+}
+
+export async function fetchPartidoTimeline(termo: string | number): Promise<any> {
+  const termoStr = String(termo).trim();
+  try {
+    const res = await fetch(`/api/partidos/timeline/${encodeURIComponent(termoStr)}`, {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+
+  // Fallback offline reconstruction
+  const partido = resolvePartido(termo);
+  if (!partido) return null;
+
+  const dataset = await loadFallbackDataset();
+  const eleicoesTimeline: any[] = [];
+  let totalVotos = 0;
+  let totalCandidatos = 0;
+  let totalEleitos = 0;
+  let eleitosPrefeito = 0;
+  let eleitosVereador = 0;
+
+  for (const [anoStr, el] of Object.entries(dataset.eleicoes)) {
+    const ano = parseInt(anoStr, 10);
+    const candsEleicao = el.resultados.filter((r) => {
+      const numPrefix = parseInt(String(r.numero).slice(0, 2), 10);
+      return numPrefix === partido.numero || r.partido.toUpperCase() === partido.sigla.toUpperCase();
+    });
+
+    const desemp = el.partidos_vereador.find((pv) => {
+      const pResolve = resolvePartido(pv.partido);
+      return pResolve?.numero === partido.numero;
+    });
+
+    if (candsEleicao.length === 0 && !desemp) continue;
+
+    const candidatosFormatted = candsEleicao.map((c) => {
+      totalCandidatos++;
+      const isEleito = c.situacao.toUpperCase().includes('ELEITO');
+      if (isEleito) {
+        totalEleitos++;
+        if (c.cargo.toUpperCase().includes('PREFEITO')) eleitosPrefeito++;
+        else if (c.cargo.toUpperCase().includes('VEREADOR')) eleitosVereador++;
+      }
+      return {
+        titulo_eleitor: c.titulo_eleitor,
+        nome_completo: c.nome_urna,
+        nome_urna: c.nome_urna,
+        numero_urna: c.numero,
+        cargo: c.cargo,
+        votos: c.votos,
+        situacao: c.situacao,
+        posicao: c.posicao,
+        sigla_epoca: c.partido,
+      };
+    });
+
+    const votosNominais = desemp ? desemp.votos_nominais : candsEleicao.reduce((acc, c) => acc + c.votos, 0);
+    const votosLegenda = desemp ? desemp.votos_legenda : 0;
+    const totalV = desemp ? desemp.total_votos : (votosNominais + votosLegenda);
+    totalVotos += totalV;
+
+    const siglaVigente = candsEleicao.length > 0 ? candsEleicao[0].partido : partido.sigla;
+
+    eleicoesTimeline.push({
+      ano,
+      id_eleicao: ano,
+      sigla_vigente: siglaVigente,
+      is_rebranded: siglaVigente.toUpperCase() !== partido.sigla.toUpperCase(),
+      votos_nominais: votosNominais,
+      votos_legenda: votosLegenda,
+      total_votos: totalV,
+      total_candidatos: candidatosFormatted.length,
+      candidatos: candidatosFormatted,
+    });
+  }
+
+  return {
+    partido,
+    numero: partido.numero,
+    sigla_atual: partido.sigla_atual || partido.sigla,
+    nome_atual: partido.nome_atual || partido.nome,
+    siglas_anteriores: partido.siglas_anteriores || [],
+    estatisticas_gerais: {
+      total_votos_historico: totalVotos,
+      total_eleicoes_disputadas: eleicoesTimeline.length,
+      total_candidatos_historico: totalCandidatos,
+      total_eleitos_historico: totalEleitos,
+      eleitos_prefeito: eleitosPrefeito,
+      eleitos_vereador: eleitosVereador,
+    },
+    eleicoes: eleicoesTimeline.sort((a, b) => a.ano - b.ano),
+  };
 }
 
 export async function updatePartido(
