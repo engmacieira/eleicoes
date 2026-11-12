@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PartidosAnoDto } from '../types/election';
-import { getPartidosAno } from '../services/api';
+import { getPartidosAno, getAnosDisponiveis } from '../services/api';
 import {
   BarChart3,
   Calendar,
@@ -21,8 +21,18 @@ interface RaioXPartidarioProps {
 export const RaioXPartidario: React.FC<RaioXPartidarioProps> = ({ ano, setAno }) => {
   const [data, setData] = useState<PartidosAnoDto | null>(null);
   const [loading, setLoading] = useState(false);
+  const [anosDisponiveis, setAnosDisponiveis] = useState<number[]>([2024, 2020, 2016, 2012, 2008, 2004, 2000]);
 
-  const anosDisponiveis = [2024, 2020, 2016, 2012, 2008, 2004, 2000];
+  useEffect(() => {
+    getAnosDisponiveis().then((res) => {
+      if (res && res.length > 0) {
+        setAnosDisponiveis((prev) => {
+          const set = new Set([...res, ...prev]);
+          return Array.from(set).sort((a, b) => b - a);
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     setLoading(true);

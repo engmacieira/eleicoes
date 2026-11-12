@@ -405,6 +405,58 @@ export const SCHEMA_TABLES: TableSchema[] = [
       'CONSTRAINT chk_votos_candidato CHECK (votos >= 0)',
     ],
   },
+  {
+    id: 'coligacoes',
+    name: 'coligacoes',
+    category: 'fato',
+    description: 'Registro das coligações partidárias e chapas majoritárias formadas por pleito.',
+    columns: [
+      { name: 'id', type: 'BIGINT GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária.' },
+      { name: 'id_eleicao', type: 'INTEGER', isFk: true, fkTarget: 'eleicao(id)', nullable: false, description: 'Pleito eleitoral.' },
+      { name: 'cargo', type: 'VARCHAR(20)', nullable: false, constraint: "DEFAULT 'Prefeito'", description: 'Cargo da chapa (Prefeito).' },
+      { name: 'numero_urna', type: 'INTEGER', nullable: false, description: 'Número oficial da chapa nas urnas.' },
+      { name: 'nome_coligacao', type: 'VARCHAR(150)', nullable: false, description: 'Nome de registro da coligação ou partido isolado.' },
+      { name: 'sigla_partido_titular', type: 'VARCHAR(20)', nullable: false, description: 'Sigla do partido cabeça de chapa.' },
+      { name: 'composicao_siglas', type: 'VARCHAR(200)', nullable: false, description: 'Composição completa das siglas participantes.' },
+      { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
+      { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
+      { name: 'criado_em', type: 'TIMESTAMPTZ', nullable: false, constraint: 'DEFAULT CURRENT_TIMESTAMP', description: 'Auditoria de inserção.' },
+    ],
+    indexes: [
+      'CREATE INDEX idx_coligacoes_eleicao ON coligacoes(id_eleicao);',
+      'CREATE INDEX idx_coligacoes_numero ON coligacoes(id_eleicao, numero_urna);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_coligacoes_eleicao FOREIGN KEY (id_eleicao) REFERENCES eleicao(id) ON DELETE CASCADE',
+    ],
+  },
+  {
+    id: 'coligacao_partidos',
+    name: 'coligacao_partidos',
+    category: 'fato',
+    description: 'Tabela associativa relacionando quais agremiações partidárias compõem cada coligação e seus respectivos papéis.',
+    columns: [
+      { name: 'id', type: 'BIGINT GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária associativa.' },
+      { name: 'id_coligacao', type: 'BIGINT', isFk: true, fkTarget: 'coligacoes(id)', nullable: false, description: 'Chave estrangeira da coligação.' },
+      { name: 'id_partido', type: 'INTEGER', isFk: true, fkTarget: 'partidos(id)', nullable: false, description: 'Chave estrangeira do partido membro.' },
+      { name: 'papel', type: 'VARCHAR(50)', nullable: false, constraint: "DEFAULT 'Partido Apoiador'", description: 'Papel na chapa: Cabeça de Chapa, Vice-Prefeito, Partido Apoiador.' },
+      { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
+      { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
+      { name: 'criado_em', type: 'TIMESTAMPTZ', nullable: false, constraint: 'DEFAULT CURRENT_TIMESTAMP', description: 'Auditoria de inserção.' },
+    ],
+    indexes: [
+      'CREATE INDEX idx_coligacao_partidos_coligacao ON coligacao_partidos(id_coligacao);',
+      'CREATE INDEX idx_coligacao_partidos_partido ON coligacao_partidos(id_partido);',
+      'CREATE UNIQUE INDEX uq_coligacao_partido ON coligacao_partidos(id_coligacao, id_partido);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_cp_coligacao FOREIGN KEY (id_coligacao) REFERENCES coligacoes(id) ON DELETE CASCADE',
+      'CONSTRAINT fk_cp_partido FOREIGN KEY (id_partido) REFERENCES partidos(id) ON DELETE RESTRICT',
+      'CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, id_partido)',
+    ],
+  },
 ];
 
 export const FULL_DDL_SCRIPT = `-- =======================================================================
@@ -582,6 +634,56 @@ CREATE TABLE IF NOT EXISTS candidatos_eleicao (
 );
 
 COMMENT ON TABLE candidatos_eleicao IS 'Fato da candidatura: votos nominais recebidos, situação e número de urna';
+
+
+-- 7. TABELA: coligacoes (Chapas e Alianças Partidárias)
+-- Armazena o registro oficial de alianças eleitorais e candidaturas majoritárias.
+CREATE TABLE IF NOT EXISTS coligacoes (
+    id                      BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_eleicao              INTEGER NOT NULL,
+    cargo                   VARCHAR(20) NOT NULL DEFAULT 'Prefeito',
+    numero_urna             INTEGER NOT NULL,
+    nome_coligacao          VARCHAR(150) NOT NULL,
+    sigla_partido_titular   VARCHAR(20) NOT NULL,
+    composicao_siglas       VARCHAR(200) NOT NULL,
+    is_active               BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted              BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em               TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_coligacoes PRIMARY KEY (id),
+    CONSTRAINT fk_coligacoes_eleicao 
+        FOREIGN KEY (id_eleicao) 
+        REFERENCES eleicao(id) 
+        ON DELETE CASCADE
+);
+
+COMMENT ON TABLE coligacoes IS 'Alianças e chapas partidárias registradas por pleito com Soft Delete universal';
+
+
+-- 8. TABELA: coligacao_partidos (Associação N:N de Partidos por Coligação)
+-- Mapeia quais agremiações partidárias compõem a chapa e seu respectivo papel institucional.
+CREATE TABLE IF NOT EXISTS coligacao_partidos (
+    id                      BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_coligacao            BIGINT NOT NULL,
+    id_partido              INTEGER NOT NULL,
+    papel                   VARCHAR(50) NOT NULL DEFAULT 'Partido Apoiador',
+    is_active               BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted              BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em               TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_coligacao_partidos PRIMARY KEY (id),
+    CONSTRAINT fk_cp_coligacao 
+        FOREIGN KEY (id_coligacao) 
+        REFERENCES coligacoes(id) 
+        ON DELETE CASCADE,
+    CONSTRAINT fk_cp_partido 
+        FOREIGN KEY (id_partido) 
+        REFERENCES partidos(id) 
+        ON DELETE RESTRICT,
+    CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, id_partido)
+);
+
+COMMENT ON TABLE coligacao_partidos IS 'Partidos integrantes de cada chapa/coligação com Soft Delete universal';
 `;
 
 export const FULL_INDEXES_SCRIPT = `-- =======================================================================
@@ -623,6 +725,18 @@ CREATE INDEX IF NOT EXISTS idx_partidos_eleicao_pleito
 -- 8. Estatísticas e Urna por Pleito
 CREATE INDEX IF NOT EXISTS idx_detalhes_votacao_pleito 
     ON detalhes_votacao(id_eleicao);
+
+-- 9. Coligações por Pleito e Número de Urna
+CREATE INDEX IF NOT EXISTS idx_coligacoes_eleicao 
+    ON coligacoes(id_eleicao);
+CREATE INDEX IF NOT EXISTS idx_coligacoes_numero 
+    ON coligacoes(id_eleicao, numero_urna);
+
+-- 10. Membros Partidários da Coligação
+CREATE INDEX IF NOT EXISTS idx_coligacao_partidos_coligacao 
+    ON coligacao_partidos(id_coligacao);
+CREATE INDEX IF NOT EXISTS idx_coligacao_partidos_partido 
+    ON coligacao_partidos(id_partido);
 `;
 
 export const ANALYTICS_VIEWS_SCRIPT = `-- =======================================================================

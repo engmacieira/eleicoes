@@ -166,3 +166,85 @@ export interface CloudSqlHealthDto {
   cloud_project: string;
   latency_ms?: number;
 }
+
+// --- Interfaces para a Gestão de Cadastros ---
+export interface CandidatoCadastroDto {
+  titulo_eleitor: string;
+  nome_completo: string;
+  data_nascimento?: string | null;
+  is_active?: boolean;
+  is_deleted?: boolean;
+}
+
+export interface PartidoCadastroDto {
+  id: number;
+  sigla: string;
+  is_active?: boolean;
+  is_deleted?: boolean;
+}
+
+export interface EleicaoCadastroDto {
+  id: number;
+  ano: number;
+  is_active?: boolean;
+  is_deleted?: boolean;
+}
+
+// --- Interfaces para Coligações Partidárias ---
+export interface ColigacaoMembroDto {
+  id: number;
+  id_partido: number;
+  sigla_partido: string;
+  papel: 'Cabeça de Chapa' | 'Vice-Prefeito' | 'Partido Apoiador' | string;
+  is_active?: boolean;
+  is_deleted?: boolean;
+}
+
+export interface ColigacaoDto {
+  id: number;
+  id_eleicao: number;
+  ano_eleicao: number;
+  cargo: string;
+  numero_urna: number;
+  nome_coligacao: string;
+  sigla_partido_titular: string;
+  composicao_siglas: string;
+  is_active: boolean;
+  is_deleted: boolean;
+  partidos: ColigacaoMembroDto[];
+  // Campos enriquecidos para exibição analítica
+  candidato_nome?: string;
+  vice_nome?: string;
+  situacao?: string;
+  votos?: number;
+  percentual_validos?: number;
+}
+
+export interface CreateColigacaoPayload {
+  ano_eleicao: number;
+  cargo: string;
+  numero_urna: number;
+  nome_coligacao: string;
+  sigla_partido_titular: string;
+  composicao_siglas?: string;
+  partidos?: Array<{
+    id_partido: number;
+    sigla_partido: string;
+    papel: string;
+  }>;
+}
+
+export interface UpdateColigacaoPayload {
+  cargo?: string;
+  numero_urna?: number;
+  nome_coligacao?: string;
+  sigla_partido_titular?: string;
+  composicao_siglas?: string;
+  is_active?: boolean;
+  partidos?: Array<{
+    id_partido: number;
+    sigla_partido: string;
+    papel: string;
+  }>;
+}
+

@@ -1,83 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { RouterProvider, useAppRouter } from './router/RouterContext';
 import { Layout } from './components/Layout';
-import { PleitoOverview } from './components/PleitoOverview';
-import { RaioXPartidario } from './components/RaioXPartidario';
-import { DossiePoliticoView } from './components/DossiePoliticoView';
-import { CandidatoDossierModal } from './components/CandidatoDossierModal';
-import { SqlExplorerView } from './components/SqlExplorerView';
-import { CloudSqlConfigView } from './components/CloudSqlConfigView';
-import {
-  RawElectionDataset,
-  DetalhesVotacaoDto,
-  ResultadoCandidatoDto,
-  EleicaoResumoDto,
-} from './types/election';
-import {
-  getEleicoes,
-  getResultados,
-  loadFallbackDataset,
-} from './services/api';
+import { PleitoPage } from './pages/PleitoPage';
+import { PartidosPage } from './pages/PartidosPage';
+import { DossiePage } from './pages/DossiePage';
+import { CandidatoDetailPage } from './pages/CandidatoDetailPage';
+import { CadastrosPage } from './pages/CadastrosPage';
+import { ColigacoesPage } from './pages/ColigacoesPage';
+import { SqlExplorerPage } from './pages/SqlExplorerPage';
+import { CloudSqlConfigPage } from './pages/CloudSqlConfigPage';
 import {
   FULL_DDL_SCRIPT,
   FULL_INDEXES_SCRIPT,
   ANALYTICS_VIEWS_SCRIPT,
   generateSeedSql,
 } from './utils/sqlGenerator';
+import { loadFallbackDataset } from './services/api';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('pleito');
-  const [ano, setAno] = useState<number>(2024);
-  const [cargo, setCargo] = useState<'Prefeito' | 'Vereador'>('Vereador');
-  const [selectedCandidato, setSelectedCandidato] = useState<string | null>(null);
+const AppContent: React.FC = () => {
+  const { currentRoute, navigate } = useAppRouter();
 
-  const [eleicoes, setEleicoes] = useState<EleicaoResumoDto[]>([]);
-  const [detalhes, setDetalhes] = useState<DetalhesVotacaoDto | null>(null);
-  const [resultados, setResultados] = useState<ResultadoCandidatoDto[]>([]);
-  const [dataset, setDataset] = useState<RawElectionDataset | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const handleDownloadAllSql = async () => {
+    let seed = '';
+    try {
+      const ds = await loadFallbackDataset();
+      if (ds) {
+        seed = generateSeedSql(ds);
+      }
+    } catch (e) {
+      console.warn('Dataset não pôde ser carregado para exportação do seed:', e);
+    }
 
-  // Initial load of elections list and raw dataset
-  useEffect(() => {
-    loadFallbackDataset()
-      .then((ds) => setDataset(ds))
-      .catch((err) => console.error('Erro carregando dataset:', err));
-
-    getEleicoes()
-      .then((data) => {
-        setEleicoes(data);
-      })
-      .catch((err) => console.error('Erro buscando eleições:', err));
-  }, []);
-
-  // Fetch results and details whenever ano or cargo changes
-  useEffect(() => {
-    setLoading(true);
-
-    Promise.all([
-      getEleicoes(ano, cargo),
-      getResultados(ano, cargo),
-    ])
-      .then(([eleicaoList, resList]) => {
-        if (eleicaoList.length > 0 && eleicaoList[0].detalhes.length > 0) {
-          const matched = eleicaoList[0].detalhes.find(
-            (d) => d.cargo.toLowerCase() === cargo.toLowerCase()
-          ) || eleicaoList[0].detalhes[0];
-          setDetalhes(matched);
-        } else {
-          setDetalhes(null);
-        }
-
-        setResultados(resList);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Erro na consulta de resultados:', err);
-        setLoading(false);
-      });
-  }, [ano, cargo]);
-
-  const handleDownloadAllSql = () => {
-    const seed = dataset ? generateSeedSql(dataset) : '';
     const fullPackage = `/* =======================================================================
    PACOTE COMPLETO: BANCO DE DADOS ELEIÇÕES MUNICIPAIS (2000 - 2024)
    SGBD: GOOGLE CLOUD SQL (POSTGRESQL 15+)
@@ -107,52 +60,33 @@ ${seed}
     URL.revokeObjectURL(url);
   };
 
+  // Map route name to tab id in layout
+  const activeTabId =
+    currentRoute.name === 'candidato' ? 'dossie' : currentRoute.name;
+
   return (
     <Layout
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
+      activeTab={activeTabId}
+      setActiveTab={(tab) => navigate(tab)}
       onDownloadAllSql={handleDownloadAllSql}
     >
-      {/* Context 1: Inteligência Eleitoral */}
-      {activeTab === 'pleito' && (
-        <PleitoOverview
-          ano={ano}
-          setAno={setAno}
-          cargo={cargo}
-          setCargo={setCargo}
-          detalhes={detalhes}
-          resultados={resultados}
-          loading={loading}
-          onSelectCandidato={(titulo) => setSelectedCandidato(titulo)}
-        />
-      )}
-
-      {activeTab === 'partidos' && (
-        <RaioXPartidario ano={ano} setAno={setAno} />
-      )}
-
-      {activeTab === 'dossie' && (
-        <DossiePoliticoView
-          dataset={dataset}
-          onSelectCandidato={(titulo) => setSelectedCandidato(titulo)}
-        />
-      )}
-
-      {/* Context 2: Engenharia & Banco de Dados */}
-      {activeTab === 'sql_explorer' && (
-        <SqlExplorerView />
-      )}
-
-      {activeTab === 'infra_config' && (
-        <CloudSqlConfigView dataset={dataset} />
-      )}
-
-      {/* Candidato Dossier Slide-Over Drawer */}
-      <CandidatoDossierModal
-        tituloEleitor={selectedCandidato}
-        onClose={() => setSelectedCandidato(null)}
-        onSelectAnother={(titulo) => setSelectedCandidato(titulo)}
-      />
+      {/* Decentralized Page Routes */}
+      {currentRoute.name === 'pleito' && <PleitoPage />}
+      {currentRoute.name === 'partidos' && <PartidosPage />}
+      {currentRoute.name === 'coligacoes' && <ColigacoesPage />}
+      {currentRoute.name === 'dossie' && <DossiePage />}
+      {currentRoute.name === 'candidato' && <CandidatoDetailPage />}
+      {currentRoute.name === 'cadastros' && <CadastrosPage />}
+      {currentRoute.name === 'sql_explorer' && <SqlExplorerPage />}
+      {currentRoute.name === 'infra_config' && <CloudSqlConfigPage />}
     </Layout>
+  );
+};
+
+export default function App() {
+  return (
+    <RouterProvider>
+      <AppContent />
+    </RouterProvider>
   );
 }

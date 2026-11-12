@@ -14,6 +14,8 @@ import {
   ExternalLink,
   Shield,
   FileSpreadsheet,
+  UserCheck,
+  Network,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -45,10 +47,22 @@ export const Layout: React.FC<LayoutProps> = ({
       badge: 'Legenda x Nominal',
     },
     {
+      id: 'coligacoes',
+      label: 'Coligações Partidárias',
+      icon: Network,
+      badge: 'Alianças & Apoios',
+    },
+    {
       id: 'dossie',
       label: 'Dossiê de Candidatos',
       icon: Users,
       badge: 'Pessoas Físicas',
+    },
+    {
+      id: 'cadastros',
+      label: 'Gestão de Cadastros',
+      icon: UserCheck,
+      badge: 'CRUD',
     },
   ];
 
@@ -73,8 +87,14 @@ export const Layout: React.FC<LayoutProps> = ({
         return { context: 'Inteligência Eleitoral', section: 'Visão Geral do Pleito' };
       case 'partidos':
         return { context: 'Inteligência Eleitoral', section: 'Raio-X Partidário' };
+      case 'coligacoes':
+        return { context: 'Inteligência Eleitoral', section: 'Coligações Partidárias' };
       case 'dossie':
         return { context: 'Inteligência Eleitoral', section: 'Dossiê de Candidatos' };
+      case 'candidato':
+        return { context: 'Inteligência Eleitoral', section: 'Perfil e Dossiê Individual' };
+      case 'cadastros':
+        return { context: 'Administração', section: 'Gestão de Cadastros' };
       case 'sql_explorer':
         return { context: 'Infraestrutura & SQL', section: 'Explorador SQL & Schema' };
       case 'infra_config':

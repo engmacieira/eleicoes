@@ -7,6 +7,10 @@ import {
   RawElectionDataset,
   ViceCandidatoDto,
   ChapaParceiroDto,
+  ColigacaoDto,
+  ColigacaoMembroDto,
+  CreateColigacaoPayload,
+  UpdateColigacaoPayload,
 } from '../types/election';
 
 let cachedDataset: RawElectionDataset | null = null;
@@ -32,7 +36,7 @@ export interface ChapaRegistro {
   };
 }
 
-export const CHAPAS_MAJORITARIAS: ChapaRegistro[] = [
+const BASE_CHAPAS_MAJORITARIAS: ChapaRegistro[] = [
   // 2024
   {
     ano: 2024,
@@ -372,6 +376,142 @@ export const CHAPAS_MAJORITARIAS: ChapaRegistro[] = [
   },
 ];
 
+const CHAPAS_OVERRIDES_KEY = 'vigiminas_chapas_overrides_v1';
+export const CANDIDATURA_OVERRIDES_KEY = 'vigiminas_candidaturas_overrides_v1';
+
+export function getChapasMajoritarias(): ChapaRegistro[] {
+  let overrides: Record<string, Partial<ChapaRegistro>> = {};
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(CHAPAS_OVERRIDES_KEY) : null;
+    if (raw) overrides = JSON.parse(raw);
+  } catch {}
+
+  return BASE_CHAPAS_MAJORITARIAS.map((base) => {
+    const key = `${base.ano}_${base.numero}`;
+    const ov = overrides[key];
+    if (!ov) return base;
+
+    return {
+      ...base,
+      ...ov,
+      prefeito: {
+        ...base.prefeito,
+        ...(ov.prefeito || {}),
+      },
+      vice: {
+        ...base.vice,
+        ...(ov.vice || {}),
+      },
+    };
+  });
+}
+
+export let CHAPAS_MAJORITARIAS: ChapaRegistro[] = getChapasMajoritarias();
+
+export function refreshChapasMajoritarias(): ChapaRegistro[] {
+  CHAPAS_MAJORITARIAS = getChapasMajoritarias();
+  return CHAPAS_MAJORITARIAS;
+}
+
+export interface CorrigirVinculoPayload {
+  ano: number;
+  cargo: 'Prefeito' | 'Vereador';
+  numero_urna: number;
+  // Titular
+  titular_novo_titulo?: string;
+  titular_novo_nome_completo?: string;
+  titular_novo_nome_urna?: string;
+  // Vice (para Prefeito)
+  vice_novo_titulo?: string;
+  vice_novo_nome_completo?: string;
+  vice_novo_nome_urna?: string;
+  vice_nova_sigla?: string;
+}
+
+export async function corrigirVinculoCandidatura(payload: CorrigirVinculoPayload): Promise<void> {
+  const normCargo = payload.cargo.toLowerCase();
+
+  // If Prefeito / Vice
+  if (normCargo === 'prefeito') {
+    let overrides: Record<string, any> = {};
+    try {
+      const raw = localStorage.getItem(CHAPAS_OVERRIDES_KEY);
+      if (raw) overrides = JSON.parse(raw);
+    } catch {}
+
+    const key = `${payload.ano}_${payload.numero_urna}`;
+    const current = overrides[key] || {};
+
+    const updatedPrefeito = {
+      ...(current.prefeito || {}),
+    };
+    if (payload.titular_novo_titulo) updatedPrefeito.titulo_eleitor = payload.titular_novo_titulo.trim();
+    if (payload.titular_novo_nome_completo) updatedPrefeito.nome_completo = payload.titular_novo_nome_completo.trim().toUpperCase();
+    if (payload.titular_novo_nome_urna) updatedPrefeito.nome_urna = payload.titular_novo_nome_urna.trim();
+
+    const updatedVice = {
+      ...(current.vice || {}),
+    };
+    if (payload.vice_novo_titulo) updatedVice.titulo_eleitor = payload.vice_novo_titulo.trim();
+    if (payload.vice_novo_nome_completo) updatedVice.nome_completo = payload.vice_novo_nome_completo.trim().toUpperCase();
+    if (payload.vice_novo_nome_urna) updatedVice.nome_urna = payload.vice_novo_nome_urna.trim();
+    if (payload.vice_nova_sigla) updatedVice.sigla_partido = payload.vice_nova_sigla.trim().toUpperCase();
+
+    overrides[key] = {
+      ...current,
+      ano: payload.ano,
+      numero: payload.numero_urna,
+      prefeito: updatedPrefeito,
+      vice: updatedVice,
+    };
+
+    localStorage.setItem(CHAPAS_OVERRIDES_KEY, JSON.stringify(overrides));
+    refreshChapasMajoritarias();
+
+    // Register / update Person records in dynamic cadastros so they exist in DadosCandidato
+    if (payload.titular_novo_titulo && payload.titular_novo_nome_completo) {
+      createCandidato({
+        titulo_eleitor: payload.titular_novo_titulo,
+        nome_completo: payload.titular_novo_nome_completo,
+      }).catch(() => {});
+    }
+
+    if (payload.vice_novo_titulo && payload.vice_novo_nome_completo) {
+      createCandidato({
+        titulo_eleitor: payload.vice_novo_titulo,
+        nome_completo: payload.vice_novo_nome_completo,
+      }).catch(() => {});
+    }
+  } else {
+    // General candidacy (e.g. Vereador)
+    let candOverrides: Record<string, any> = {};
+    try {
+      const raw = localStorage.getItem(CANDIDATURA_OVERRIDES_KEY);
+      if (raw) candOverrides = JSON.parse(raw);
+    } catch {}
+
+    const key = `${payload.ano}_${payload.cargo}_${payload.numero_urna}`;
+    candOverrides[key] = {
+      ano: payload.ano,
+      cargo: payload.cargo,
+      numero_urna: payload.numero_urna,
+      titulo_eleitor: payload.titular_novo_titulo?.trim(),
+      nome_completo: payload.titular_novo_nome_completo?.trim().toUpperCase(),
+      nome_urna: payload.titular_novo_nome_urna?.trim(),
+    };
+
+    localStorage.setItem(CANDIDATURA_OVERRIDES_KEY, JSON.stringify(candOverrides));
+
+    if (payload.titular_novo_titulo && payload.titular_novo_nome_completo) {
+      createCandidato({
+        titulo_eleitor: payload.titular_novo_titulo,
+        nome_completo: payload.titular_novo_nome_completo,
+      }).catch(() => {});
+    }
+  }
+}
+
+
 export async function loadFallbackDataset(): Promise<RawElectionDataset> {
   if (cachedDataset) return cachedDataset;
   const res = await fetch('/assets/aistudio/eleicoes_braunas_ed52d128.json');
@@ -428,9 +568,15 @@ export async function getEleicoes(ano?: number, cargo?: string): Promise<Eleicao
 
   // Fallback computation matching FastAPI logic exactly
   const ds = await loadFallbackDataset();
-  const anos = Object.keys(ds.eleicoes)
-    .map(Number)
-    .sort((a, b) => b - a);
+  const dynamic = loadDynamicCadastros();
+
+  const baseAnos = Object.keys(ds.eleicoes).map(Number);
+  const customAnos = dynamic.eleicoesCustom
+    .filter((e) => !e.is_deleted && e.is_active && e.ano > 0)
+    .map((e) => e.ano);
+
+  const anosSet = new Set<number>([...baseAnos, ...customAnos]);
+  const anos = Array.from(anosSet).sort((a, b) => b - a);
 
   const filteredAnos = ano ? anos.filter((a) => a === ano) : anos;
 
@@ -442,23 +588,41 @@ export async function getEleicoes(ano?: number, cargo?: string): Promise<Eleicao
       ? [cargo.toLowerCase()]
       : ['prefeito', 'vereador'];
 
-    for (const c of cargos) {
-      const det = c === 'prefeito' ? el.detalhes.prefeito : el.detalhes.vereador;
-      if (det) {
-        const taxaAbs = det.aptos > 0 ? (det.abstencoes / det.aptos) * 100 : 0;
-        const taxaComp = det.aptos > 0 ? (det.comparecimento / det.aptos) * 100 : 0;
+    if (!el) {
+      // Pleito futuro ou cadastrado recentemente
+      for (const c of cargos) {
         detalhes.push({
           id: idx * 10 + (c === 'prefeito' ? 1 : 2),
           cargo: c === 'prefeito' ? 'Prefeito' : 'Vereador',
-          aptos: det.aptos,
-          comparecimento: det.comparecimento,
-          abstencoes: det.abstencoes,
-          validos: det.validos,
-          brancos: det.brancos,
-          nulos: det.nulos,
-          taxa_abstencao_pct: Number(taxaAbs.toFixed(2)),
-          taxa_comparecimento_pct: Number(taxaComp.toFixed(2)),
+          aptos: 4100, // Estimativa demográfica média de eleitores para Braúnas
+          comparecimento: 0,
+          abstencoes: 0,
+          validos: 0,
+          brancos: 0,
+          nulos: 0,
+          taxa_abstencao_pct: 0,
+          taxa_comparecimento_pct: 0,
         });
+      }
+    } else {
+      for (const c of cargos) {
+        const det = c === 'prefeito' ? el.detalhes.prefeito : el.detalhes.vereador;
+        if (det) {
+          const taxaAbs = det.aptos > 0 ? (det.abstencoes / det.aptos) * 100 : 0;
+          const taxaComp = det.aptos > 0 ? (det.comparecimento / det.aptos) * 100 : 0;
+          detalhes.push({
+            id: idx * 10 + (c === 'prefeito' ? 1 : 2),
+            cargo: c === 'prefeito' ? 'Prefeito' : 'Vereador',
+            aptos: det.aptos,
+            comparecimento: det.comparecimento,
+            abstencoes: det.abstencoes,
+            validos: det.validos,
+            brancos: det.brancos,
+            nulos: det.nulos,
+            taxa_abstencao_pct: Number(taxaAbs.toFixed(2)),
+            taxa_comparecimento_pct: Number(taxaComp.toFixed(2)),
+          });
+        }
       }
     }
 
@@ -468,6 +632,15 @@ export async function getEleicoes(ano?: number, cargo?: string): Promise<Eleicao
       detalhes,
     };
   });
+}
+
+export async function getAnosDisponiveis(): Promise<number[]> {
+  try {
+    const eleicoes = await getEleicoesCadastradas();
+    return eleicoes.map((e) => e.ano).sort((a, b) => b - a);
+  } catch {
+    return [2028, 2024, 2020, 2016, 2012, 2008, 2004, 2000];
+  }
 }
 
 export async function getResultados(ano: number, cargo: string): Promise<ResultadoCandidatoDto[]> {
@@ -508,14 +681,25 @@ export async function getResultados(ano: number, cargo: string): Promise<Resulta
   }
 
   // Fallback computation
+  refreshChapasMajoritarias();
   const ds = await loadFallbackDataset();
   const el = ds.eleicoes[String(ano)];
   if (!el) return [];
+
+  let candOverrides: Record<string, any> = {};
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(CANDIDATURA_OVERRIDES_KEY) : null;
+    if (raw) candOverrides = JSON.parse(raw);
+  } catch {}
 
   const filtered = el.resultados.filter((r) => r.cargo.toLowerCase() === normCargo);
   const totalVotos = filtered.reduce((acc, curr) => acc + curr.votos, 0) || 1;
 
   return filtered.map((r) => {
+    // Check if there is a manual override for this candidate
+    const ovKey = `${ano}_${r.cargo}_${r.numero}`;
+    const candOv = candOverrides[ovKey];
+
     if (normCargo === 'prefeito') {
       const chapa = CHAPAS_MAJORITARIAS.find(
         (ch) =>
@@ -557,9 +741,9 @@ export async function getResultados(ano: number, cargo: string): Promise<Resulta
     return {
       posicao: r.posicao,
       numero_urna: r.numero,
-      nome_urna: r.nome_urna,
-      nome_completo: base.nome_completo,
-      titulo_eleitor: r.titulo_eleitor,
+      nome_urna: candOv?.nome_urna || r.nome_urna,
+      nome_completo: candOv?.nome_completo || base.nome_completo,
+      titulo_eleitor: candOv?.titulo_eleitor || r.titulo_eleitor,
       sigla_partido: r.partido,
       cargo: r.cargo,
       votos: r.votos,
@@ -581,12 +765,17 @@ export async function getCandidatoHistorico(tituloEleitor: string): Promise<Cand
   }
 
   // Fallback computation
+  refreshChapasMajoritarias();
   const ds = await loadFallbackDataset();
+  const dynamic = loadDynamicCadastros();
 
-  // Find candidate profile either in base or in chapas
+  // Find candidate profile either in base, dynamic cadastros, or in chapas
   let baseNome = '';
   let baseData = '';
-  if (ds.candidatos_base[tituloEleitor]) {
+  if (dynamic.candidatosCustom[tituloEleitor]) {
+    baseNome = dynamic.candidatosCustom[tituloEleitor].nome_completo;
+    baseData = dynamic.candidatosCustom[tituloEleitor].data_nascimento || '';
+  } else if (ds.candidatos_base[tituloEleitor]) {
     baseNome = ds.candidatos_base[tituloEleitor].nome_completo;
     baseData = ds.candidatos_base[tituloEleitor].data_nascimento;
   } else {
@@ -781,3 +970,832 @@ export async function getPartidosAno(ano: number): Promise<PartidosAnoDto> {
     total_geral_votos: totalGeral,
   };
 }
+
+// =======================================================================
+// GESTÃO DE CADASTROS (CANDIDATOS, PARTIDOS, ELEIÇÕES) COM SYNC & FALLBACK
+// =======================================================================
+
+// In-memory / localStorage store for dynamic CRUD operations
+const CADASTRO_STORAGE_KEY = 'vigiminas_cadastros_v1';
+
+interface DynamicCadastrosState {
+  candidatosCustom: Record<string, { titulo_eleitor: string; nome_completo: string; data_nascimento?: string | null; is_active: boolean; is_deleted: boolean }>;
+  partidosCustom: Array<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }>;
+  eleicoesCustom: Array<{ id: number; ano: number; is_active: boolean; is_deleted: boolean }>;
+}
+
+function loadDynamicCadastros(): DynamicCadastrosState {
+  try {
+    const raw = localStorage.getItem(CADASTRO_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {
+    candidatosCustom: {},
+    partidosCustom: [],
+    eleicoesCustom: [],
+  };
+}
+
+function saveDynamicCadastros(state: DynamicCadastrosState) {
+  try {
+    localStorage.setItem(CADASTRO_STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+export async function getCandidatosCadastrados(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ total: number; items: Array<{ titulo_eleitor: string; nome_completo: string; data_nascimento?: string | null; is_active: boolean; is_deleted: boolean }> }> {
+  const dynamic = loadDynamicCadastros();
+  const ds = await loadFallbackDataset();
+
+  // Combine dataset base with dynamic custom candidates
+  const mapAll = new Map<string, { titulo_eleitor: string; nome_completo: string; data_nascimento?: string | null; is_active: boolean; is_deleted: boolean }>();
+
+  // Base dataset
+  Object.values(ds.candidatos_base).forEach((c) => {
+    mapAll.set(c.titulo_eleitor, {
+      titulo_eleitor: c.titulo_eleitor,
+      nome_completo: c.nome_completo,
+      data_nascimento: c.data_nascimento || null,
+      is_active: true,
+      is_deleted: false,
+    });
+  });
+
+  // Apply custom dynamic additions or soft deletes
+  Object.values(dynamic.candidatosCustom).forEach((c) => {
+    mapAll.set(c.titulo_eleitor, c);
+  });
+
+  let list = Array.from(mapAll.values()).filter((c) => !c.is_deleted);
+
+  if (params?.search) {
+    const s = params.search.toLowerCase().trim();
+    list = list.filter(
+      (c) =>
+        c.nome_completo.toLowerCase().includes(s) ||
+        c.titulo_eleitor.includes(s)
+    );
+  }
+
+  // Sort alphabetically by name
+  list.sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
+
+  const total = list.length;
+  const offset = params?.offset || 0;
+  const limit = params?.limit || 50;
+  const paginated = list.slice(offset, offset + limit);
+
+  return { total, items: paginated };
+}
+
+export async function updateCandidato(
+  titulo_eleitor: string,
+  payload: { nome_completo?: string; data_nascimento?: string | null; is_active?: boolean }
+): Promise<void> {
+  try {
+    await fetch(`/api/candidatos/${titulo_eleitor}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const existing = dynamic.candidatosCustom[titulo_eleitor] || {
+    titulo_eleitor,
+    nome_completo: payload.nome_completo || '',
+    data_nascimento: payload.data_nascimento || null,
+    is_active: payload.is_active !== undefined ? payload.is_active : true,
+    is_deleted: false,
+  };
+
+  if (payload.nome_completo !== undefined) existing.nome_completo = payload.nome_completo.toUpperCase();
+  if (payload.data_nascimento !== undefined) existing.data_nascimento = payload.data_nascimento;
+  if (payload.is_active !== undefined) existing.is_active = payload.is_active;
+
+  dynamic.candidatosCustom[titulo_eleitor] = existing;
+  saveDynamicCadastros(dynamic);
+}
+
+export async function deleteCandidato(titulo_eleitor: string): Promise<void> {
+  try {
+    await fetch(`/api/candidatos/${titulo_eleitor}`, {
+      method: 'DELETE',
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const existing = dynamic.candidatosCustom[titulo_eleitor] || {
+    titulo_eleitor,
+    nome_completo: '',
+    is_active: false,
+    is_deleted: true,
+  };
+  existing.is_deleted = true;
+  existing.is_active = false;
+  dynamic.candidatosCustom[titulo_eleitor] = existing;
+  saveDynamicCadastros(dynamic);
+}
+
+export async function getPartidosCadastrados(): Promise<Array<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }>> {
+  const dynamic = loadDynamicCadastros();
+  const ds = await loadFallbackDataset();
+
+  // Aggregate base partidos from all elections
+  const siglas = new Set<string>();
+  Object.values(ds.eleicoes).forEach((el) => {
+    el.partidos_vereador?.forEach((p) => siglas.add(p.partido));
+    el.resultados?.forEach((r) => siglas.add(r.partido));
+  });
+
+  let idCounter = 1;
+  const mapPartidos = new Map<string, { id: number; sigla: string; is_active: boolean; is_deleted: boolean }>();
+
+  Array.from(siglas).sort().forEach((sigla) => {
+    mapPartidos.set(sigla, {
+      id: idCounter++,
+      sigla,
+      is_active: true,
+      is_deleted: false,
+    });
+  });
+
+  // Apply custom partidos
+  dynamic.partidosCustom.forEach((p) => {
+    mapPartidos.set(p.sigla, p);
+  });
+
+  return Array.from(mapPartidos.values())
+    .filter((p) => !p.is_deleted)
+    .sort((a, b) => a.sigla.localeCompare(b.sigla));
+}
+
+export async function updatePartido(
+  id: number,
+  payload: { sigla?: string; is_active?: boolean }
+): Promise<void> {
+  try {
+    await fetch(`/api/partidos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const match = dynamic.partidosCustom.find((p) => p.id === id);
+  if (match) {
+    if (payload.sigla !== undefined) match.sigla = payload.sigla.trim().toUpperCase();
+    if (payload.is_active !== undefined) match.is_active = payload.is_active;
+  } else {
+    // If it was a base partido, add it to custom overrides
+    dynamic.partidosCustom.push({
+      id,
+      sigla: payload.sigla ? payload.sigla.trim().toUpperCase() : '',
+      is_active: payload.is_active !== undefined ? payload.is_active : true,
+      is_deleted: false,
+    });
+  }
+  saveDynamicCadastros(dynamic);
+}
+
+export async function deletePartido(id: number): Promise<void> {
+  const dynamic = loadDynamicCadastros();
+  const match = dynamic.partidosCustom.find((p) => p.id === id);
+  if (match) {
+    match.is_deleted = true;
+    match.is_active = false;
+  } else {
+    // Track deleted base id
+    dynamic.partidosCustom.push({ id, sigla: '', is_active: false, is_deleted: true });
+  }
+  saveDynamicCadastros(dynamic);
+}
+
+export async function getEleicoesCadastradas(): Promise<Array<{ id: number; ano: number; is_active: boolean; is_deleted: boolean }>> {
+  const dynamic = loadDynamicCadastros();
+  const ds = await loadFallbackDataset();
+
+  const mapEleicoes = new Map<number, { id: number; ano: number; is_active: boolean; is_deleted: boolean }>();
+  let idCounter = 1;
+
+  Object.keys(ds.eleicoes).map(Number).sort((a, b) => b - a).forEach((ano) => {
+    mapEleicoes.set(ano, {
+      id: idCounter++,
+      ano,
+      is_active: true,
+      is_deleted: false,
+    });
+  });
+
+  dynamic.eleicoesCustom.forEach((e) => {
+    mapEleicoes.set(e.ano, e);
+  });
+
+  return Array.from(mapEleicoes.values())
+    .filter((e) => !e.is_deleted)
+    .sort((a, b) => b.ano - a.ano);
+}
+
+export async function createCandidato(payload: {
+  titulo_eleitor: string;
+  nome_completo: string;
+  data_nascimento?: string | null;
+}): Promise<{
+  titulo_eleitor: string;
+  nome_completo: string;
+  data_nascimento?: string | null;
+  is_active: boolean;
+  is_deleted: boolean;
+}> {
+  // Attempt backend API if live
+  try {
+    const res = await fetch(`/api/candidatos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const tituloTrimmed = payload.titulo_eleitor.trim();
+  const nomeUpper = payload.nome_completo.trim().toUpperCase();
+
+  // Check if exists in base dataset or dynamic
+  const ds = await loadFallbackDataset();
+  const baseCand = ds.candidatos_base[tituloTrimmed];
+  const customCand = dynamic.candidatosCustom[tituloTrimmed];
+
+  if (customCand && !customCand.is_deleted) {
+    throw new Error(`O título de eleitor ${tituloTrimmed} já se encontra cadastrado para: ${customCand.nome_completo}`);
+  }
+  if (baseCand && (!customCand || !customCand.is_deleted)) {
+    throw new Error(`O título de eleitor ${tituloTrimmed} já existe na base de dados oficial (${baseCand.nome_completo}).`);
+  }
+
+  const newItem = {
+    titulo_eleitor: tituloTrimmed,
+    nome_completo: nomeUpper,
+    data_nascimento: payload.data_nascimento ? payload.data_nascimento.trim() : null,
+    is_active: true,
+    is_deleted: false,
+  };
+  dynamic.candidatosCustom[tituloTrimmed] = newItem;
+  saveDynamicCadastros(dynamic);
+  return newItem;
+}
+
+export async function createPartido(payload: { sigla: string }): Promise<{ id: number; sigla: string; is_active: boolean; is_deleted: boolean }> {
+  // Attempt backend API if live
+  try {
+    const res = await fetch(`/api/partidos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const siglaUpper = payload.sigla.trim().toUpperCase();
+
+  const existing = dynamic.partidosCustom.find((p) => p.sigla.toUpperCase() === siglaUpper);
+  if (existing) {
+    if (existing.is_deleted) {
+      existing.is_deleted = false;
+      existing.is_active = true;
+      saveDynamicCadastros(dynamic);
+      return existing;
+    }
+    throw new Error(`A agremiação partidária com sigla '${siglaUpper}' já se encontra cadastrada.`);
+  }
+
+  const newId = 1000 + dynamic.partidosCustom.length + 1;
+  const newItem = {
+    id: newId,
+    sigla: siglaUpper,
+    is_active: true,
+    is_deleted: false,
+  };
+  dynamic.partidosCustom.push(newItem);
+  saveDynamicCadastros(dynamic);
+  return newItem;
+}
+
+export async function createEleicao(payload: { ano: number }): Promise<{ id: number; ano: number; is_active: boolean; is_deleted: boolean }> {
+  // Attempt backend API if live
+  try {
+    const res = await fetch(`/api/eleicoes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {}
+
+  const dynamic = loadDynamicCadastros();
+  const existing = dynamic.eleicoesCustom.find((e) => e.ano === payload.ano);
+  if (existing) {
+    if (existing.is_deleted) {
+      existing.is_deleted = false;
+      existing.is_active = true;
+      saveDynamicCadastros(dynamic);
+      return existing;
+    }
+    throw new Error(`O pleito municipal de ${payload.ano} já se encontra cadastrado.`);
+  }
+
+  const ds = await loadFallbackDataset();
+  if (ds.eleicoes[String(payload.ano)]) {
+    const wasDeleted = dynamic.eleicoesCustom.find((e) => e.id === payload.ano && e.is_deleted);
+    if (wasDeleted) {
+      wasDeleted.is_deleted = false;
+      wasDeleted.is_active = true;
+      saveDynamicCadastros(dynamic);
+      return wasDeleted;
+    }
+    throw new Error(`O pleito de ${payload.ano} já existe na série histórica oficial.`);
+  }
+
+  const newId = 2000 + dynamic.eleicoesCustom.length + 1;
+  const newItem = {
+    id: newId,
+    ano: payload.ano,
+    is_active: true,
+    is_deleted: false,
+  };
+  dynamic.eleicoesCustom.push(newItem);
+  saveDynamicCadastros(dynamic);
+  return newItem;
+}
+
+export async function deleteEleicao(id: number): Promise<void> {
+  const dynamic = loadDynamicCadastros();
+  const match = dynamic.eleicoesCustom.find((e) => e.id === id);
+  if (match) {
+    match.is_deleted = true;
+    match.is_active = false;
+  } else {
+    dynamic.eleicoesCustom.push({ id, ano: 0, is_active: false, is_deleted: true });
+  }
+  saveDynamicCadastros(dynamic);
+}
+
+// ==========================================
+// MÓDULO DE COLIGAÇÕES PARTIDÁRIAS
+// ==========================================
+
+const COLIGACOES_STORAGE_KEY = 'vigiminas_coligacoes_v1';
+
+const DEFAULT_COLIGACOES: ColigacaoDto[] = [
+  // 2024
+  {
+    id: 1,
+    id_eleicao: 2024,
+    ano_eleicao: 2024,
+    cargo: 'Prefeito',
+    numero_urna: 55,
+    nome_coligacao: 'União por Braúnas',
+    sigla_partido_titular: 'PSD',
+    composicao_siglas: 'PSD / AVANTE / MDB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 101, id_partido: 55, sigla_partido: 'PSD', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 102, id_partido: 70, sigla_partido: 'AVANTE', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 103, id_partido: 15, sigla_partido: 'MDB', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 2,
+    id_eleicao: 2024,
+    ano_eleicao: 2024,
+    cargo: 'Prefeito',
+    numero_urna: 12,
+    nome_coligacao: 'Renovação e Trabalho',
+    sigla_partido_titular: 'PDT',
+    composicao_siglas: 'PDT',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 104, id_partido: 12, sigla_partido: 'PDT', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2020
+  {
+    id: 3,
+    id_eleicao: 2020,
+    ano_eleicao: 2020,
+    cargo: 'Prefeito',
+    numero_urna: 43,
+    nome_coligacao: 'Juntos por uma Braúnas Melhor',
+    sigla_partido_titular: 'PV',
+    composicao_siglas: 'PV / PSDB / PP',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 105, id_partido: 43, sigla_partido: 'PV', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 106, id_partido: 45, sigla_partido: 'PSDB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 107, id_partido: 11, sigla_partido: 'PP', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 4,
+    id_eleicao: 2020,
+    ano_eleicao: 2020,
+    cargo: 'Prefeito',
+    numero_urna: 10,
+    nome_coligacao: 'Braúnas no Rumo Certo',
+    sigla_partido_titular: 'REPUBLICANOS',
+    composicao_siglas: 'REPUBLICANOS / MDB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 108, id_partido: 10, sigla_partido: 'REPUBLICANOS', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 109, id_partido: 15, sigla_partido: 'MDB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2016
+  {
+    id: 5,
+    id_eleicao: 2016,
+    ano_eleicao: 2016,
+    cargo: 'Prefeito',
+    numero_urna: 45,
+    nome_coligacao: 'Unidos pelo Progresso de Braúnas',
+    sigla_partido_titular: 'PSDB',
+    composicao_siglas: 'PSDB / PMDB / PP',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 110, id_partido: 45, sigla_partido: 'PSDB', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 111, id_partido: 15, sigla_partido: 'PMDB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 112, id_partido: 11, sigla_partido: 'PP', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 6,
+    id_eleicao: 2016,
+    ano_eleicao: 2016,
+    cargo: 'Prefeito',
+    numero_urna: 43,
+    nome_coligacao: 'Por Amor a Braúnas',
+    sigla_partido_titular: 'PV',
+    composicao_siglas: 'PV / PT',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 113, id_partido: 43, sigla_partido: 'PV', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 114, id_partido: 13, sigla_partido: 'PT', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2012
+  {
+    id: 7,
+    id_eleicao: 2012,
+    ano_eleicao: 2012,
+    cargo: 'Prefeito',
+    numero_urna: 43,
+    nome_coligacao: 'Trabalho, Respeito e Desenvolvimento',
+    sigla_partido_titular: 'PV',
+    composicao_siglas: 'PV / PT / PMDB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 115, id_partido: 43, sigla_partido: 'PV', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 116, id_partido: 13, sigla_partido: 'PT', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 117, id_partido: 15, sigla_partido: 'PMDB', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 8,
+    id_eleicao: 2012,
+    ano_eleicao: 2012,
+    cargo: 'Prefeito',
+    numero_urna: 45,
+    nome_coligacao: 'O Povo no Coração',
+    sigla_partido_titular: 'PSDB',
+    composicao_siglas: 'PSDB / DEM',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 118, id_partido: 45, sigla_partido: 'PSDB', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 119, id_partido: 25, sigla_partido: 'DEM', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2008
+  {
+    id: 9,
+    id_eleicao: 2008,
+    ano_eleicao: 2008,
+    cargo: 'Prefeito',
+    numero_urna: 43,
+    nome_coligacao: 'Unidos para Vencer',
+    sigla_partido_titular: 'PV',
+    composicao_siglas: 'PV / PSDB / PTB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 120, id_partido: 43, sigla_partido: 'PV', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 121, id_partido: 45, sigla_partido: 'PSDB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 122, id_partido: 14, sigla_partido: 'PTB', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 10,
+    id_eleicao: 2008,
+    ano_eleicao: 2008,
+    cargo: 'Prefeito',
+    numero_urna: 25,
+    nome_coligacao: 'Compromisso com Braúnas',
+    sigla_partido_titular: 'DEM',
+    composicao_siglas: 'DEM / PMDB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 123, id_partido: 25, sigla_partido: 'DEM', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 124, id_partido: 15, sigla_partido: 'PMDB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2004
+  {
+    id: 11,
+    id_eleicao: 2004,
+    ano_eleicao: 2004,
+    cargo: 'Prefeito',
+    numero_urna: 45,
+    nome_coligacao: 'Aliança por Braúnas',
+    sigla_partido_titular: 'PSDB',
+    composicao_siglas: 'PSDB / PFL',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 125, id_partido: 45, sigla_partido: 'PSDB', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 126, id_partido: 25, sigla_partido: 'PFL', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 12,
+    id_eleicao: 2004,
+    ano_eleicao: 2004,
+    cargo: 'Prefeito',
+    numero_urna: 13,
+    nome_coligacao: 'Frente Popular de Braúnas',
+    sigla_partido_titular: 'PT',
+    composicao_siglas: 'PT / PL',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 127, id_partido: 13, sigla_partido: 'PT', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 128, id_partido: 22, sigla_partido: 'PL', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+  // 2000
+  {
+    id: 13,
+    id_eleicao: 2000,
+    ano_eleicao: 2000,
+    cargo: 'Prefeito',
+    numero_urna: 15,
+    nome_coligacao: 'União e Vitória',
+    sigla_partido_titular: 'PMDB',
+    composicao_siglas: 'PMDB / PFL / PTB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 129, id_partido: 15, sigla_partido: 'PMDB', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 130, id_partido: 25, sigla_partido: 'PFL', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+      { id: 131, id_partido: 14, sigla_partido: 'PTB', papel: 'Partido Apoiador', is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 14,
+    id_eleicao: 2000,
+    ano_eleicao: 2000,
+    cargo: 'Prefeito',
+    numero_urna: 45,
+    nome_coligacao: 'Braúnas para Todos',
+    sigla_partido_titular: 'PSDB',
+    composicao_siglas: 'PSDB / PPB',
+    is_active: true,
+    is_deleted: false,
+    partidos: [
+      { id: 132, id_partido: 45, sigla_partido: 'PSDB', papel: 'Cabeça de Chapa', is_active: true, is_deleted: false },
+      { id: 133, id_partido: 11, sigla_partido: 'PPB', papel: 'Vice-Prefeito', is_active: true, is_deleted: false },
+    ],
+  },
+];
+
+function loadStoredColigacoes(): ColigacaoDto[] {
+  try {
+    const raw = localStorage.getItem(COLIGACOES_STORAGE_KEY);
+    if (!raw) return DEFAULT_COLIGACOES;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+    return DEFAULT_COLIGACOES;
+  } catch {
+    return DEFAULT_COLIGACOES;
+  }
+}
+
+function saveStoredColigacoes(list: ColigacaoDto[]): void {
+  try {
+    localStorage.setItem(COLIGACOES_STORAGE_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+export async function getColigacoes(ano?: number): Promise<ColigacaoDto[]> {
+  let coligacoes: ColigacaoDto[] = [];
+
+  // Try backend first
+  try {
+    const url = ano ? `/api/coligacoes?ano=${ano}` : '/api/coligacoes';
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      coligacoes = await res.json();
+    }
+  } catch {}
+
+  // If backend returned nothing or failed, use local storage
+  if (coligacoes.length === 0) {
+    const all = loadStoredColigacoes();
+    coligacoes = ano ? all.filter((c) => c.ano_eleicao === ano) : all;
+  }
+
+  // Filter out soft-deleted
+  coligacoes = coligacoes.filter((c) => !c.is_deleted);
+
+  // Enrich with candidate details and votes
+  for (const c of coligacoes) {
+    try {
+      const resultados: ResultadoCandidatoDto[] = await getResultados(c.ano_eleicao, c.cargo || 'Prefeito');
+      const match = resultados.find((r: ResultadoCandidatoDto) => r.numero_urna === c.numero_urna);
+      if (match) {
+        c.candidato_nome = match.nome_urna;
+        c.vice_nome = match.vice?.nome_urna;
+        c.situacao = match.situacao;
+        c.votos = match.votos;
+        c.percentual_validos = match.percentual_validos;
+      }
+    } catch {}
+  }
+
+  return coligacoes;
+}
+
+export async function createColigacao(payload: CreateColigacaoPayload): Promise<ColigacaoDto> {
+  // Try backend first
+  try {
+    const res = await fetch('/api/coligacoes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const created: ColigacaoDto = await res.json();
+      const all = loadStoredColigacoes();
+      all.push(created);
+      saveStoredColigacoes(all);
+      return created;
+    }
+  } catch {}
+
+  // Fallback to local storage
+  const all = loadStoredColigacoes();
+  const maxId = all.reduce((max, c) => Math.max(max, c.id), 0);
+  const newId = maxId + 1;
+
+  const composicao = payload.composicao_siglas || (payload.partidos && payload.partidos.length > 0
+    ? payload.partidos.map((p) => p.sigla_partido).join(' / ')
+    : payload.sigla_partido_titular);
+
+  const partidosMembros: ColigacaoMembroDto[] = (payload.partidos || []).map((p, idx) => ({
+    id: newId * 100 + idx + 1,
+    id_partido: p.id_partido || 0,
+    sigla_partido: p.sigla_partido,
+    papel: p.papel,
+    is_active: true,
+    is_deleted: false,
+  }));
+
+  // If no parties provided in payload, default to titular party
+  if (partidosMembros.length === 0) {
+    partidosMembros.push({
+      id: newId * 100 + 1,
+      id_partido: payload.numero_urna,
+      sigla_partido: payload.sigla_partido_titular,
+      papel: 'Cabeça de Chapa',
+      is_active: true,
+      is_deleted: false,
+    });
+  }
+
+  const newColigacao: ColigacaoDto = {
+    id: newId,
+    id_eleicao: payload.ano_eleicao,
+    ano_eleicao: payload.ano_eleicao,
+    cargo: payload.cargo || 'Prefeito',
+    numero_urna: payload.numero_urna,
+    nome_coligacao: payload.nome_coligacao,
+    sigla_partido_titular: payload.sigla_partido_titular,
+    composicao_siglas: composicao,
+    is_active: true,
+    is_deleted: false,
+    partidos: partidosMembros,
+  };
+
+  all.push(newColigacao);
+  saveStoredColigacoes(all);
+  return newColigacao;
+}
+
+export async function updateColigacao(id: number, payload: UpdateColigacaoPayload): Promise<ColigacaoDto> {
+  // Try backend first
+  try {
+    const res = await fetch(`/api/coligacoes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const updated: ColigacaoDto = await res.json();
+      const all = loadStoredColigacoes();
+      const idx = all.findIndex((c) => c.id === id);
+      if (idx >= 0) {
+        all[idx] = updated;
+        saveStoredColigacoes(all);
+      }
+      return updated;
+    }
+  } catch {}
+
+  // Fallback to local storage
+  const all = loadStoredColigacoes();
+  const idx = all.findIndex((c) => c.id === id);
+  if (idx < 0) {
+    throw new Error(`Coligação com ID ${id} não encontrada.`);
+  }
+
+  const existing = all[idx];
+  if (payload.cargo !== undefined) existing.cargo = payload.cargo;
+  if (payload.numero_urna !== undefined) existing.numero_urna = payload.numero_urna;
+  if (payload.nome_coligacao !== undefined) existing.nome_coligacao = payload.nome_coligacao;
+  if (payload.sigla_partido_titular !== undefined) existing.sigla_partido_titular = payload.sigla_partido_titular;
+  if (payload.composicao_siglas !== undefined) existing.composicao_siglas = payload.composicao_siglas;
+  if (payload.is_active !== undefined) existing.is_active = payload.is_active;
+
+  if (payload.partidos) {
+    existing.partidos = payload.partidos.map((p, pIdx) => ({
+      id: existing.id * 100 + pIdx + 1,
+      id_partido: p.id_partido,
+      sigla_partido: p.sigla_partido,
+      papel: p.papel,
+      is_active: true,
+      is_deleted: false,
+    }));
+    existing.composicao_siglas = payload.composicao_siglas || existing.partidos.map((p) => p.sigla_partido).join(' / ');
+  }
+
+  all[idx] = existing;
+  saveStoredColigacoes(all);
+  return existing;
+}
+
+export async function deleteColigacao(id: number): Promise<void> {
+  // Try backend first
+  try {
+    await fetch(`/api/coligacoes/${id}`, {
+      method: 'DELETE',
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {}
+
+  const all = loadStoredColigacoes();
+  const match = all.find((c) => c.id === id);
+  if (match) {
+    match.is_deleted = true;
+    match.is_active = false;
+    saveStoredColigacoes(all);
+  }
+}
+
