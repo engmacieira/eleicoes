@@ -28,7 +28,7 @@ export const IndexesViewer: React.FC = () => {
       columns: '(titulo_eleitor)',
       type: 'B-Tree (FK Lookup)',
       justification:
-        'Crucial para reconstruir a linha do tempo do candidato através dos anos (2000 a 2024). Evita Seq Scan na tabela fato ao buscar por indivíduo.',
+        'Crucial para reconstruir a linha do tempo do político através dos anos (2000 a 2024). Evita Seq Scan na tabela fato ao buscar por indivíduo.',
       impact: 'Redução de O(N) para O(log N) em consultas de histórico pessoal.',
       icon: Search,
     },
@@ -38,8 +38,8 @@ export const IndexesViewer: React.FC = () => {
       columns: '(ano)',
       type: 'B-Tree (Unique / Range)',
       justification:
-        'Acelera buscas por pleito específico (ex: WHERE ano = 2024) ou filtros de intervalos temporais (ex: WHERE ano BETWEEN 2008 AND 2020).',
-      impact: 'Acesso por ponto instantâneo (Index Scan).',
+        'Acelera buscas por pleito específico (ex: WHERE ano = 2024) ou filtros de intervalos temporais.',
+      impact: 'Acesso pontual instantâneo (Index Scan).',
       icon: Zap,
     },
     {
@@ -69,7 +69,7 @@ export const IndexesViewer: React.FC = () => {
       type: 'B-Tree (Unique)',
       justification:
         'Garante unicidade e acelera a resolução de chaves durante processos de carga (ETL com UPSERT ON CONFLICT).',
-      impact: 'Evita duplicação de partidos como MDB, PSDB, PT.',
+      impact: 'Evita duplicação de legendas como MDB, PSDB, PT.',
       icon: Search,
     },
     {
@@ -87,37 +87,37 @@ export const IndexesViewer: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200/80 rounded-xl p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <span>Estratégia de Indexação & Otimização de Performance</span>
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
+            <h3 className="text-lg font-bold text-slate-900">
+              Estratégia de Indexação & Otimização de Performance
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">
               Índices B-Tree compostos e simples desenhados especificamente para a carga analítica eleitoral e planos de execução otimizados no PostgreSQL.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition cursor-pointer"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer shadow-xs"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copiado!' : 'Copiar Índices'}</span>
             </button>
             <button
               onClick={handleDownload}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition cursor-pointer shadow-sm"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition cursor-pointer shadow-xs"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               <span>Baixar .sql</span>
             </button>
           </div>
         </div>
 
         {/* DBA Tip Card */}
-        <div className="mt-5 p-4 rounded-lg bg-emerald-950/40 border border-emerald-900/50 text-xs text-emerald-200">
-          <strong className="text-emerald-300">Nota de DBA Especialista em Cloud SQL:</strong> O PostgreSQL <em>não</em> cria automaticamente índices em colunas que possuem Foreign Keys (apenas na Primary Key referenciada). Por isso, criamos explicitamente índices em <code>candidatos_eleicao(titulo_eleitor)</code> e <code>candidatos_eleicao(id_partido)</code> para prevenir bloqueios de tabela e Sequential Scans em operações de <code>JOIN</code> e <code>DELETE/UPDATE CASCADE</code>.
+        <div className="mt-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900">
+          <strong className="text-emerald-950 font-bold">Nota de DBA Especialista em Cloud SQL:</strong> O PostgreSQL <em>não</em> cria automaticamente índices em colunas que possuem Foreign Keys (apenas na Primary Key referenciada). Por isso, criamos explicitamente índices em <code>candidatos_eleicao(titulo_eleitor)</code> e <code>candidatos_eleicao(id_partido)</code> para prevenir bloqueios de tabela e Sequential Scans em operações de <code>JOIN</code> e <code>DELETE/UPDATE CASCADE</code>.
         </div>
       </div>
 
@@ -128,40 +128,40 @@ export const IndexesViewer: React.FC = () => {
           return (
             <div
               key={i}
-              className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between hover:border-slate-700 transition"
+              className="bg-white border border-slate-200/80 rounded-xl p-4 flex flex-col justify-between hover:border-slate-300 transition shadow-xs"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <div className="p-1.5 rounded-md bg-blue-950 text-blue-400 border border-blue-900">
+                    <div className="p-1.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-xs font-bold text-white truncate max-w-[170px]" title={idx.title}>
+                    <span className="font-mono text-xs font-bold text-slate-900 truncate max-w-[170px]" title={idx.title}>
                       {idx.title}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                     {idx.type}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1.5 mt-3">
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Tabela Alvo:</span>
-                    <span className="font-mono text-slate-200 font-semibold">{idx.table}</span>
+                    <span className="font-mono text-slate-800 font-bold">{idx.table}</span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Colunas:</span>
-                    <span className="font-mono text-blue-300 font-medium">{idx.columns}</span>
+                    <span className="font-mono text-blue-700 font-semibold">{idx.columns}</span>
                   </div>
-                  <p className="text-slate-400 text-xs pt-2 border-t border-slate-800/80 leading-relaxed">
+                  <p className="text-slate-600 text-xs pt-2 border-t border-slate-100 leading-relaxed">
                     {idx.justification}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800/80 text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-                <Check className="w-3 h-3 shrink-0" />
+              <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
                 <span>{idx.impact}</span>
               </div>
             </div>
@@ -170,24 +170,21 @@ export const IndexesViewer: React.FC = () => {
       </div>
 
       {/* SQL Script Viewer */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-4 py-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-            <span className="text-xs font-mono text-slate-400 ml-2">02_indexes_eleicoes.sql</span>
+            <span className="text-xs font-mono font-bold text-slate-700">02_indexes_eleicoes.sql</span>
           </div>
           <button
             onClick={handleCopy}
-            className="flex items-center space-x-1 text-xs text-slate-400 hover:text-white transition cursor-pointer"
+            className="inline-flex items-center space-x-1 px-3 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer shadow-xs"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copiado!' : 'Copiar Script'}</span>
           </button>
         </div>
 
-        <div className="p-4 bg-slate-950 overflow-x-auto max-h-[400px] scrollbar-thin">
+        <div className="p-4 bg-slate-900 text-slate-100 overflow-x-auto max-h-[400px] scrollbar-dark">
           <pre className="font-mono text-xs text-slate-300 leading-relaxed">
             {FULL_INDEXES_SCRIPT}
           </pre>

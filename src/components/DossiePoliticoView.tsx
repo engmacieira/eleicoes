@@ -10,6 +10,8 @@ import {
   TrendingUp,
   ShieldCheck,
   Star,
+  X,
+  Filter,
 } from 'lucide-react';
 
 interface DossiePoliticoViewProps {
@@ -122,33 +124,33 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+      {/* Header Context Banner */}
+      <div className="bg-white border border-slate-200/80 rounded-xl p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center space-x-2 text-xs font-semibold text-blue-400 mb-1">
+            <div className="flex items-center space-x-2 text-xs font-semibold text-blue-700 mb-1">
               <span className="uppercase tracking-wider">Tabela Mestra: Dados_Candidato</span>
-              <span>•</span>
-              <span className="text-slate-400">Pessoas Físicas Únicas (TSE)</span>
+              <span>·</span>
+              <span className="text-slate-500">Pessoas Físicas Únicas (TSE)</span>
             </div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-400" />
-              <span>Dossiê Político: Trajetória Histórica dos Candidatos (2000 - 2024)</span>
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <User className="w-6 h-6 text-blue-600" />
+              <span>Dossiê de Candidatos: Trajetórias Políticas (2000–2024)</span>
             </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Consulte a vida política de qualquer pessoa física através do seu <strong>Título de Eleitor único</strong>. Acompanhe trocas de partido, número de mandatos conquistados e votação acumulada em 24 anos de história eleitoral em Braúnas/MG.
+            <p className="text-sm text-slate-600 mt-1 max-w-3xl">
+              Consulte o histórico de qualquer indivíduo pelo <strong>Título de Eleitor único</strong>. Acompanhe migrações partidárias, eleições disputadas, mandatos conquistados e votação acumulada ao longo de 24 anos.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1.5 rounded-lg bg-blue-950 text-blue-300 border border-blue-900 font-mono text-xs font-semibold">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 border border-blue-200/80 font-mono text-xs font-bold">
               {politicos.length} Cidadãos Registrados
             </span>
           </div>
         </div>
 
         {/* Search & Quick Filters */}
-        <div className="mt-5 flex flex-col sm:flex-row gap-3">
+        <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -156,15 +158,24 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
               placeholder="Pesquisar por nome civil, nome de urna ou título de eleitor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition"
+              className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-10 pr-9 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                aria-label="Limpar pesquisa"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+          <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
             <button
               onClick={() => setFilterType('todos')}
               className={`px-3 py-1.5 rounded-md transition cursor-pointer font-medium ${
-                filterType === 'todos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                filterType === 'todos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Todos ({politicos.length})
@@ -172,15 +183,15 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
             <button
               onClick={() => setFilterType('prefeitos')}
               className={`px-3 py-1.5 rounded-md transition cursor-pointer font-medium ${
-                filterType === 'prefeitos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                filterType === 'prefeitos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Disputaram Prefeitura
+              Prefeitura
             </button>
             <button
               onClick={() => setFilterType('multiplos')}
               className={`px-3 py-1.5 rounded-md transition cursor-pointer font-medium ${
-                filterType === 'multiplos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                filterType === 'multiplos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               2+ Mandatos Eleitos
@@ -188,7 +199,7 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
             <button
               onClick={() => setFilterType('top_votos')}
               className={`px-3 py-1.5 rounded-md transition cursor-pointer font-medium ${
-                filterType === 'top_votos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                filterType === 'top_votos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Mais Votados (300+)
@@ -198,83 +209,103 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
       </div>
 
       {/* Grid of Politician Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPoliticos.slice(0, 48).map((p) => {
-          const nomesUrna = Array.from(p.nomes_urna);
-          const partidos = Array.from(p.partidos);
+      {filteredPoliticos.length === 0 ? (
+        <div className="bg-white border border-slate-200/80 rounded-xl p-12 text-center text-slate-500 shadow-xs">
+          <User className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+          <h4 className="font-bold text-slate-800 text-sm">Nenhum candidato encontrado</h4>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            Não encontramos registros para o termo "{searchTerm}". Tente buscar por parte do nome civil ou título de eleitor.
+          </p>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setFilterType('todos');
+            }}
+            className="mt-4 px-3.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100 transition cursor-pointer"
+          >
+            Limpar busca e filtros
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPoliticos.slice(0, 48).map((p) => {
+            const nomesUrna = Array.from(p.nomes_urna);
+            const partidos = Array.from(p.partidos);
 
-          return (
-            <div
-              key={p.titulo_eleitor}
-              onClick={() => onSelectCandidato(p.titulo_eleitor)}
-              className="bg-slate-900 border border-slate-800 hover:border-blue-500/60 rounded-xl p-5 cursor-pointer transition shadow-sm hover:shadow-blue-500/10 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-blue-950 text-blue-400 border border-blue-900 flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
-                      <User className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-mono text-slate-400 block">
-                        TÍTULO: {p.titulo_eleitor}
-                      </span>
-                      <h3 className="font-bold text-white text-sm line-clamp-1 group-hover:text-blue-300 transition" title={p.nome_completo}>
-                        {p.nome_completo}
-                      </h3>
-                    </div>
-                  </div>
-
-                  {p.mandatos_count > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1 shrink-0">
-                      <Award className="w-3 h-3" /> {p.mandatos_count} {p.mandatos_count === 1 ? 'mandato' : 'mandatos'}
-                    </span>
-                  )}
-                </div>
-
-                {/* Nomes de Urna & Partidos */}
-                <div className="space-y-1.5 mt-3 text-xs">
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <span className="text-slate-400">Urna:</span>
-                    <strong className="text-slate-200 truncate">
-                      {nomesUrna.join(' / ')}
-                    </strong>
-                  </div>
-
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <span className="text-slate-400">Partidos:</span>
-                    <span className="font-mono text-blue-300 font-semibold truncate">
-                      {partidos.join(' ➔ ')}
-                    </span>
-                  </div>
-
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <span className="text-slate-400">Cargos:</span>
-                    <span className="text-slate-300 font-medium">
-                      {Array.from(p.cargos).join(', ')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats Footer */}
-              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+            return (
+              <div
+                key={p.titulo_eleitor}
+                onClick={() => onSelectCandidato(p.titulo_eleitor)}
+                className="bg-white border border-slate-200/80 hover:border-blue-400 rounded-xl p-5 cursor-pointer transition shadow-xs hover:shadow-md flex flex-col justify-between group"
+              >
                 <div>
-                  <div className="text-[10px] text-slate-400">Votos Totais Acumulados</div>
-                  <div className="font-mono font-black text-white text-base">
-                    {p.votos_total.toLocaleString('pt-BR')}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-400 block font-medium">
+                          TÍTULO: {p.titulo_eleitor}
+                        </span>
+                        <h3 className="font-bold text-slate-900 text-sm line-clamp-1 group-hover:text-blue-700 transition" title={p.nome_completo}>
+                          {p.nome_completo}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {p.mandatos_count > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1 shrink-0">
+                        <Award className="w-3 h-3 text-amber-600" />
+                        {p.mandatos_count} {p.mandatos_count === 1 ? 'mandato' : 'mandatos'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Nomes de Urna & Partidos */}
+                  <div className="space-y-1.5 mt-3 text-xs">
+                    <div className="text-slate-600 flex items-center gap-1.5">
+                      <span className="text-slate-400">Urna:</span>
+                      <strong className="text-slate-800 truncate font-semibold">
+                        {nomesUrna.join(' / ')}
+                      </strong>
+                    </div>
+
+                    <div className="text-slate-600 flex items-center gap-1.5">
+                      <span className="text-slate-400">Partidos:</span>
+                      <span className="font-mono text-blue-700 font-semibold truncate">
+                        {partidos.join(' ➔ ')}
+                      </span>
+                    </div>
+
+                    <div className="text-slate-600 flex items-center gap-1.5">
+                      <span className="text-slate-400">Cargos:</span>
+                      <span className="text-slate-700 font-medium">
+                        {Array.from(p.cargos).join(', ')}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 text-blue-400 font-semibold group-hover:translate-x-0.5 transition">
-                  <span>Abrir Dossiê</span>
-                  <ChevronRight className="w-4 h-4" />
+                {/* Stats Footer */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Votos Acumulados</div>
+                    <div className="font-mono font-extrabold text-slate-900 text-base tabular-nums">
+                      {p.votos_total.toLocaleString('pt-BR')}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 text-blue-700 font-semibold group-hover:translate-x-1 transition">
+                    <span>Ver Dossiê</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

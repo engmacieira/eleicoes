@@ -370,26 +370,26 @@ python-dotenv>=1.0.1`,
   return (
     <div className="space-y-6">
       {/* Infrastructure Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200/80 rounded-xl p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+          <div className="flex items-start gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-blue-700 text-white flex items-center justify-center shadow-xs shrink-0">
               <Server className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Google Cloud SQL Ativo
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Google Cloud SQL Ativo
                 </span>
-                <span className="text-xs text-slate-400 font-mono">
+                <span className="text-xs text-slate-500 font-mono">
                   Projeto: eleicoes-braunas
                 </span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
-                Instância PostgreSQL 15: <code>eleicoes-db-instance</code>
-              </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Região: <code>southamerica-east1</code> (São Paulo) • Especificação: 1 vCPU / 3840 MB RAM
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+                Instância PostgreSQL 15: <code className="text-blue-700 font-mono">eleicoes-db-instance</code>
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Região: <code>southamerica-east1</code> (São Paulo) · Especificação: 1 vCPU / 3840 MB RAM
               </p>
             </div>
           </div>
@@ -397,33 +397,33 @@ python-dotenv>=1.0.1`,
           <button
             onClick={refreshHealth}
             disabled={loading}
-            className="self-start md:self-center inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition cursor-pointer"
+            className="self-start md:self-center inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer shadow-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-blue-400' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-blue-600' : ''}`} />
             <span>Testar Conexão</span>
           </button>
         </div>
 
         {/* Connection Coordinates Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
-          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 block text-[11px]">IP Público:</span>
-            <span className="font-bold text-white text-sm">34.95.135.110</span>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 font-mono text-xs">
+            <span className="text-slate-500 block text-[11px] font-sans">IP Público:</span>
+            <span className="font-bold text-slate-900 text-sm">34.95.135.110</span>
           </div>
 
-          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 block text-[11px]">Porta / Database:</span>
-            <span className="font-bold text-sky-400 text-sm">5432 / eleicoes_db</span>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 font-mono text-xs">
+            <span className="text-slate-500 block text-[11px] font-sans">Porta / Database:</span>
+            <span className="font-bold text-blue-700 text-sm">5432 / eleicoes_db</span>
           </div>
 
-          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 block text-[11px]">Usuário Master:</span>
-            <span className="font-bold text-emerald-400 text-sm">postgres</span>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 font-mono text-xs">
+            <span className="text-slate-500 block text-[11px] font-sans">Usuário Master:</span>
+            <span className="font-bold text-emerald-800 text-sm">postgres</span>
           </div>
 
-          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 block text-[11px]">Status Conexão:</span>
-            <span className="font-bold text-emerald-400 flex items-center gap-1 text-xs mt-0.5">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 font-mono text-xs">
+            <span className="text-slate-500 block text-[11px] font-sans">Status Conexão:</span>
+            <span className="font-bold text-emerald-700 flex items-center gap-1 text-xs mt-0.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
               {health?.status === 'healthy' ? 'API Conectada' : 'Simulador Conectado'}
             </span>
@@ -432,20 +432,20 @@ python-dotenv>=1.0.1`,
       </div>
 
       {/* Backend Code Explorer */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="p-4 bg-slate-850 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Code className="w-4 h-4 text-blue-400" />
+            <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Code className="w-4 h-4 text-blue-700" />
               <span>Código-Fonte Completo do Backend FastAPI (Python)</span>
-            </h3>
-            <p className="text-xs text-slate-400">
+            </h4>
+            <p className="text-xs text-slate-500">
               Arquivos salvos e disponíveis no diretório <code>/backend/</code> do repositório.
             </p>
           </div>
 
           {/* File Selector Tabs */}
-          <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <div className="flex flex-wrap gap-1 bg-slate-200/70 p-0.5 rounded-lg border border-slate-300 text-xs font-mono">
             {[
               { id: 'main', label: 'main.py' },
               { id: 'models', label: 'models.py' },
@@ -459,8 +459,8 @@ python-dotenv>=1.0.1`,
                 onClick={() => setActiveFile(f.id as any)}
                 className={`px-2.5 py-1 rounded transition cursor-pointer ${
                   activeFile === f.id
-                    ? 'bg-blue-600 text-white font-bold'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-blue-700 text-white font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {f.label}
@@ -469,12 +469,12 @@ python-dotenv>=1.0.1`,
           </div>
         </div>
 
-        {/* Code Content Box */}
-        <div className="p-4 bg-slate-950 overflow-x-auto max-h-[480px] scrollbar-thin relative group">
+        {/* Code Content Box (Dark high-contrast container) */}
+        <div className="p-4 bg-slate-900 text-slate-100 overflow-x-auto max-h-[480px] scrollbar-dark relative group">
           <div className="absolute right-4 top-4 z-10">
             <button
               onClick={() => copyCode(fileContents[activeFile], activeFile)}
-              className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition cursor-pointer shadow-md"
+              className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition cursor-pointer shadow-md"
             >
               {copiedFile === activeFile ? (
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -492,24 +492,24 @@ python-dotenv>=1.0.1`,
       </div>
 
       {/* Local Run Instructions */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-amber-400" />
+      <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-xs space-y-3">
+        <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-amber-600" />
           <span>Como Executar o Backend FastAPI Localmente (Apontando para o Cloud SQL)</span>
-        </h3>
+        </h4>
 
-        <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+        <div className="p-4 bg-slate-900 text-slate-100 rounded-lg border border-slate-800 font-mono text-xs space-y-2 scrollbar-dark overflow-x-auto">
           <div className="text-slate-400"># 1. Entre na pasta do backend e crie o ambiente virtual:</div>
           <div className="text-emerald-400 font-semibold">cd backend && python -m venv .venv && source .venv/bin/activate</div>
 
-          <div className="text-slate-400 pt-1"># 2. Instale as bibliotecas necessárias:</div>
+          <div className="text-slate-400 pt-1"># 2. Instale as dependências:</div>
           <div className="text-emerald-400 font-semibold">pip install -r requirements.txt</div>
 
           <div className="text-slate-400 pt-1"># 3. Configure a senha da instância Cloud SQL:</div>
           <div className="text-emerald-400 font-semibold">export DB_PASS="sua_senha_cloud_sql"</div>
 
-          <div className="text-slate-400 pt-1"># 4. Inicie a API FastAPI:</div>
-          <div className="text-amber-400 font-bold">uvicorn main:app --host 0.0.0.0 --port 8000 --reload</div>
+          <div className="text-slate-400 pt-1"># 4. Inicie o servidor FastAPI:</div>
+          <div className="text-amber-300 font-bold">uvicorn main:app --host 0.0.0.0 --port 8000 --reload</div>
         </div>
       </div>
     </div>

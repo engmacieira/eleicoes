@@ -37,7 +37,7 @@ export const DataSeeder: React.FC<DataSeederProps> = ({ dataset }) => {
 
   if (!dataset) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center text-slate-400">
+      <div className="bg-white border border-slate-200/80 rounded-xl p-8 text-center text-slate-500 shadow-xs">
         Carregando dados das eleições...
       </div>
     );
@@ -60,38 +60,38 @@ export const DataSeeder: React.FC<DataSeederProps> = ({ dataset }) => {
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200/80 rounded-xl p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-semibold">
-                ETL / Data Pipeline
+              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
+                ETL / Pipeline de Carga
               </span>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-slate-500 font-mono">
                 {dataset.municipio.nome} / {dataset.municipio.uf} (TSE: {dataset.municipio.codigo_tse})
               </span>
             </div>
-            <h2 className="text-xl font-bold text-white mt-1">
+            <h3 className="text-lg font-bold text-slate-900 mt-1">
               Script de Carga dos Dados Históricos (2000 a 2024)
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Script gerado a partir do DTO JSON fornecido pelo usuário. Converte as estruturas aninhadas em declarações <code>INSERT INTO</code> idempotentes com integridade referencial protegida.
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">
+              Gera declarações <code>INSERT INTO</code> idempotentes com integridade referencial protegida a partir do DTO JSON do TSE.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition cursor-pointer"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer shadow-xs"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copiado!' : 'Copiar INSERTs'}</span>
             </button>
             <button
               onClick={handleDownload}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition cursor-pointer shadow-sm"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition cursor-pointer shadow-xs"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               <span>Baixar Carga (.sql)</span>
             </button>
           </div>
@@ -99,62 +99,62 @@ export const DataSeeder: React.FC<DataSeederProps> = ({ dataset }) => {
 
         {/* Dataset Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
-          <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-            <div className="flex items-center space-x-2 text-slate-400 text-xs">
-              <Users className="w-3.5 h-3.5 text-blue-400" />
-              <span>Pessoas Físicas (Candidatos)</span>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+            <div className="flex items-center space-x-2 text-slate-500 text-xs font-semibold">
+              <Users className="w-3.5 h-3.5 text-blue-600" />
+              <span>Pessoas Físicas</span>
             </div>
-            <div className="text-xl font-bold text-white mt-1">{totalCandidatos}</div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1 tabular-nums">{totalCandidatos}</div>
             <div className="text-[10px] text-slate-400">dados_candidato</div>
           </div>
 
-          <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-            <div className="flex items-center space-x-2 text-slate-400 text-xs">
-              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+            <div className="flex items-center space-x-2 text-slate-500 text-xs font-semibold">
+              <Calendar className="w-3.5 h-3.5 text-amber-600" />
               <span>Pleitos Municipais</span>
             </div>
-            <div className="text-xl font-bold text-white mt-1">{totalEleicoes}</div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1 tabular-nums">{totalEleicoes}</div>
             <div className="text-[10px] text-slate-400">2000 até 2024</div>
           </div>
 
-          <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-            <div className="flex items-center space-x-2 text-slate-400 text-xs">
-              <Vote className="w-3.5 h-3.5 text-purple-400" />
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+            <div className="flex items-center space-x-2 text-slate-500 text-xs font-semibold">
+              <Vote className="w-3.5 h-3.5 text-purple-600" />
               <span>Candidaturas Apuradas</span>
             </div>
-            <div className="text-xl font-bold text-white mt-1">{totalCandidaturas}</div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1 tabular-nums">{totalCandidaturas}</div>
             <div className="text-[10px] text-slate-400">candidatos_eleicao</div>
           </div>
 
-          <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-            <div className="flex items-center space-x-2 text-slate-400 text-xs">
-              <Award className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+            <div className="flex items-center space-x-2 text-slate-500 text-xs font-semibold">
+              <Award className="w-3.5 h-3.5 text-emerald-600" />
               <span>Partidos Identificados</span>
             </div>
-            <div className="text-xl font-bold text-white mt-1">{totalPartidosSet.size}</div>
+            <div className="text-xl font-extrabold text-slate-900 mt-1 tabular-nums">{totalPartidosSet.size}</div>
             <div className="text-[10px] text-slate-400">partidos cadastrados</div>
           </div>
         </div>
       </div>
 
       {/* Code Box */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-4 py-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <span className="text-xs font-mono text-slate-400">03_seed_eleicoes_braunas.sql</span>
-            <div className="flex rounded-md bg-slate-950 p-0.5 border border-slate-800 text-xs">
+            <span className="text-xs font-mono font-bold text-slate-700">03_seed_eleicoes_braunas.sql</span>
+            <div className="flex rounded-md bg-slate-200/70 p-0.5 border border-slate-300 text-xs">
               <button
                 onClick={() => setSelectedPreview('sql')}
-                className={`px-2.5 py-0.5 rounded ${
-                  selectedPreview === 'sql' ? 'bg-blue-600 text-white font-medium' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-0.5 rounded transition cursor-pointer ${
+                  selectedPreview === 'sql' ? 'bg-blue-700 text-white font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 SQL Inserts (~{seedSql.split('\n').length} linhas)
               </button>
               <button
                 onClick={() => setSelectedPreview('json')}
-                className={`px-2.5 py-0.5 rounded ${
-                  selectedPreview === 'json' ? 'bg-blue-600 text-white font-medium' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-0.5 rounded transition cursor-pointer ${
+                  selectedPreview === 'json' ? 'bg-blue-700 text-white font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 JSON Original (DTO)
@@ -164,14 +164,14 @@ export const DataSeeder: React.FC<DataSeederProps> = ({ dataset }) => {
 
           <button
             onClick={handleCopy}
-            className="flex items-center space-x-1 text-xs text-slate-400 hover:text-white transition cursor-pointer"
+            className="inline-flex items-center space-x-1 px-3 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer shadow-xs"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copiado!' : 'Copiar Tudo'}</span>
           </button>
         </div>
 
-        <div className="p-4 bg-slate-950 overflow-x-auto max-h-[500px] scrollbar-thin">
+        <div className="p-4 bg-slate-900 text-slate-100 overflow-x-auto max-h-[500px] scrollbar-dark">
           <pre className="font-mono text-xs text-slate-300 leading-relaxed">
             {selectedPreview === 'sql' ? seedSql : JSON.stringify(dataset, null, 2)}
           </pre>
