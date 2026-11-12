@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { RawElectionDataset } from '../types/election';
+import { CHAPAS_MAJORITARIAS } from '../services/api';
 import {
   User,
   Search,
@@ -26,7 +27,7 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'todos' | 'prefeitos' | 'multiplos' | 'top_votos'>('todos');
 
-  // Compute stats for all politicians across all years
+  // Compute stats for all politicians across all years, including Prefeitos and Vice-Prefeitos
   const politicos = useMemo(() => {
     if (!dataset) return [];
 
@@ -43,56 +44,89 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
       nomes_urna: Set<string>;
     }>();
 
-    // Initialize with base candidates
+    const getOrCreate = (titulo: string, nomeCompleto: string, dataNasc: string = '') => {
+      let entry = map.get(titulo);
+      if (!entry) {
+        entry = {
+          titulo_eleitor: titulo,
+          nome_completo: nomeCompleto,
+          data_nascimento: dataNasc,
+          eleicoes_count: 0,
+          mandatos_count: 0,
+          votos_total: 0,
+          anos: [],
+          cargos: new Set(),
+          partidos: new Set(),
+          nomes_urna: new Set(),
+        };
+        map.set(titulo, entry);
+      }
+      return entry;
+    };
+
+    // 1. Initialize with base candidates
     Object.values(dataset.candidatos_base).forEach((base) => {
-      map.set(base.titulo_eleitor, {
-        titulo_eleitor: base.titulo_eleitor,
-        nome_completo: base.nome_completo,
-        data_nascimento: base.data_nascimento,
-        eleicoes_count: 0,
-        mandatos_count: 0,
-        votos_total: 0,
-        anos: [],
-        cargos: new Set(),
-        partidos: new Set(),
-        nomes_urna: new Set(),
-      });
+      getOrCreate(base.titulo_eleitor, base.nome_completo, base.data_nascimento);
     });
 
-    // Populate with historical elections
+    // 2. Initialize with Majoritarian Tickets (Prefeitos e Vice-Prefeitos)
+    CHAPAS_MAJORITARIAS.forEach((ch) => {
+      getOrCreate(ch.prefeito.titulo_eleitor, ch.prefeito.nome_completo, ch.prefeito.data_nascimento || '');
+      getOrCreate(ch.vice.titulo_eleitor, ch.vice.nome_completo, ch.vice.data_nascimento || '');
+    });
+
+    // 3. Populate with historical elections (Vereadores)
     Object.keys(dataset.eleicoes).forEach((anoStr) => {
       const ano = parseInt(anoStr, 10);
       const el = dataset.eleicoes[anoStr];
       el.resultados.forEach((res) => {
-        let entry = map.get(res.titulo_eleitor);
-        if (!entry) {
-          entry = {
-            titulo_eleitor: res.titulo_eleitor,
-            nome_completo: res.nome_urna,
-            data_nascimento: '',
-            eleicoes_count: 0,
-            mandatos_count: 0,
-            votos_total: 0,
-            anos: [],
-            cargos: new Set(),
-            partidos: new Set(),
-            nomes_urna: new Set(),
-          };
-          map.set(res.titulo_eleitor, entry);
-        }
+        if (res.cargo.toLowerCase() === 'vereador') {
+          const entry = getOrCreate(res.titulo_eleitor, res.nome_urna);
+          entry.eleicoes_count++;
+          entry.votos_total += res.votos;
+          entry.anos.push(ano);
+          entry.cargos.add('Vereador');
+          entry.partidos.add(res.partido);
+          entry.nomes_urna.add(res.nome_urna);
 
-        entry.eleicoes_count++;
-        entry.votos_total += res.votos;
-        entry.anos.push(ano);
-        entry.cargos.add(res.cargo);
-        entry.partidos.add(res.partido);
-        entry.nomes_urna.add(res.nome_urna);
-
-        const sit = res.situacao.toLowerCase();
-        if (sit.includes('eleito') && !sit.includes('não')) {
-          entry.mandatos_count++;
+          const sit = res.situacao.toLowerCase();
+          if (sit.includes('eleito') && !sit.includes('não')) {
+            entry.mandatos_count++;
+          }
         }
       });
+    });
+
+    // 4. Populate with Majoritarian Tickets (Prefeito & Vice-Prefeito)
+    CHAPAS_MAJORITARIAS.forEach((ch) => {
+      const el = dataset.eleicoes[String(ch.ano)];
+      const resPrefeito = el?.resultados.find(
+        (r) => r.cargo.toLowerCase() === 'prefeito' && (r.numero === ch.numero || r.partido === ch.partido)
+      );
+
+      const votos = resPrefeito ? resPrefeito.votos : 0;
+      const situacao = resPrefeito ? resPrefeito.situacao : 'Não eleito';
+      const isEleito = situacao.toLowerCase().includes('eleito') && !situacao.toLowerCase().includes('não');
+
+      // Prefeito entry
+      const prefEntry = getOrCreate(ch.prefeito.titulo_eleitor, ch.prefeito.nome_completo, ch.prefeito.data_nascimento || '');
+      prefEntry.eleicoes_count++;
+      prefEntry.votos_total += votos;
+      prefEntry.anos.push(ch.ano);
+      prefEntry.cargos.add('Prefeito');
+      prefEntry.partidos.add(ch.partido);
+      prefEntry.nomes_urna.add(ch.prefeito.nome_urna);
+      if (isEleito) prefEntry.mandatos_count++;
+
+      // Vice-Prefeito entry
+      const viceEntry = getOrCreate(ch.vice.titulo_eleitor, ch.vice.nome_completo, ch.vice.data_nascimento || '');
+      viceEntry.eleicoes_count++;
+      viceEntry.votos_total += votos;
+      viceEntry.anos.push(ch.ano);
+      viceEntry.cargos.add('Vice-Prefeito');
+      viceEntry.partidos.add(ch.vice.sigla_partido);
+      viceEntry.nomes_urna.add(ch.vice.nome_urna);
+      if (isEleito) viceEntry.mandatos_count++;
     });
 
     return Array.from(map.values()).sort((a, b) => b.votos_total - a.votos_total);
@@ -109,7 +143,7 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
       if (!matchSearch) return false;
 
       if (filterType === 'prefeitos') {
-        return p.cargos.has('Prefeito');
+        return p.cargos.has('Prefeito') || p.cargos.has('Vice-Prefeito');
       }
       if (filterType === 'multiplos') {
         return p.mandatos_count >= 2;
@@ -138,7 +172,7 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
               <span>Dossiê de Candidatos: Trajetórias Políticas (2000–2024)</span>
             </h2>
             <p className="text-sm text-slate-600 mt-1 max-w-3xl">
-              Consulte o histórico de qualquer indivíduo pelo <strong>Título de Eleitor único</strong>. Acompanhe migrações partidárias, eleições disputadas, mandatos conquistados e votação acumulada ao longo de 24 anos.
+              Consulte o histórico de qualquer indivíduo pelo <strong>Título de Eleitor único</strong>. Acompanhe a evolução de Prefeitos, Vice-Prefeitos e Vereadores ao longo de 24 anos de eleições em Braúnas/MG.
             </p>
           </div>
 
@@ -186,7 +220,7 @@ export const DossiePoliticoView: React.FC<DossiePoliticoViewProps> = ({
                 filterType === 'prefeitos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Prefeitura
+              Prefeito / Vice
             </button>
             <button
               onClick={() => setFilterType('multiplos')}

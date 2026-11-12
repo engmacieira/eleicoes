@@ -26,6 +26,25 @@ class EleicaoResumoSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# --- Schemas de Vice-Candidatura e Chapas Majoritárias ---
+class ViceCandidatoSchema(BaseModel):
+    nome_urna: str
+    nome_completo: str
+    titulo_eleitor: str
+    sigla_partido: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChapaParceiroSchema(BaseModel):
+    papel: str  # 'Prefeito' ou 'Vice-Prefeito'
+    nome_urna: str
+    nome_completo: str
+    titulo_eleitor: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 # --- Schemas de Resultados de Candidatos por Pleito ---
 class ResultadoCandidatoSchema(BaseModel):
     posicao: Optional[int]
@@ -38,6 +57,7 @@ class ResultadoCandidatoSchema(BaseModel):
     votos: int
     situacao: str
     percentual_validos: Optional[float] = None
+    vice: Optional[ViceCandidatoSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -52,6 +72,7 @@ class HistoricoParticipacaoSchema(BaseModel):
     votos: int
     situacao: str
     posicao: Optional[int]
+    chapa_parceiro: Optional[ChapaParceiroSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
 

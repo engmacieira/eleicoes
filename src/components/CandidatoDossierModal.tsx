@@ -22,6 +22,8 @@ import {
   Clock,
   XCircle,
   ShieldCheck,
+  UserCheck,
+  ArrowRight,
 } from 'lucide-react';
 
 interface CandidatoDossierModalProps {
@@ -45,7 +47,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
     const isSuplente = data.situacao.toLowerCase().includes('suplente');
 
     return (
-      <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3 text-xs space-y-1.5 min-w-[190px]">
+      <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3 text-xs space-y-1.5 min-w-[200px]">
         <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
           <span className="font-bold text-slate-900 font-mono text-sm">
             Eleição {label}
@@ -65,7 +67,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
         </div>
 
         <div className="pt-1 border-t border-slate-100 flex items-center justify-between">
-          <span className="text-slate-500">Votos Recebidos:</span>
+          <span className="text-slate-500">Votos da Chapa/Nominais:</span>
           <span className="font-mono font-bold text-blue-700 text-sm tabular-nums">
             {data.votos.toLocaleString('pt-BR')}
           </span>
@@ -159,7 +161,6 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
 
   if (!tituloEleitor) return null;
 
-  const maxVotos = data ? Math.max(...data.historico.map((h) => h.votos), 1) : 1;
   const partidosDistintos = data
     ? Array.from(new Set(data.historico.map((h) => h.sigla_partido)))
     : [];
@@ -192,7 +193,7 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
                   Dossiê Político TSE
                 </span>
-                <span className="text-xs text-slate-500 font-mono">
+                <span className="text-xs text-slate-500 font-mono font-medium">
                   Título: {tituloEleitor}
                 </span>
               </div>
@@ -264,7 +265,7 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                   <div className="text-2xl font-extrabold text-emerald-700 mt-1 tabular-nums">
                     {data.total_votos_acumulados.toLocaleString('pt-BR')}
                   </div>
-                  <div className="text-[11px] text-emerald-700 font-medium">votos nominais</div>
+                  <div className="text-[11px] text-emerald-700 font-medium">nominais / chapa</div>
                 </div>
 
                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
@@ -351,7 +352,7 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                   <span>Cronologia Oficial das Candidaturas</span>
                 </h3>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {data.historico.map((h, index) => {
                     const isEleito =
                       h.situacao.toLowerCase().includes('eleito') &&
@@ -361,62 +362,86 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                     return (
                       <div
                         key={index}
-                        className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition ${
+                        className={`p-4 rounded-xl border flex flex-col justify-between gap-3 transition ${
                           isEleito
                             ? 'bg-emerald-50/50 border-emerald-200/80 hover:border-emerald-400'
                             : 'bg-white border-slate-200/80 hover:border-slate-300'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center font-mono shrink-0">
-                            <span className="text-[10px] text-slate-400 font-bold">ANO</span>
-                            <span className="font-extrabold text-slate-900 text-sm">{h.ano}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center font-mono shrink-0">
+                              <span className="text-[10px] text-slate-400 font-bold">ANO</span>
+                              <span className="font-extrabold text-slate-900 text-sm">{h.ano}</span>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900 text-sm">
+                                  {h.cargo} · Urna: {h.nome_urna}
+                                </span>
+                                <span className="font-mono text-xs text-blue-700 font-bold">
+                                  Nº {h.numero_urna}
+                                </span>
+                              </div>
+                              <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                                <span>Legenda: <strong className="text-slate-800 font-mono">{h.sigla_partido}</strong></span>
+                                <span>·</span>
+                                <span>Colocação: {h.posicao ? `${h.posicao}º lugar` : 'N/D'}</span>
+                              </div>
+                            </div>
                           </div>
 
-                          <div>
+                          <div className="flex items-center gap-3 sm:text-right">
+                            <div>
+                              <div className="text-base font-extrabold text-slate-900 font-mono tabular-nums">
+                                {h.votos.toLocaleString('pt-BR')}
+                              </div>
+                              <div className="text-[10px] text-slate-400 uppercase font-semibold">Votos da Chapa</div>
+                            </div>
+
+                            <div
+                              className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 border shrink-0 ${
+                                isEleito
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  : isSuplente
+                                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                  : 'bg-slate-100 text-slate-600 border-slate-200'
+                              }`}
+                            >
+                              {isEleito ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : isSuplente ? (
+                                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 text-slate-400" />
+                              )}
+                              <span>{h.situacao}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Joint Ticket Partner (Chapa Majoritária Prefeito / Vice-Prefeito) */}
+                        {h.chapa_parceiro && onSelectAnother && (
+                          <div className="pt-2 border-t border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70 p-2.5 rounded-lg text-xs">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-900 text-sm">
-                                {h.cargo} · Urna: {h.nome_urna}
+                              <UserCheck className="w-4 h-4 text-purple-600 shrink-0" />
+                              <span className="text-slate-600">
+                                Chapa Majoritária com {h.chapa_parceiro.papel}:{' '}
+                                <strong className="text-slate-900">{h.chapa_parceiro.nome_urna}</strong> ({h.chapa_parceiro.nome_completo})
                               </span>
-                              <span className="font-mono text-xs text-blue-700 font-bold">
-                                Nº {h.numero_urna}
-                              </span>
                             </div>
-                            <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                              <span>Legenda: <strong className="text-slate-800 font-mono">{h.sigla_partido}</strong></span>
-                              <span>·</span>
-                              <span>Colocação: {h.posicao ? `${h.posicao}º lugar` : 'N/D'}</span>
-                            </div>
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-3 sm:text-right">
-                          <div>
-                            <div className="text-base font-extrabold text-slate-900 font-mono tabular-nums">
-                              {h.votos.toLocaleString('pt-BR')}
-                            </div>
-                            <div className="text-[10px] text-slate-400 uppercase font-semibold">Votos Recebidos</div>
+                            <button
+                              onClick={() => onSelectAnother(h.chapa_parceiro!.titulo_eleitor)}
+                              className="self-start sm:self-auto inline-flex items-center gap-1 px-2.5 py-1 rounded bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 text-[11px] font-semibold transition cursor-pointer"
+                              title={`Abrir Dossiê de ${h.chapa_parceiro.nome_urna} (${h.chapa_parceiro.papel})`}
+                            >
+                              <span>Ver Dossiê do {h.chapa_parceiro.papel}</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </button>
                           </div>
-
-                          <div
-                            className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 border shrink-0 ${
-                              isEleito
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                : isSuplente
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                : 'bg-slate-100 text-slate-600 border-slate-200'
-                            }`}
-                          >
-                            {isEleito ? (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            ) : isSuplente ? (
-                              <Clock className="w-3.5 h-3.5 text-amber-600" />
-                            ) : (
-                              <XCircle className="w-3.5 h-3.5 text-slate-400" />
-                            )}
-                            <span>{h.situacao}</span>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     );
                   })}

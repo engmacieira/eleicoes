@@ -15,11 +15,9 @@ import {
   XCircle,
   ExternalLink,
   Award,
-  ChevronDown,
   Building2,
-  Filter,
-  Calculator,
   X,
+  UserCheck,
 } from 'lucide-react';
 
 interface PleitoOverviewProps {
@@ -55,7 +53,12 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
         c.nome_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.sigla_partido.toLowerCase().includes(searchTerm.toLowerCase()) ||
         String(c.numero_urna).includes(searchTerm) ||
-        c.titulo_eleitor.includes(searchTerm);
+        c.titulo_eleitor.includes(searchTerm) ||
+        (c.vice && (
+          c.vice.nome_urna.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.vice.nome_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.vice.titulo_eleitor.includes(searchTerm)
+        ));
 
       if (!matchSearch) return false;
 
@@ -93,7 +96,9 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
           Apuração & Balanço do Pleito ({ano})
         </h2>
         <p className="text-sm text-slate-500 mt-0.5">
-          Indicadores consolidados da urna, quociente eleitoral e classificação oficial de candidatos a {cargo} em Braúnas/MG.
+          {cargo === 'Prefeito'
+            ? 'Chapas majoritárias concorrentes à Prefeitura Municipal. É possível consultar separadamente o dossiê do Prefeito e do Vice-Prefeito.'
+            : 'Indicadores consolidados da urna, quociente eleitoral e classificação oficial de candidatos a Vereador em Braúnas/MG.'}
         </p>
       </div>
 
@@ -137,7 +142,7 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
-                <span>Prefeito</span>
+                <span>Prefeito & Vice</span>
               </button>
               <button
                 onClick={() => setCargo('Vereador')}
@@ -155,7 +160,7 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
         </div>
       </div>
 
-      {/* Primary KPI Cards (4 Column Grid chunking) */}
+      {/* Primary KPI Cards (4 Column Grid) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Eleitorado Apto */}
         <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-xs">
@@ -209,12 +214,12 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
             {totalVotosValidos.toLocaleString('pt-BR')}
           </div>
           <div className="text-xs text-slate-500 mt-1">
-            {cargo === 'Vereador' ? 'Nominais e de Legenda' : 'Votos computados aos candidatos'}
+            {cargo === 'Vereador' ? 'Nominais e de Legenda' : 'Votos computados às chapas'}
           </div>
         </div>
       </div>
 
-      {/* Secondary Balance Strip (Urna Balanço: Brancos, Nulos, QE) */}
+      {/* Secondary Balance Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white border border-slate-200/70 rounded-lg p-3 text-xs">
           <span className="text-slate-500 block text-[11px]">Votos em Branco:</span>
@@ -259,9 +264,11 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
         </div>
 
         <div className="bg-white border border-slate-200/70 rounded-lg p-3 text-xs">
-          <span className="text-slate-500 block text-[11px]">Candidaturas Registradas:</span>
+          <span className="text-slate-500 block text-[11px]">
+            {cargo === 'Prefeito' ? 'Chapas Registradas:' : 'Candidaturas Registradas:'}
+          </span>
           <span className="font-bold text-slate-900 text-sm tabular-nums">
-            {resultados.length} postulantes
+            {resultados.length} {cargo === 'Prefeito' ? 'chapas majoritárias' : 'postulantes'}
           </span>
           <span className="text-[10px] text-slate-400 block mt-0.5">
             com apuração pelo TSE
@@ -277,14 +284,16 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <Award className="w-5 h-5 text-amber-600" />
               <span>
-                Classificação Oficial — {cargo} em {ano}
+                {cargo === 'Prefeito' ? `Eleição Majoritária — Chapas a Prefeito em ${ano}` : `Classificação Oficial — Vereador em ${ano}`}
               </span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 ml-1">
-                {filteredResultados.length} {filteredResultados.length === 1 ? 'candidato' : 'candidatos'}
+                {filteredResultados.length} {filteredResultados.length === 1 ? 'chapa' : 'chapas'}
               </span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Clique em qualquer linha ou no botão para abrir o <strong>Dossiê Histórico Completo</strong> do político.
+              {cargo === 'Prefeito'
+                ? 'Clique no botão correspondente para abrir o dossiê do Prefeito ou do Vice-Prefeito.'
+                : 'Clique em qualquer linha ou no botão para abrir o Dossiê Histórico Completo do candidato.'}
             </p>
           </div>
 
@@ -294,10 +303,10 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Buscar candidato, partido, nº..."
+                placeholder={cargo === 'Prefeito' ? 'Buscar prefeito, vice, título...' : 'Buscar candidato, partido, nº...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg pl-9 pr-8 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-60 transition"
+                className="bg-white border border-slate-300 rounded-lg pl-9 pr-8 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-64 transition"
               />
               {searchTerm && (
                 <button
@@ -327,14 +336,16 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
               >
                 Eleitos
               </button>
-              <button
-                onClick={() => setSituacaoFilter('suplentes')}
-                className={`px-2.5 py-1 rounded transition cursor-pointer font-medium ${
-                  situacaoFilter === 'suplentes' ? 'bg-amber-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Suplentes
-              </button>
+              {cargo === 'Vereador' && (
+                <button
+                  onClick={() => setSituacaoFilter('suplentes')}
+                  className={`px-2.5 py-1 rounded transition cursor-pointer font-medium ${
+                    situacaoFilter === 'suplentes' ? 'bg-amber-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Suplentes
+                </button>
+              )}
               <button
                 onClick={() => setSituacaoFilter('nao_eleitos')}
                 className={`px-2.5 py-1 rounded transition cursor-pointer font-medium ${
@@ -352,7 +363,7 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
           {loading ? (
             /* Skeleton Loading State */
             <div className="p-6 space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="animate-pulse flex items-center justify-between py-3 px-4 border-b border-slate-100">
                   <div className="flex items-center space-x-3 w-1/3">
                     <div className="w-6 h-6 bg-slate-200 rounded-full" />
@@ -369,10 +380,10 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
               ))}
             </div>
           ) : filteredResultados.length === 0 ? (
-            /* Friendly Empty State */
+            /* Empty State */
             <div className="p-12 text-center text-slate-500">
               <Search className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h4 className="font-bold text-slate-800 text-sm">Nenhum candidato localizado</h4>
+              <h4 className="font-bold text-slate-800 text-sm">Nenhum registro localizado</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                 Não encontramos candidaturas correspondentes ao termo "{searchTerm}" ou ao filtro selecionado.
               </p>
@@ -384,7 +395,7 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                   }}
                   className="mt-4 px-3.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100 transition cursor-pointer"
                 >
-                  Limpar todos os filtros
+                  Limpar filtros
                 </button>
               )}
             </div>
@@ -393,13 +404,17 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
               <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3 px-4 w-12 text-center">Pos</th>
-                  <th className="py-3 px-4">Candidato</th>
+                  <th className="py-3 px-4">
+                    {cargo === 'Prefeito' ? 'Chapa Majoritária (Prefeito & Vice)' : 'Candidato'}
+                  </th>
                   <th className="py-3 px-4">Número</th>
                   <th className="py-3 px-4">Partido</th>
-                  <th className="py-3 px-4 text-right">Votos Nominais</th>
+                  <th className="py-3 px-4 text-right">Votos Válidos</th>
                   <th className="py-3 px-4 text-right">% Válidos</th>
                   <th className="py-3 px-4 text-center">Situação TSE</th>
-                  <th className="py-3 px-4 text-center">Ação</th>
+                  <th className="py-3 px-4 text-center">
+                    {cargo === 'Prefeito' ? 'Consultar Dossiês' : 'Ação'}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -412,15 +427,14 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                   return (
                     <tr
                       key={`${c.titulo_eleitor}-${c.posicao ?? 'na'}-${index}`}
-                      onClick={() => onSelectCandidato(c.titulo_eleitor)}
-                      className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
+                      className="hover:bg-blue-50/40 transition-colors group"
                     >
                       {/* Posição */}
                       <td className="py-3 px-4 text-center font-mono font-bold text-slate-700">
                         {c.posicao ? (
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                              c.posicao <= 3 && isEleito
+                              c.posicao === 1 && isEleito
                                 ? 'bg-amber-100 text-amber-800 border border-amber-300'
                                 : 'bg-slate-100 text-slate-700'
                             }`}
@@ -432,18 +446,57 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                         )}
                       </td>
 
-                      {/* Nome Urna & Nome Civil */}
+                      {/* Nome Urna / Chapa Majoritária */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-slate-900 group-hover:text-blue-700 text-sm flex items-center gap-1.5 transition">
-                          <span>{c.nome_urna}</span>
-                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 text-blue-600 transition" />
+                        {/* Prefeito */}
+                        <div
+                          onClick={() => onSelectCandidato(c.titulo_eleitor)}
+                          className="cursor-pointer group/cand"
+                        >
+                          <div className="font-bold text-slate-900 group-hover/cand:text-blue-700 text-sm flex items-center gap-1.5 transition">
+                            <span>{c.nome_urna}</span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-200">
+                              Prefeito
+                            </span>
+                            <ExternalLink className="w-3 h-3 opacity-0 group-hover/cand:opacity-100 text-blue-600 transition" />
+                          </div>
+                          <div className="text-slate-500 text-[11px] truncate max-w-xs" title={c.nome_completo}>
+                            {c.nome_completo}
+                          </div>
+                          <div className="text-slate-400 font-mono text-[10px]">
+                            TÍTULO: {c.titulo_eleitor}
+                          </div>
                         </div>
-                        <div className="text-slate-500 text-[11px] truncate max-w-xs" title={c.nome_completo}>
-                          {c.nome_completo}
-                        </div>
-                        <div className="text-slate-400 font-mono text-[10px]">
-                          TÍTULO: {c.titulo_eleitor}
-                        </div>
+
+                        {/* Vice-Prefeito (quando cargo for Prefeito) */}
+                        {cargo === 'Prefeito' && c.vice && (
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectCandidato(c.vice!.titulo_eleitor);
+                            }}
+                            className="mt-2 pt-2 border-t border-slate-100 pl-2.5 border-l-2 border-l-purple-500 cursor-pointer group/vice hover:bg-purple-50/60 p-1.5 rounded-r transition"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <UserCheck className="w-3.5 h-3.5 text-purple-600" />
+                              <span className="font-bold text-slate-800 text-xs group-hover/vice:text-purple-700 transition">
+                                Vice: {c.vice.nome_urna}
+                              </span>
+                              {c.vice.sigla_partido && (
+                                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                                  {c.vice.sigla_partido}
+                                </span>
+                              )}
+                              <ExternalLink className="w-2.5 h-2.5 opacity-0 group-hover/vice:opacity-100 text-purple-600 transition" />
+                            </div>
+                            <div className="text-slate-500 text-[10px] truncate max-w-xs" title={c.vice.nome_completo}>
+                              {c.vice.nome_completo}
+                            </div>
+                            <div className="text-slate-400 font-mono text-[9px]">
+                              TÍTULO: {c.vice.titulo_eleitor}
+                            </div>
+                          </div>
+                        )}
                       </td>
 
                       {/* Número da Urna */}
@@ -498,17 +551,42 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                         </span>
                       </td>
 
-                      {/* Ação */}
+                      {/* Ação (Dossiê Prefeito e Dossiê Vice) */}
                       <td className="py-3 px-4 text-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectCandidato(c.titulo_eleitor);
-                          }}
-                          className="px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 text-[11px] font-semibold transition cursor-pointer"
-                        >
-                          Dossiê
-                        </button>
+                        {cargo === 'Prefeito' && c.vice ? (
+                          <div className="flex flex-col gap-1.5 items-center justify-center">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectCandidato(c.titulo_eleitor);
+                              }}
+                              className="w-full px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 text-[11px] font-semibold transition cursor-pointer"
+                              title={`Abrir Dossiê de ${c.nome_urna} (Prefeito)`}
+                            >
+                              Dossiê Prefeito
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectCandidato(c.vice!.titulo_eleitor);
+                              }}
+                              className="w-full px-2.5 py-1 rounded-md bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 text-[11px] font-semibold transition cursor-pointer"
+                              title={`Abrir Dossiê de ${c.vice.nome_urna} (Vice-Prefeito)`}
+                            >
+                              Dossiê Vice
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectCandidato(c.titulo_eleitor);
+                            }}
+                            className="px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 text-[11px] font-semibold transition cursor-pointer"
+                          >
+                            Dossiê
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

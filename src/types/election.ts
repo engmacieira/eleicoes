@@ -94,6 +94,13 @@ export interface EleicaoResumoDto {
   detalhes: DetalhesVotacaoDto[];
 }
 
+export interface ViceCandidatoDto {
+  nome_urna: string;
+  nome_completo: string;
+  titulo_eleitor: string;
+  sigla_partido?: string;
+}
+
 export interface ResultadoCandidatoDto {
   posicao: number | null;
   numero_urna: number;
@@ -105,6 +112,14 @@ export interface ResultadoCandidatoDto {
   votos: number;
   situacao: string;
   percentual_validos?: number;
+  vice?: ViceCandidatoDto | null;
+}
+
+export interface ChapaParceiroDto {
+  papel: 'Prefeito' | 'Vice-Prefeito';
+  nome_urna: string;
+  nome_completo: string;
+  titulo_eleitor: string;
 }
 
 export interface HistoricoParticipacaoDto {
@@ -116,6 +131,7 @@ export interface HistoricoParticipacaoDto {
   votos: number;
   situacao: string;
   posicao: number | null;
+  chapa_parceiro?: ChapaParceiroDto | null;
 }
 
 export interface CandidatoHistoricoDto {
