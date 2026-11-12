@@ -2878,66 +2878,6 @@
           "votos_nominais": 103,
           "votos_legenda": 8,
           "total_votos": 111
-        },
-        {
-          "partido": "PSDB",
-          "votos_nominais": 601,
-          "votos_legenda": 50,
-          "total_votos": 651
-        },
-        {
-          "partido": "PV",
-          "votos_nominais": 492,
-          "votos_legenda": 90,
-          "total_votos": 582
-        },
-        {
-          "partido": "PTC",
-          "votos_nominais": 297,
-          "votos_legenda": 85,
-          "total_votos": 382
-        },
-        {
-          "partido": "MDB",
-          "votos_nominais": 289,
-          "votos_legenda": 23,
-          "total_votos": 312
-        },
-        {
-          "partido": "PDT",
-          "votos_nominais": 274,
-          "votos_legenda": 28,
-          "total_votos": 302
-        },
-        {
-          "partido": "PPS",
-          "votos_nominais": 257,
-          "votos_legenda": 9,
-          "total_votos": 266
-        },
-        {
-          "partido": "PTB",
-          "votos_nominais": 169,
-          "votos_legenda": 4,
-          "total_votos": 173
-        },
-        {
-          "partido": "DEM",
-          "votos_nominais": 157,
-          "votos_legenda": 6,
-          "total_votos": 163
-        },
-        {
-          "partido": "PL",
-          "votos_nominais": 127,
-          "votos_legenda": 21,
-          "total_votos": 148
-        },
-        {
-          "partido": "AVANTE",
-          "votos_nominais": 97,
-          "votos_legenda": 40,
-          "total_votos": 137
         }
       ],
       "resultados": [

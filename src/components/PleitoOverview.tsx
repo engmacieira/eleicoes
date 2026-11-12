@@ -309,13 +309,13 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-sans">
-                {filteredResultados.map((c) => {
+                {filteredResultados.map((c, index) => {
                   const isEleito = c.situacao.toLowerCase().includes('eleito') && !c.situacao.toLowerCase().includes('não');
                   const isSuplente = c.situacao.toLowerCase().includes('suplente');
 
                   return (
                     <tr
-                      key={`${c.titulo_eleitor}-${c.posicao}`}
+                      key={`${c.titulo_eleitor}-${c.posicao ?? 'na'}-${index}`}
                       onClick={() => onSelectCandidato(c.titulo_eleitor)}
                       className="hover:bg-blue-600/10 cursor-pointer transition-colors group"
                     >

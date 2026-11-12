@@ -226,13 +226,29 @@ export async function getPartidosAno(ano: number): Promise<PartidosAnoDto> {
     return { ano, partidos: [], total_geral_votos: 0 };
   }
 
-  const totalGeral = el.partidos_vereador.reduce((acc, p) => acc + p.total_votos, 0) || 1;
+  // Deduplicate and aggregate by partido in case of multiple entries in raw data
+  const mapPartidos = new Map<string, { sigla: string; votos_nominais: number; votos_legenda: number; total_votos: number }>();
+  for (const p of el.partidos_vereador) {
+    const existing = mapPartidos.get(p.partido);
+    if (existing) {
+      existing.votos_nominais += p.votos_nominais;
+      existing.votos_legenda += p.votos_legenda;
+      existing.total_votos += p.total_votos;
+    } else {
+      mapPartidos.set(p.partido, {
+        sigla: p.partido,
+        votos_nominais: p.votos_nominais,
+        votos_legenda: p.votos_legenda,
+        total_votos: p.total_votos,
+      });
+    }
+  }
 
-  const partidos = el.partidos_vereador.map((p) => ({
-    sigla: p.partido,
-    votos_nominais: p.votos_nominais,
-    votos_legenda: p.votos_legenda,
-    total_votos: p.total_votos,
+  const list = Array.from(mapPartidos.values());
+  const totalGeral = list.reduce((acc, p) => acc + p.total_votos, 0) || 1;
+
+  const partidos = list.map((p) => ({
+    ...p,
     percentual_total: Number(((p.total_votos / totalGeral) * 100).toFixed(2)),
   })).sort((a, b) => b.total_votos - a.total_votos);
 

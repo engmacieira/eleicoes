@@ -171,14 +171,14 @@ export const CandidatoDossierModal: React.FC<CandidatoDossierModalProps> = ({
                 </div>
 
                 <div className="space-y-2 pt-2">
-                  {data.historico.map((h) => {
+                  {data.historico.map((h, index) => {
                     const pct = (h.votos / maxVotos) * 100;
                     const isEleito =
                       h.situacao.toLowerCase().includes('eleito') &&
                       !h.situacao.toLowerCase().includes('não');
 
                     return (
-                      <div key={`${h.ano}-${h.cargo}`} className="space-y-1">
+                      <div key={`${h.ano}-${h.cargo}-${index}`} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-2">
                             <span className="font-mono font-black text-white text-sm w-12">

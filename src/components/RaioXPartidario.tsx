@@ -177,7 +177,7 @@ export const RaioXPartidario: React.FC<RaioXPartidarioProps> = ({ ano, setAno })
               const legendaPctOfParty = p.total_votos > 0 ? (p.votos_legenda / p.total_votos) * 100 : 0;
 
               return (
-                <div key={p.sigla} className="space-y-1.5">
+                <div key={`${p.sigla}-${index}`} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[11px] font-bold flex items-center justify-center">
@@ -258,12 +258,12 @@ export const RaioXPartidario: React.FC<RaioXPartidarioProps> = ({ ano, setAno })
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
-                {data.partidos.map((p) => {
+                {data.partidos.map((p, index) => {
                   const nomPct = p.total_votos > 0 ? (p.votos_nominais / p.total_votos) * 100 : 0;
                   const legPct = p.total_votos > 0 ? (p.votos_legenda / p.total_votos) * 100 : 0;
 
                   return (
-                    <tr key={p.sigla} className="hover:bg-slate-800/40 transition">
+                    <tr key={`${p.sigla}-${index}`} className="hover:bg-slate-800/40 transition">
                       <td className="py-3 px-4 font-bold text-white text-sm">
                         {p.sigla}
                       </td>
