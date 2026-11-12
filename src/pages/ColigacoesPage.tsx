@@ -1533,436 +1533,499 @@ export const ColigacoesPage: React.FC = () => {
 
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/60">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 w-full max-w-2xl my-auto max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header (Fixed at top) */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
                   <Network className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900">
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-tight">
                     {editingColigacao ? 'Editar Coligação Partidária' : 'Nova Coligação Partidária'}
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-[11px] text-slate-500 mt-0.5">
                     Eleição Municipal de {formAno} &bull; Braúnas/MG
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                title="Fechar modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmitForm} className="p-6 space-y-4">
-              {formError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{formError}</span>
-                </div>
-              )}
+            <form onSubmit={handleSubmitForm} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* Scrollable Form Body */}
+              <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1 min-h-0 overscroll-contain">
+                {formError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{formError}</span>
+                  </div>
+                )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Ano da Eleição */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Ano do Pleito *
-                  </label>
-                  <select
-                    value={formAno}
-                    onChange={(e) => setFormAno(Number(e.target.value))}
-                    disabled={!!editingColigacao}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
-                  >
-                    {eleicoes.map((a) => (
-                      <option key={a} value={a}>
-                        {a}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {/* Bloco 1: Dados Gerais da Chapa */}
+                <div className="space-y-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>1. Dados do Pleito e Registro da Chapa</span>
+                  </div>
 
-                {/* Número da Urna */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Número na Urna *
-                  </label>
-                  <input
-                    type="number"
-                    value={formNumeroUrna}
-                    onChange={(e) => setFormNumeroUrna(Number(e.target.value))}
-                    required
-                    min={10}
-                    max={99}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
-                  />
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Ano da Eleição */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Ano do Pleito *
+                      </label>
+                      <select
+                        value={formAno}
+                        onChange={(e) => setFormAno(Number(e.target.value))}
+                        disabled={!!editingColigacao}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500 cursor-pointer"
+                      >
+                        {eleicoes.map((a) => (
+                          <option key={a} value={a}>
+                            {a}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                {/* Partido Titular */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Sigla Titular (Cabeça) *
-                  </label>
-                  <input
-                    type="text"
-                    value={formSiglaTitular}
-                    onChange={(e) => setFormSiglaTitular(e.target.value.toUpperCase())}
-                    required
-                    placeholder="Ex: PSD, PV, PSDB"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold uppercase"
-                  />
-                </div>
-              </div>
+                    {/* Número da Urna */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Número na Urna *
+                      </label>
+                      <input
+                        type="number"
+                        value={formNumeroUrna}
+                        onChange={(e) => setFormNumeroUrna(Number(e.target.value))}
+                        required
+                        min={10}
+                        max={99}
+                        placeholder="Ex: 55, 12, 15"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
 
-              {/* Nome da Coligação */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Nome Oficial da Coligação *
-                </label>
-                <input
-                  type="text"
-                  value={formNomeColigacao}
-                  onChange={(e) => setFormNomeColigacao(e.target.value)}
-                  required
-                  placeholder="Ex: União por Braúnas, Juntos por uma Braúnas Melhor..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
+                    {/* Partido Titular */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Sigla Titular (Cabeça) *
+                      </label>
+                      <input
+                        type="text"
+                        value={formSiglaTitular}
+                        onChange={(e) => setFormSiglaTitular(e.target.value.toUpperCase())}
+                        required
+                        placeholder="Ex: PSD, MDB, PDT"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 uppercase"
+                      />
+                    </div>
+                  </div>
 
-              {/* Seção de Partidos que compõem a Aliança */}
-              <div className="pt-2 border-t border-slate-100">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  {/* Nome da Coligação */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700">
-                      Partidos que estavam apoiando esta chapa ({formPartidos.length})
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Nome Oficial da Coligação / Composição Partidária *
                     </label>
-                    <span className="text-[11px] text-slate-400">
-                      Pesquise por sigla atual, sigla antiga ou número da legenda
-                    </span>
-                  </div>
-
-                  {/* Ordenação rápida */}
-                  <div className="flex items-center gap-1 self-start sm:self-auto bg-slate-100 p-0.5 rounded-lg text-[11px]">
-                    <span className="text-[10px] text-slate-400 px-1 font-medium hidden sm:inline">Ordem:</span>
-                    <button
-                      type="button"
-                      onClick={() => setPartySortBy('numero')}
-                      className={`px-2 py-0.5 rounded font-medium transition-colors ${
-                        partySortBy === 'numero'
-                          ? 'bg-white text-indigo-700 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Nº Urna
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPartySortBy('sigla')}
-                      className={`px-2 py-0.5 rounded font-medium transition-colors ${
-                        partySortBy === 'sigla'
-                          ? 'bg-white text-indigo-700 shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Sigla A-Z
-                    </button>
-                  </div>
-                </div>
-
-                {/* Searchable Combobox Container */}
-                <div ref={partyDropdownRef} className="relative mb-3">
-                  <div className="relative flex items-center">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                     <input
                       type="text"
-                      value={partySearchQuery}
-                      onChange={(e) => {
-                        setPartySearchQuery(e.target.value);
-                        setIsPartyDropdownOpen(true);
-                      }}
-                      onFocus={() => setIsPartyDropdownOpen(true)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                          setIsPartyDropdownOpen(false);
-                        } else if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const firstAvailable = filteredPartidosCadastrados.find((p) => !isPartyInForm(p));
-                          if (firstAvailable) {
-                            const matchedFormer = getMatchedFormerSigla(firstAvailable);
-                            handleAddPartidoToForm(matchedFormer || firstAvailable.sigla, firstAvailable);
-                          }
-                        }
-                      }}
-                      placeholder="Pesquisar por sigla atual (ex: MDB), antiga (ex: PMDB) ou número (ex: 15)..."
-                      className="w-full pl-9 pr-20 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all font-medium"
+                      value={formNomeColigacao}
+                      onChange={(e) => setFormNomeColigacao(e.target.value)}
+                      required
+                      placeholder="Ex: União por Braúnas, Juntos por uma Braúnas Melhor..."
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                     />
-                    <div className="absolute right-2 flex items-center gap-1">
-                      {partySearchQuery && (
-                        <button
-                          type="button"
-                          onClick={() => setPartySearchQuery('')}
-                          className="p-1 text-slate-400 hover:text-slate-600 rounded"
-                          title="Limpar pesquisa"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                  </div>
+                </div>
+
+                {/* Bloco 2: Seção de Partidos que compõem a Aliança */}
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <Flag className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>2. Partidos que Apoiavam esta Chapa ({formPartidos.length})</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Adicione as agremiações por número ou sigla (atual ou histórica) e defina os papéis na aliança.
+                      </p>
+                    </div>
+
+                    {/* Ordenação rápida */}
+                    <div className="flex items-center gap-1 self-start sm:self-auto bg-slate-100 p-0.5 rounded-lg text-[11px]">
+                      <span className="text-[10px] text-slate-400 px-1 font-medium hidden sm:inline">Ordem:</span>
                       <button
                         type="button"
-                        onClick={() => setIsPartyDropdownOpen(!isPartyDropdownOpen)}
-                        className="p-1 text-slate-400 hover:text-slate-600 rounded"
-                        title={isPartyDropdownOpen ? 'Fechar opções' : 'Ver todos os partidos'}
+                        onClick={() => setPartySortBy('numero')}
+                        className={`px-2 py-0.5 rounded font-semibold transition-colors cursor-pointer ${
+                          partySortBy === 'numero'
+                            ? 'bg-white text-indigo-700 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
                       >
-                        {isPartyDropdownOpen ? (
-                          <ChevronUp className="w-4 h-4 text-indigo-600" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
+                        Nº TSE
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPartySortBy('sigla')}
+                        className={`px-2 py-0.5 rounded font-semibold transition-colors cursor-pointer ${
+                          partySortBy === 'sigla'
+                            ? 'bg-white text-indigo-700 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        Sigla A-Z
                       </button>
                     </div>
                   </div>
 
-                  {/* Atalhos rápidos para pesquisas frequentes com siglas históricas */}
-                  <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-                    <span className="text-[10px] text-slate-400 font-medium">Atalhos:</span>
-                    {[
-                      { label: 'MDB (15/PMDB)', q: '15' },
-                      { label: 'PL (22/PR)', q: '22' },
-                      { label: 'AVANTE (70/PTdoB)', q: '70' },
-                      { label: 'UNIÃO (44/DEM/PFL)', q: '44' },
-                      { label: 'REPUBLICANOS (10/PRB)', q: '10' },
-                      { label: 'PP (11/PPB)', q: '11' },
-                      { label: 'CIDADANIA (23/PPS)', q: '23' },
-                    ].map((shortcut) => (
-                      <button
-                        key={shortcut.label}
-                        type="button"
-                        onClick={() => {
-                          setPartySearchQuery(shortcut.q);
+                  {/* Seletor com Busca e Dropdown Contido */}
+                  <div ref={partyDropdownRef} className="relative">
+                    <div className="relative flex items-center">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={partySearchQuery}
+                        onChange={(e) => {
+                          setPartySearchQuery(e.target.value);
                           setIsPartyDropdownOpen(true);
                         }}
-                        className="text-[10px] px-1.5 py-0.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 rounded border border-slate-200/80 transition-colors"
-                      >
-                        {shortcut.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Dropdown de Opções Pesquisáveis */}
-                  {isPartyDropdownOpen && (
-                    <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-slate-100 animate-in fade-in duration-100">
-                      <div className="px-3 py-1.5 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-medium sticky top-0 z-10 border-b border-slate-200/80">
-                        <span>
-                          {filteredPartidosCadastrados.length}{' '}
-                          {filteredPartidosCadastrados.length === 1 ? 'partido encontrado' : 'partidos encontrados'}
-                          {partySearchQuery ? ` para "${partySearchQuery}"` : ''}
-                        </span>
+                        onFocus={() => setIsPartyDropdownOpen(true)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsPartyDropdownOpen(false);
+                          } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const firstAvailable = filteredPartidosCadastrados.find((p) => !isPartyInForm(p));
+                            if (firstAvailable) {
+                              const matchedFormer = getMatchedFormerSigla(firstAvailable);
+                              handleAddPartidoToForm(matchedFormer || firstAvailable.sigla, firstAvailable);
+                            }
+                          }
+                        }}
+                        placeholder="Buscar partido por sigla atual (ex: MDB), antiga (ex: PMDB) ou número (15)..."
+                        className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all font-medium"
+                      />
+                      <div className="absolute right-2 flex items-center gap-1">
+                        {partySearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setPartySearchQuery('')}
+                            className="p-1 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
+                            title="Limpar pesquisa"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <button
                           type="button"
-                          onClick={() => setIsPartyDropdownOpen(false)}
-                          className="text-slate-400 hover:text-slate-600 font-normal"
+                          onClick={() => setIsPartyDropdownOpen(!isPartyDropdownOpen)}
+                          className="px-2 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                          title={isPartyDropdownOpen ? 'Recolher lista' : 'Exibir todos os partidos'}
                         >
-                          Fechar
+                          <span>{isPartyDropdownOpen ? 'Fechar' : 'Listar'}</span>
+                          {isPartyDropdownOpen ? (
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          )}
                         </button>
                       </div>
+                    </div>
 
-                      {filteredPartidosCadastrados.length === 0 ? (
-                        <div className="p-4 text-center">
-                          <p className="text-xs text-slate-600 font-medium">Nenhum partido localizado</p>
-                          <p className="text-[11px] text-slate-400 mt-1">
-                            Não encontramos registros para &quot;{partySearchQuery}&quot;. Tente buscar pelo número (ex: 15), sigla atual (ex: MDB) ou denominação histórica anterior (ex: PMDB).
-                          </p>
+                    {/* Atalhos rápidos com siglas e números históricos */}
+                    <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Atalhos:</span>
+                      {[
+                        { label: '15 MDB (PMDB)', q: '15' },
+                        { label: '22 PL (PR)', q: '22' },
+                        { label: '70 AVANTE (PTdoB)', q: '70' },
+                        { label: '44 UNIÃO (DEM/PFL)', q: '44' },
+                        { label: '10 REP (PRB)', q: '10' },
+                        { label: '11 PP (PPB)', q: '11' },
+                        { label: '55 PSD', q: '55' },
+                        { label: '12 PDT', q: '12' },
+                        { label: '13 PT', q: '13' },
+                        { label: '45 PSDB', q: '45' },
+                      ].map((shortcut) => (
+                        <button
+                          key={shortcut.label}
+                          type="button"
+                          onClick={() => {
+                            setPartySearchQuery(shortcut.q);
+                            setIsPartyDropdownOpen(true);
+                          }}
+                          className="text-[10px] px-2 py-0.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 rounded-md border border-slate-200/80 transition-colors font-medium cursor-pointer"
+                        >
+                          {shortcut.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Dropdown de Opções Pesquisáveis (Altura contida max-h-52 para não estourar) */}
+                    {isPartyDropdownOpen && (
+                      <div className="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-52 overflow-y-auto divide-y divide-slate-100 animate-in fade-in duration-100">
+                        <div className="px-3 py-1.5 bg-slate-50/90 flex items-center justify-between text-[11px] text-slate-500 font-semibold sticky top-0 z-10 border-b border-slate-200/80 backdrop-blur-xs">
+                          <span>
+                            {filteredPartidosCadastrados.length}{' '}
+                            {filteredPartidosCadastrados.length === 1 ? 'partido encontrado' : 'partidos encontrados'}
+                            {partySearchQuery ? ` para "${partySearchQuery}"` : ''}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setIsPartyDropdownOpen(false)}
+                            className="text-slate-400 hover:text-slate-700 cursor-pointer font-normal"
+                          >
+                            Fechar lista
+                          </button>
                         </div>
-                      ) : (
-                        filteredPartidosCadastrados.map((p) => {
-                          const alreadyIn = isPartyInForm(p);
-                          const histSiglas = getPartyHistoricalSiglas(p);
-                          const matchedFormer = getMatchedFormerSigla(p);
 
-                          return (
-                            <div
-                              key={p.id || p.numero}
-                              className={`p-2.5 transition-colors flex items-center justify-between gap-3 ${
-                                alreadyIn ? 'bg-slate-50/70 opacity-60' : 'hover:bg-indigo-50/40'
-                              }`}
-                            >
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
-                                    Nº {p.numero}
-                                  </span>
-                                  <span className="font-bold text-xs text-slate-900">{p.sigla}</span>
-                                  {p.nome && (
-                                    <span className="text-[11px] text-slate-500 truncate max-w-xs">
-                                      — {p.nome}
+                        {filteredPartidosCadastrados.length === 0 ? (
+                          <div className="p-4 text-center">
+                            <p className="text-xs text-slate-600 font-medium">Nenhum partido localizado</p>
+                            <p className="text-[11px] text-slate-400 mt-1">
+                              Tente buscar pelo número (ex: 15), sigla atual (ex: MDB) ou antiga (ex: PMDB).
+                            </p>
+                          </div>
+                        ) : (
+                          filteredPartidosCadastrados.map((p) => {
+                            const alreadyIn = isPartyInForm(p);
+                            const histSiglas = getPartyHistoricalSiglas(p);
+                            const matchedFormer = getMatchedFormerSigla(p);
+
+                            return (
+                              <div
+                                key={p.id || p.numero}
+                                className={`p-2 sm:p-2.5 transition-colors flex items-center justify-between gap-2.5 ${
+                                  alreadyIn ? 'bg-slate-50/70 opacity-60' : 'hover:bg-indigo-50/50'
+                                }`}
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-900 border border-blue-200">
+                                      Nº {p.numero}
                                     </span>
+                                    <span className="font-bold text-xs text-slate-900">{p.sigla}</span>
+                                    {p.nome && (
+                                      <span className="text-[11px] text-slate-500 truncate max-w-xs hidden sm:inline">
+                                        — {p.nome}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Linha de Siglas Históricas / Anteriores */}
+                                  {histSiglas.length > 0 && (
+                                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                      <span className="text-[10px] text-slate-400">Siglas anteriores:</span>
+                                      {histSiglas.map((hSigla) => {
+                                        const isMatch =
+                                          matchedFormer &&
+                                          matchedFormer.toUpperCase() === hSigla.toUpperCase();
+                                        return (
+                                          <span
+                                            key={hSigla}
+                                            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                                              isMatch
+                                                ? 'bg-amber-100 text-amber-900 border-amber-300 ring-1 ring-amber-300 font-bold'
+                                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                                            }`}
+                                          >
+                                            {hSigla}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
                                   )}
                                 </div>
 
-                                {/* Linha de Siglas Históricas / Anteriores */}
-                                {histSiglas.length > 0 && (
-                                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <span className="text-[10px] text-slate-400">Siglas antigas:</span>
-                                    {histSiglas.map((hSigla) => {
-                                      const isMatch =
-                                        matchedFormer &&
-                                        matchedFormer.toUpperCase() === hSigla.toUpperCase();
-                                      return (
-                                        <span
-                                          key={hSigla}
-                                          className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
-                                            isMatch
-                                              ? 'bg-amber-100 text-amber-800 border-amber-300 ring-1 ring-amber-300'
-                                              : 'bg-slate-100 text-slate-600 border-slate-200'
-                                          }`}
-                                        >
-                                          {hSigla}
-                                        </span>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Ações de Inclusão */}
-                              <div className="flex items-center gap-1 shrink-0">
-                                {alreadyIn ? (
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
-                                    <CheckCircle2 className="w-3 h-3" />
-                                    Na chapa
-                                  </span>
-                                ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        handleAddPartidoToForm(p.sigla, p);
-                                      }}
-                                      className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-semibold transition-colors flex items-center gap-1"
-                                      title={`Incluir legenda como ${p.sigla}`}
-                                    >
-                                      <Plus className="w-3 h-3" />
-                                      {p.sigla}
-                                    </button>
-
-                                    {/* Botão rápido para sigla histórica caso tenha sido pesquisada ou exista */}
-                                    {matchedFormer && matchedFormer.toUpperCase() !== p.sigla.toUpperCase() && (
+                                {/* Ações de Inclusão */}
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {alreadyIn ? (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      Na chapa
+                                    </span>
+                                  ) : (
+                                    <>
                                       <button
                                         type="button"
                                         onClick={() => {
-                                          handleAddPartidoToForm(matchedFormer, p);
+                                          handleAddPartidoToForm(p.sigla, p);
                                         }}
-                                        className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-xs font-semibold transition-colors flex items-center gap-1"
-                                        title={`Incluir com a sigla histórica ${matchedFormer}`}
+                                        className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                                        title={`Incluir como ${p.sigla}`}
                                       >
                                         <Plus className="w-3 h-3" />
-                                        {matchedFormer} (antiga)
+                                        <span>+ {p.sigla}</span>
                                       </button>
-                                    )}
-                                  </>
+
+                                      {/* Atalho rápido caso uma sigla histórica tenha sido pesquisada */}
+                                      {matchedFormer && matchedFormer.toUpperCase() !== p.sigla.toUpperCase() && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            handleAddPartidoToForm(matchedFormer, p);
+                                          }}
+                                          className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                                          title={`Incluir com a sigla histórica ${matchedFormer}`}
+                                        >
+                                          <Plus className="w-3 h-3" />
+                                          <span>{matchedFormer} (antiga)</span>
+                                        </button>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lista de Partidos Integrantes da Aliança */}
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                      <span>Composição Definida ({formPartidos.length} legendas):</span>
+                      {formPartidos.length > 0 && (
+                        <span className="text-slate-400 text-[10px]">
+                          Cabeça: <strong>{formSiglaTitular || 'Não definida'}</strong>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 divide-y divide-slate-100/60">
+                      {formPartidos.length === 0 ? (
+                        <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-xs text-slate-500 text-center space-y-1">
+                          <p className="font-semibold text-slate-700">Nenhum partido adicionado ainda</p>
+                          <p className="text-[11px] text-slate-400">
+                            Use a busca acima para incluir a legenda do prefeito e os partidos coligados.
+                          </p>
+                        </div>
+                      ) : (
+                        formPartidos.map((membro, mIdx) => {
+                          const pObj = partidosCadastrados.find(
+                            (p) =>
+                              p.sigla.toUpperCase() === membro.sigla_partido.toUpperCase() ||
+                              p.sigla_atual?.toUpperCase() === membro.sigla_partido.toUpperCase() ||
+                              p.siglas_anteriores?.some((s) => s.toUpperCase() === membro.sigla_partido.toUpperCase()) ||
+                              p.historico?.some((h) => h.sigla.toUpperCase() === membro.sigla_partido.toUpperCase())
+                          );
+                          const hasRebranding = pObj && pObj.sigla.toUpperCase() !== membro.sigla_partido.toUpperCase();
+
+                          const isCabeca = membro.papel === 'Cabeça de Chapa';
+                          const isVice = membro.papel === 'Vice-Prefeito';
+
+                          return (
+                            <div
+                              key={membro.sigla_partido}
+                              className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-colors ${
+                                isCabeca
+                                  ? 'bg-blue-50/70 border-blue-200/90'
+                                  : isVice
+                                  ? 'bg-amber-50/60 border-amber-200/80'
+                                  : 'bg-slate-50/70 border-slate-200/80'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <span className="font-mono text-[10px] text-slate-400 w-4 text-center">
+                                  {mIdx + 1}.
+                                </span>
+                                <span className="font-mono font-bold text-slate-900 px-2 py-0.5 bg-white rounded-md border border-slate-200">
+                                  {membro.sigla_partido}
+                                </span>
+                                {pObj?.numero && (
+                                  <span className="font-mono text-[11px] text-slate-500 font-semibold">
+                                    Nº {pObj.numero}
+                                  </span>
                                 )}
+                                {hasRebranding && (
+                                  <span className="text-[10px] font-semibold bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded border border-amber-200 hidden sm:inline">
+                                    atual {pObj.sigla}
+                                  </span>
+                                )}
+                                {pObj?.nome && (
+                                  <span className="text-[11px] text-slate-500 hidden sm:inline truncate max-w-[150px]">
+                                    — {pObj.nome}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-2 shrink-0">
+                                <select
+                                  value={membro.papel}
+                                  onChange={(e) => handleChangePapel(membro.sigla_partido, e.target.value)}
+                                  className={`px-2 py-1 rounded-lg text-xs font-semibold border focus:outline-hidden cursor-pointer ${
+                                    isCabeca
+                                      ? 'bg-blue-100/80 text-blue-900 border-blue-300'
+                                      : isVice
+                                      ? 'bg-amber-100/80 text-amber-900 border-amber-300'
+                                      : 'bg-white text-slate-700 border-slate-200'
+                                  }`}
+                                >
+                                  <option value="Cabeça de Chapa">Cabeça de Chapa</option>
+                                  <option value="Vice-Prefeito">Vice-Prefeito</option>
+                                  <option value="Partido Apoiador">Partido Apoiador</option>
+                                </select>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemovePartidoFromForm(membro.sigla_partido)}
+                                  className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Remover partido da coligação"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             </div>
                           );
                         })
                       )}
                     </div>
-                  )}
-                </div>
-
-                {/* List of members with roles */}
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {formPartidos.length === 0 ? (
-                    <div className="p-3 bg-slate-50 rounded-lg text-xs text-slate-400 text-center italic">
-                      Nenhum partido adicionado à aliança ainda. Adicione pelo menos a legenda titular.
-                    </div>
-                  ) : (
-                    formPartidos.map((membro) => {
-                      const pObj = partidosCadastrados.find(
-                        (p) =>
-                          p.sigla.toUpperCase() === membro.sigla_partido.toUpperCase() ||
-                          p.sigla_atual?.toUpperCase() === membro.sigla_partido.toUpperCase() ||
-                          p.siglas_anteriores?.some((s) => s.toUpperCase() === membro.sigla_partido.toUpperCase()) ||
-                          p.historico?.some((h) => h.sigla.toUpperCase() === membro.sigla_partido.toUpperCase())
-                      );
-                      const hasRebranding = pObj && pObj.sigla.toUpperCase() !== membro.sigla_partido.toUpperCase();
-
-                      return (
-                        <div
-                          key={membro.sigla_partido}
-                          className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-lg text-xs"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 px-2 py-0.5 bg-white rounded border border-slate-200">
-                              {membro.sigla_partido}
-                            </span>
-                            {pObj?.numero && (
-                              <span className="font-mono text-[11px] text-slate-500 font-semibold">
-                                Nº {pObj.numero}
-                              </span>
-                            )}
-                            {hasRebranding && (
-                              <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-200">
-                                atual {pObj.sigla}
-                              </span>
-                            )}
-                            {pObj?.nome && (
-                              <span className="text-[11px] text-slate-400 hidden sm:inline truncate max-w-[150px]">
-                                {pObj.nome}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <select
-                              value={membro.papel}
-                              onChange={(e) => handleChangePapel(membro.sigla_partido, e.target.value)}
-                              className="px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-800 focus:outline-none"
-                            >
-                              <option value="Cabeça de Chapa">Cabeça de Chapa</option>
-                              <option value="Vice-Prefeito">Vice-Prefeito</option>
-                              <option value="Partido Apoiador">Partido Apoiador</option>
-                            </select>
-
-                            <button
-                              type="button"
-                              onClick={() => handleRemovePartidoFromForm(membro.sigla_partido)}
-                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                              title="Remover partido da coligação"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
+                  </div>
                 </div>
               </div>
 
-              {/* Modal Actions */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isSubmitting}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm flex items-center gap-2"
-                >
-                  {isSubmitting && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  <span>{editingColigacao ? 'Salvar Alterações' : 'Criar Coligação'}</span>
-                </button>
+              {/* Modal Actions Footer (Fixed at bottom - ALWAYS visible) */}
+              <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/90 flex items-center justify-between gap-3 shrink-0">
+                <div className="text-[11px] text-slate-500 hidden sm:block">
+                  {formPartidos.length === 0 ? (
+                    <span>Preencha os dados e inclua os partidos da aliança</span>
+                  ) : (
+                    <span>
+                      <strong>{formPartidos.length}</strong> {formPartidos.length === 1 ? 'partido' : 'partidos'} na composição ({formSiglaTitular || 'Sem titular'})
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    disabled={isSubmitting}
+                    className="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                    <span>{editingColigacao ? 'Salvar Alterações' : 'Criar Coligação'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
