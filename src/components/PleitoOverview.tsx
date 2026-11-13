@@ -462,7 +462,14 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                 {cargo === 'Prefeito' ? `Eleição Majoritária — Chapas a Prefeito em ${ano}` : `Classificação Oficial — Vereador em ${ano}`}
               </span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 ml-1">
-                {filteredResultados.length} {filteredResultados.length === 1 ? 'chapa' : 'chapas'}
+                {filteredResultados.length}{' '}
+                {cargo === 'Prefeito'
+                  ? filteredResultados.length === 1
+                    ? 'chapa'
+                    : 'chapas'
+                  : filteredResultados.length === 1
+                  ? 'candidato'
+                  : 'candidatos'}
               </span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -630,8 +637,14 @@ export const PleitoOverview: React.FC<PleitoOverviewProps> = ({
                         >
                           <div className="font-bold text-slate-900 group-hover/cand:text-blue-700 text-sm flex items-center gap-1.5 transition">
                             <span>{c.nome_urna}</span>
-                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 border border-blue-200">
-                              Prefeito
+                            <span
+                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                                cargo === 'Prefeito'
+                                  ? 'bg-blue-100 text-blue-800 border-blue-200'
+                                  : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              }`}
+                            >
+                              {cargo === 'Prefeito' ? 'Prefeito' : 'Vereador'}
                             </span>
                             <ExternalLink className="w-3 h-3 opacity-0 group-hover/cand:opacity-100 text-blue-600 transition" />
                           </div>
