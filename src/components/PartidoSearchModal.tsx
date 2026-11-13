@@ -438,7 +438,7 @@ export const PartidoSearchModal: React.FC<PartidoSearchModalProps> = ({
 
                 return (
                   <div
-                    key={partido.id || partido.numero}
+                    key={`${partido.id || 0}-${partido.numero || 0}-${partido.sigla}`}
                     className={`p-3.5 sm:p-4 rounded-xl border transition-all duration-150 bg-white ${
                       estaSelecionado
                         ? 'border-emerald-300 ring-1 ring-emerald-200 bg-emerald-50/20'

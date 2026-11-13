@@ -163,25 +163,35 @@ export const ColigacoesPage: React.FC = () => {
     loadData(selectedAno);
   }, [selectedAno]);
 
-  // Normalization helper for party acronyms (e.g. MDB <-> PMDB, PFL <-> DEM, PPB <-> PP)
+  // Normalization helper for party acronyms (e.g. MDB <-> PMDB, PFL <-> DEM, PPB <-> PP, PR <-> PL, PTdoB <-> AVANTE)
   const matchPartidos = (siglaA: string, siglaB: string) => {
-    const sA = siglaA.trim().toUpperCase();
-    const sB = siglaB.trim().toUpperCase();
+    const sA = siglaA.trim().toUpperCase().replace(/\s+/g, '');
+    const sB = siglaB.trim().toUpperCase().replace(/\s+/g, '');
     if (sA === sB) return true;
-    if ((sA === 'MDB' && sB === 'PMDB') || (sA === 'PMDB' && sB === 'MDB')) return true;
-    if ((sA === 'PFL' && sB === 'DEM') || (sA === 'DEM' && sB === 'PFL')) return true;
-    if ((sA === 'PPB' && sB === 'PP') || (sA === 'PP' && sB === 'PPB')) return true;
-    if ((sA === 'PTB' && sB === 'PRD') || (sA === 'PRD' && sB === 'PTB')) return true;
-    if ((sA === 'PR' && sB === 'PL') || (sA === 'PL' && sB === 'PR')) return true;
-    return false;
+    const pairs: Array<[string, string]> = [
+      ['MDB', 'PMDB'],
+      ['PFL', 'DEM'],
+      ['PPB', 'PP'],
+      ['PTB', 'PRD'],
+      ['PR', 'PL'],
+      ['PTDOB', 'AVANTE'],
+      ['PTC', 'AGIR'],
+      ['PRN', 'AGIR'],
+      ['PRB', 'REPUBLICANOS'],
+      ['PPS', 'CIDADANIA'],
+      ['SD', 'SOLIDARIEDADE'],
+      ['PTN', 'PODE'],
+    ];
+    return pairs.some(([a, b]) => (sA === a && sB === b) || (sA === b && sB === a));
   };
 
   // Helper to compute councilor votes (nominal + legenda) for a given coalition
   const getCoalitionCouncilStats = (c: ColigacaoDto) => {
     const partyStats = c.partidos.map((membro) => {
+      const membroNum = membro.partido_numero || membro.id_partido;
       const found = partidosDesempenho.find(
         (p) =>
-          (membro.partido_numero && p.numero && membro.partido_numero === p.numero) ||
+          (membroNum > 0 && p.numero && membroNum === p.numero) ||
           matchPartidos(p.sigla, membro.sigla_partido)
       );
       return {
@@ -254,8 +264,14 @@ export const ColigacoesPage: React.FC = () => {
         },
       ];
       if (firstPref.vice && firstPref.vice.sigla_partido && firstPref.vice.sigla_partido !== firstPref.sigla_partido) {
+        const viceSiglaUpper = firstPref.vice.sigla_partido.toUpperCase();
+        const viceMatch = partidosCadastrados.find(
+          (p) =>
+            p.sigla.toUpperCase() === viceSiglaUpper ||
+            p.historico?.some((h) => h.sigla.toUpperCase() === viceSiglaUpper)
+        );
         initialMembers.push({
-          id_partido: 0,
+          id_partido: viceMatch?.numero || 0,
           sigla_partido: firstPref.vice.sigla_partido,
           papel: 'Vice-Prefeito',
         });
@@ -886,14 +902,14 @@ export const ColigacoesPage: React.FC = () => {
       ) : viewMode === 'cards' ? (
         /* CARDS VIEW WITH EMBEDDED PARALLEL SECTION */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredColigacoes.map((col) => {
+          {filteredColigacoes.map((col, colIdx) => {
             const isEleito = col.situacao?.toUpperCase().includes('ELEITO') && !col.situacao?.toUpperCase().includes('NÃO');
             const stats = getCoalitionCouncilStats(col);
             const isExpanded = !!expandedCardBreakdown[col.id];
 
             return (
               <div
-                key={col.id}
+                key={`${col.id}-${col.ano_eleicao}-${col.numero_urna}-${colIdx}`}
                 className="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden hover:border-indigo-300 transition-all flex flex-col justify-between"
               >
                 {/* Header of Card */}
@@ -1141,7 +1157,7 @@ export const ColigacoesPage: React.FC = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-1.5">
-                      {col.partidos.map((membro) => {
+                      {col.partidos.map((membro, mIdx) => {
                         const isTitular = membro.papel === 'Cabeça de Chapa';
                         const isVice = membro.papel === 'Vice-Prefeito';
                         const hasRebranding =
@@ -1149,7 +1165,7 @@ export const ColigacoesPage: React.FC = () => {
 
                         return (
                           <div
-                            key={membro.id}
+                            key={`${membro.id ?? 'm'}-${membro.id_partido}-${membro.sigla_partido}-${mIdx}`}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
                               isTitular
                                 ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
@@ -1267,13 +1283,13 @@ export const ColigacoesPage: React.FC = () => {
 
           {/* Detailed Side-by-Side Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {coligacoes.map((c) => {
+            {coligacoes.map((c, cIdx) => {
               const stats = getCoalitionCouncilStats(c);
               const isEleito = c.situacao?.toUpperCase().includes('ELEITO') && !c.situacao?.toUpperCase().includes('NÃO');
 
               return (
                 <div
-                  key={c.id}
+                  key={`${c.id}-${c.ano_eleicao}-${c.numero_urna}-${cIdx}`}
                   className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between"
                 >
                   <div>
@@ -1427,10 +1443,10 @@ export const ColigacoesPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {coligacoes.map((c) => {
+                  {coligacoes.map((c, cIdx) => {
                     const stats = getCoalitionCouncilStats(c);
                     return (
-                      <tr key={c.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={`${c.id}-${c.ano_eleicao}-${c.numero_urna}-${cIdx}`} className="hover:bg-slate-50 transition-colors">
                         <td className="py-3 px-4 font-bold text-slate-900">
                           {c.candidato_nome || `Chapa ${c.numero_urna}`}
                         </td>
@@ -1840,7 +1856,7 @@ export const ColigacoesPage: React.FC = () => {
                             </p>
                           </div>
                         ) : (
-                          filteredPartidosCadastrados.map((p) => {
+                          filteredPartidosCadastrados.map((p, pIdx) => {
                             const alreadyIn = isPartyInForm(p);
                             const histSiglas = getPartyHistoricalSiglas(p);
                             const matchedFormer = getMatchedFormerSigla(p);
@@ -1848,7 +1864,7 @@ export const ColigacoesPage: React.FC = () => {
 
                             return (
                               <div
-                                key={p.id || p.numero}
+                                key={`${p.id || 0}-${p.numero || 0}-${p.sigla}-${pIdx}`}
                                 className={`p-2 sm:p-2.5 transition-colors flex items-center justify-between gap-2.5 ${
                                   alreadyIn ? 'bg-slate-50/70 opacity-60' : 'hover:bg-indigo-50/50'
                                 }`}
@@ -1978,7 +1994,7 @@ export const ColigacoesPage: React.FC = () => {
 
                           return (
                             <div
-                              key={membro.sigla_partido}
+                              key={`${membro.id_partido}-${membro.sigla_partido}-${mIdx}`}
                               className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-colors ${
                                 isCabeca
                                   ? 'bg-blue-50/70 border-blue-200/90'

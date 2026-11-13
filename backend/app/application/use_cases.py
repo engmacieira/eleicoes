@@ -479,14 +479,15 @@ class CriarChapaProporcionalUseCase:
     ) -> ChapaProporcionalDto:
         if not nome or not nome.strip():
             raise ValueError("O nome da chapa proporcional é obrigatório.")
-        if not partido_ids:
+        partido_ids_unicos = list(dict.fromkeys(partido_ids or []))
+        if not partido_ids_unicos:
             raise ValueError("Ao menos um partido deve ser vinculado à chapa proporcional.")
 
         e = self.quociente_repo.create_chapa(
             eleicao_id=eleicao_id,
             nome=nome.strip(),
             tipo=tipo.strip().upper(),
-            partido_ids=partido_ids,
+            partido_ids=partido_ids_unicos,
         )
         partidos_dtos = [
             ChapaProporcionalPartidoDto(
@@ -524,11 +525,14 @@ class AtualizarChapaProporcionalUseCase:
         partido_ids: Optional[List[int]] = None,
         is_active: Optional[bool] = None,
     ) -> ChapaProporcionalDto:
+        partido_ids_unicos = (
+            list(dict.fromkeys(partido_ids)) if partido_ids is not None else None
+        )
         e = self.quociente_repo.update_chapa(
             chapa_id=chapa_id,
             nome=nome,
             tipo=tipo,
-            partido_ids=partido_ids,
+            partido_ids=partido_ids_unicos,
             is_active=is_active,
         )
         if not e:

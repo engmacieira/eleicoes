@@ -82,6 +82,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
   const [formChapaTipo, setFormChapaTipo] = useState<string>('PARTIDO');
   const [formChapaPartidos, setFormChapaPartidos] = useState<number[]>([]);
   const [savingChapa, setSavingChapa] = useState<boolean>(false);
+  const [formChapaError, setFormChapaError] = useState<string | null>(null);
 
   // 1. Carregar lista de eleições disponíveis
   useEffect(() => {
@@ -191,6 +192,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
     setFormChapaNome('');
     setFormChapaTipo('PARTIDO');
     setFormChapaPartidos([]);
+    setFormChapaError(null);
     setIsChapaModalOpen(true);
   };
 
@@ -200,18 +202,20 @@ export const QuocienteEleitoralPage: React.FC = () => {
     setFormChapaNome(chapa.nome);
     setFormChapaTipo(chapa.tipo);
     setFormChapaPartidos(chapa.partidos.map((p) => p.partido_id));
+    setFormChapaError(null);
     setIsChapaModalOpen(true);
   };
 
   // Salvar Chapa (Criar ou Atualizar)
   const handleSalvarChapa = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormChapaError(null);
     if (!formChapaNome.trim()) {
-      setErrorMsg('O nome da chapa é obrigatório.');
+      setFormChapaError('O nome da chapa é obrigatório.');
       return;
     }
     if (formChapaPartidos.length === 0) {
-      setErrorMsg('Selecione ao menos um partido para a chapa.');
+      setFormChapaError('Selecione ao menos um partido para a chapa.');
       return;
     }
 
@@ -238,6 +242,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
       await carregarDadosEleicao(selectedEleicaoId, selectedAno);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao salvar chapa.';
+      setFormChapaError(msg);
       setErrorMsg(msg);
     } finally {
       setSavingChapa(false);
@@ -348,7 +353,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
                 const isSelected = el.ano === selectedAno;
                 return (
                   <button
-                    key={el.id}
+                    key={`${el.id}-${el.ano}`}
                     onClick={() => handleMudarAno(el.ano)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       isSelected
@@ -532,9 +537,9 @@ export const QuocienteEleitoralPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {chapas.map((ch) => (
+            {chapas.map((ch, cIdx) => (
               <div
-                key={ch.id}
+                key={`${ch.id}-${ch.nome}-${cIdx}`}
                 className="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/70 hover:bg-white hover:border-blue-300 transition shadow-2xs flex flex-col justify-between gap-2"
               >
                 <div>
@@ -556,9 +561,9 @@ export const QuocienteEleitoralPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                    {ch.partidos.map((p) => (
+                    {ch.partidos.map((p, pIdx) => (
                       <span
-                        key={p.partido_id}
+                        key={`${p.partido_id}-${p.sigla}-${pIdx}`}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-700 shadow-2xs"
                       >
                         <span className="font-mono text-slate-400 text-[10px]">{p.numero}</span>
@@ -624,9 +629,9 @@ export const QuocienteEleitoralPage: React.FC = () => {
               <span>Passo a Passo da Distribuição das Sobras (Art. 109 CE)</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {calculo.memoria_sobras.map((s) => (
+              {calculo.memoria_sobras.map((s, sIdx) => (
                 <div
-                  key={s.rodada}
+                  key={`${s.rodada}-${s.chapa_id}-${sIdx}`}
                   className="p-3 bg-white border border-indigo-200 rounded-xl shadow-2xs text-xs space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
@@ -685,11 +690,11 @@ export const QuocienteEleitoralPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                calculo.chapas.map((ch) => {
+                calculo.chapas.map((ch, cIdx) => {
                   const isExpanded = expandedChapaId === ch.id;
                   return (
                     <tr
-                      key={ch.id}
+                      key={`${ch.id}-${ch.nome}-${cIdx}`}
                       onClick={() => setExpandedChapaId(isExpanded ? null : ch.id)}
                       className={`hover:bg-blue-50/50 transition cursor-pointer ${
                         ch.total_eleitos > 0 ? 'bg-white' : 'bg-slate-50/30'
@@ -707,9 +712,9 @@ export const QuocienteEleitoralPage: React.FC = () => {
                           <div>
                             <span className="font-bold text-slate-900">{ch.nome}</span>
                             <div className="flex flex-wrap gap-1 mt-0.5">
-                              {ch.partidos.map((p) => (
+                              {ch.partidos.map((p, pIdx) => (
                                 <span
-                                  key={p.partido_id}
+                                  key={`${p.partido_id}-${p.sigla}-${pIdx}`}
                                   className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium"
                                 >
                                   {p.sigla}
@@ -804,11 +809,11 @@ export const QuocienteEleitoralPage: React.FC = () => {
         </div>
 
         {calculo &&
-          calculo.chapas.map((ch) => {
+          calculo.chapas.map((ch, cIdx) => {
             const isExpanded = expandedChapaId === ch.id;
             return (
               <div
-                key={ch.id}
+                key={`${ch.id}-${ch.nome}-${cIdx}`}
                 className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden transition-all"
               >
                 {/* Cabeçalho do Acordeão */}
@@ -883,9 +888,9 @@ export const QuocienteEleitoralPage: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-200/60 bg-white">
-                            {ch.ranking_candidatos.map((cand) => (
+                            {ch.ranking_candidatos.map((cand, cIdx) => (
                               <tr
-                                key={cand.titulo_eleitor}
+                                key={`${cand.titulo_eleitor}-${cand.numero_urna}-${cIdx}`}
                                 className={`hover:bg-blue-50/30 transition ${
                                   cand.status_calculado === 'ELEITO_QP'
                                     ? 'bg-emerald-50/40'
@@ -1132,6 +1137,12 @@ export const QuocienteEleitoralPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSalvarChapa} className="space-y-4 text-xs">
+              {formChapaError && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2 font-medium">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{formChapaError}</span>
+                </div>
+              )}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Nome da Chapa / Sigla
@@ -1173,15 +1184,15 @@ export const QuocienteEleitoralPage: React.FC = () => {
                       Nenhum partido localizado na apuração deste ano.
                     </p>
                   ) : (
-                    partidosEleicao.map((p) => {
+                    partidosEleicao.map((p, pIdx) => {
                       const pNum = p.numero || 0;
-                      const isSelected = formChapaPartidos.includes(pNum);
-                      const outroVinculo = partidosVinculadosMap.get(pNum);
-                      const isBlocked = !!outroVinculo;
+                      const isSelected = pNum > 0 && formChapaPartidos.includes(pNum);
+                      const outroVinculo = pNum > 0 ? partidosVinculadosMap.get(pNum) : undefined;
+                      const isBlocked = !!outroVinculo || pNum === 0;
 
                       return (
                         <label
-                          key={pNum}
+                          key={`${pNum}-${p.sigla}-${pIdx}`}
                           className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition ${
                             isBlocked
                               ? 'opacity-50 cursor-not-allowed bg-slate-100'
@@ -1196,6 +1207,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
                               disabled={isBlocked}
                               checked={isSelected}
                               onChange={(e) => {
+                                if (pNum <= 0) return;
                                 if (e.target.checked) {
                                   setFormChapaPartidos([...formChapaPartidos, pNum]);
                                 } else {
@@ -1206,7 +1218,7 @@ export const QuocienteEleitoralPage: React.FC = () => {
                             />
                             <div>
                               <span className="font-bold text-slate-900">
-                                {p.sigla} ({pNum})
+                                {p.sigla} ({pNum > 0 ? pNum : 'S/Nº'})
                               </span>
                               <span className="text-[11px] text-slate-500 ml-2">
                                 {p.total_votos} votos ({p.votos_nominais} nom. + {p.votos_legenda} leg.)

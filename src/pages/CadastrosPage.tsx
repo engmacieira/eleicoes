@@ -871,8 +871,8 @@ export const CadastrosPage: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  partidosPaginated.map((p) => (
-                    <tr key={p.id} className="hover:bg-slate-50/80 transition">
+                  partidosPaginated.map((p, pIdx) => (
+                    <tr key={`${p.id}-${p.numero}-${p.sigla}-${pIdx}`} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4 text-center">
                         <span className="inline-flex items-center justify-center font-mono font-bold text-xs bg-blue-50 text-blue-800 px-2.5 py-1 rounded-md border border-blue-200">
                           {p.numero}
@@ -891,7 +891,7 @@ export const CadastrosPage: React.FC = () => {
                           <div className="flex flex-wrap items-center gap-1.5">
                             {p.historico.map((h, hIdx) => (
                               <span
-                                key={h.id || hIdx}
+                                key={`${h.id ?? 'h'}-${h.sigla}-${hIdx}`}
                                 className="inline-flex items-center gap-1 text-[11px] font-mono bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-200"
                                 title={h.nome ? `${h.sigla} - ${h.nome}` : h.sigla}
                               >
@@ -1123,8 +1123,8 @@ export const CadastrosPage: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  eleicoesPaginated.map((el) => (
-                    <tr key={el.id} className="hover:bg-slate-50/80 transition">
+                  eleicoesPaginated.map((el, eIdx) => (
+                    <tr key={`${el.id}-${el.ano}-${eIdx}`} className="hover:bg-slate-50/80 transition">
                       <td className="py-3 px-4 font-mono text-slate-500">
                         {el.id}
                       </td>

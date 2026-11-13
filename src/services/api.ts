@@ -748,6 +748,12 @@ export async function getResultados(ano: number, cargo: string): Promise<Resulta
       data_nascimento: '',
     };
 
+    const twoDigitPrefix = r.numero >= 10 ? Number(String(r.numero).slice(0, 2)) : 0;
+    const resolvedPart = resolvePartido(r.partido);
+    const partidoNumero = (!isNaN(twoDigitPrefix) && twoDigitPrefix >= 10)
+      ? twoDigitPrefix
+      : (resolvedPart?.numero || undefined);
+
     return {
       posicao: r.posicao,
       numero_urna: r.numero,
@@ -755,6 +761,9 @@ export async function getResultados(ano: number, cargo: string): Promise<Resulta
       nome_completo: candOv?.nome_completo || base.nome_completo,
       titulo_eleitor: candOv?.titulo_eleitor || r.titulo_eleitor,
       sigla_partido: r.partido,
+      partido_numero: partidoNumero,
+      sigla_epoca: r.partido,
+      sigla_atual: resolvedPart?.sigla || r.partido,
       cargo: r.cargo,
       votos: r.votos,
       situacao: r.situacao,
@@ -969,10 +978,27 @@ export async function getPartidosAno(ano: number): Promise<PartidosAnoDto> {
   const list = Array.from(mapPartidos.values());
   const totalGeral = list.reduce((acc, p) => acc + p.total_votos, 0) || 1;
 
-  const partidos = list.map((p) => ({
-    ...p,
-    percentual_total: Number(((p.total_votos / totalGeral) * 100).toFixed(2)),
-  })).sort((a, b) => b.total_votos - a.total_votos);
+  const partidos = list.map((p) => {
+    const resolved = resolvePartido(p.sigla);
+    let numero = resolved?.numero;
+    if (!numero && el.resultados) {
+      const cand = el.resultados.find(
+        (r) => r.partido.trim().toUpperCase() === p.sigla.trim().toUpperCase() && r.numero >= 10
+      );
+      if (cand) {
+        const twoDigits = Number(String(cand.numero).slice(0, 2));
+        if (!isNaN(twoDigits) && twoDigits > 0) {
+          numero = twoDigits;
+        }
+      }
+    }
+    return {
+      ...p,
+      numero,
+      sigla_atual: resolved?.sigla || p.sigla,
+      percentual_total: Number(((p.total_votos / totalGeral) * 100).toFixed(2)),
+    };
+  }).sort((a, b) => b.total_votos - a.total_votos);
 
   return {
     ano,
@@ -1077,6 +1103,17 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     ],
   },
   {
+    id: 18,
+    numero: 18,
+    sigla: 'REDE',
+    nome: 'Rede Sustentabilidade',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1801, id_partido: 18, numero: 18, sigla: 'REDE', nome: 'Rede Sustentabilidade', ano_inicio: 2015, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
     id: 19,
     numero: 19,
     sigla: 'PODE',
@@ -1128,12 +1165,13 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     id: 25,
     numero: 25,
     sigla: 'DEM',
-    nome: 'Democratas / União Brasil',
+    nome: 'Democratas / PRD',
     is_active: true,
     is_deleted: false,
     historico: [
       { id: 2501, id_partido: 25, numero: 25, sigla: 'PFL', nome: 'Partido da Frente Liberal', ano_inicio: 1985, ano_fim: 2007, is_atual: false, is_active: true, is_deleted: false },
-      { id: 2502, id_partido: 25, numero: 25, sigla: 'DEM', nome: 'Democratas', ano_inicio: 2007, ano_fim: 2022, is_atual: true, is_active: true, is_deleted: false },
+      { id: 2502, id_partido: 25, numero: 25, sigla: 'DEM', nome: 'Democratas', ano_inicio: 2007, ano_fim: 2022, is_atual: false, is_active: true, is_deleted: false },
+      { id: 2503, id_partido: 25, numero: 25, sigla: 'PRD', nome: 'Partido Renovação Democrática', ano_inicio: 2023, is_atual: true, is_active: true, is_deleted: false },
     ],
   },
   {
@@ -1217,6 +1255,18 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     is_deleted: false,
     historico: [
       { id: 4501, id_partido: 45, numero: 45, sigla: 'PSDB', nome: 'Partido da Social Democracia Brasileira', ano_inicio: 1988, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 51,
+    numero: 51,
+    sigla: 'PATRIOTA',
+    nome: 'Patriota',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 5101, id_partido: 51, numero: 51, sigla: 'PEN', nome: 'Partido Ecológico Nacional', ano_inicio: 2012, ano_fim: 2018, is_atual: false, is_active: true, is_deleted: false },
+      { id: 5102, id_partido: 51, numero: 51, sigla: 'PATRIOTA', nome: 'Patriota', ano_inicio: 2018, ano_fim: 2023, is_atual: true, is_active: true, is_deleted: false },
     ],
   },
   {
@@ -1511,23 +1561,45 @@ export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroD
   const rawStr = String(siglaOuNumero).trim().toUpperCase();
   const sClean = rawStr.replace(/\s+/g, '');
 
-  // 1. Direct match with current acronym
-  const direct = all.find((p) => p.sigla.toUpperCase().replace(/\s+/g, '') === sClean);
+  // 1. Direct exact match with current acronym
+  const direct = all.find(
+    (p) =>
+      p.sigla.toUpperCase().replace(/\s+/g, '') === sClean ||
+      (p.sigla_atual && p.sigla_atual.toUpperCase().replace(/\s+/g, '') === sClean)
+  );
   if (direct) return direct;
 
-  // 2. Match with historical names/acronyms in the auxiliary table
+  // 2. Exact match with historical acronyms across ALL parties before any name matching
   for (const p of all) {
-    if (p.historico && p.historico.some((h) =>
-      h.sigla.toUpperCase().replace(/\s+/g, '') === sClean ||
-      (h.nome && h.nome.toUpperCase().includes(rawStr))
-    )) {
+    if (
+      p.historico &&
+      p.historico.some((h) => h.sigla.toUpperCase().replace(/\s+/g, '') === sClean)
+    ) {
       return p;
     }
   }
 
-  // 3. Match with party name
-  const byName = all.find((p) => (p.nome && p.nome.toUpperCase().includes(rawStr)) || (p.nome_atual && p.nome_atual.toUpperCase().includes(rawStr)));
-  if (byName) return byName;
+  // 3. Exact match with official or historical party name
+  for (const p of all) {
+    if (
+      (p.nome && p.nome.toUpperCase() === rawStr) ||
+      (p.nome_atual && p.nome_atual.toUpperCase() === rawStr) ||
+      (p.historico && p.historico.some((h) => h.nome && h.nome.toUpperCase() === rawStr))
+    ) {
+      return p;
+    }
+  }
+
+  // 4. Partial substring match on names only when query has >= 4 chars (avoids "PR" matching "PROGRESSISTA")
+  if (rawStr.length >= 4) {
+    const byName = all.find(
+      (p) =>
+        (p.nome && p.nome.toUpperCase().includes(rawStr)) ||
+        (p.nome_atual && p.nome_atual.toUpperCase().includes(rawStr)) ||
+        (p.historico && p.historico.some((h) => h.nome && h.nome.toUpperCase().includes(rawStr)))
+    );
+    if (byName) return byName;
+  }
 
   return null;
 }
@@ -2189,8 +2261,26 @@ export async function getColigacoes(ano?: number): Promise<ColigacaoDto[]> {
     coligacoes = ano ? all.filter((c) => c.ano_eleicao === ano) : all;
   }
 
-  // Filter out soft-deleted
-  coligacoes = coligacoes.filter((c) => !c.is_deleted);
+  // Filter out soft-deleted and normalize member IDs/siglas
+  coligacoes = coligacoes
+    .filter((c) => !c.is_deleted)
+    .map((c) => {
+      const rawMembers = (c.partidos && c.partidos.length > 0)
+        ? c.partidos
+        : ((c as unknown as { partidos_membros?: ColigacaoMembroDto[] }).partidos_membros || []);
+      return {
+        ...c,
+        ano_eleicao: c.ano_eleicao || (c as unknown as { ano?: number }).ano || c.id_eleicao,
+        partidos: rawMembers.map((m, mIdx) => {
+          const rawM = m as ColigacaoMembroDto & { sigla?: string };
+          return {
+            ...m,
+            id: m.id && m.id > 0 ? m.id : (c.id * 100 + mIdx + 1),
+            sigla_partido: m.sigla_partido || rawM.sigla || '',
+          };
+        }),
+      };
+    });
 
   // Enrich with candidate details and votes
   for (const c of coligacoes) {
@@ -2352,106 +2442,691 @@ export async function deleteColigacao(id: number): Promise<void> {
 // MÓDULO DE QUOCIENTE ELEITORAL (VEREADOR) & CHAPAS PROPORCIONAIS
 // =======================================================================
 
-export async function getParametrosQe(eleicaoId: number): Promise<ParametrosQeDto> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    throw new Error(`Falha ao obter parâmetros do QE da eleição ${eleicaoId}`);
+const QE_PARAMS_STORAGE_KEY = 'vigiminas_qe_params_v1';
+const QE_CHAPAS_STORAGE_KEY = 'vigiminas_qe_chapas_v1';
+
+interface StoredChapaProporcional {
+  id: number;
+  eleicao_id: number;
+  nome: string;
+  tipo: string;
+  partido_ids: number[];
+  is_active: boolean;
+  is_deleted: boolean;
+}
+
+function loadStoredQeParams(): Record<number, ParametrosQeDto> {
+  try {
+    const raw = localStorage.getItem(QE_PARAMS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch {}
+  return {};
+}
+
+function saveStoredQeParams(map: Record<number, ParametrosQeDto>): void {
+  try {
+    localStorage.setItem(QE_PARAMS_STORAGE_KEY, JSON.stringify(map));
+  } catch {}
+}
+
+function loadStoredQeChapas(): StoredChapaProporcional[] {
+  try {
+    const raw = localStorage.getItem(QE_CHAPAS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {}
+  return [];
+}
+
+function saveStoredQeChapas(list: StoredChapaProporcional[]): void {
+  try {
+    localStorage.setItem(QE_CHAPAS_STORAGE_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+async function resolveAnoFromEleicaoId(eleicaoId: number): Promise<number> {
+  if (eleicaoId >= 1900 && eleicaoId <= 2200) {
+    return eleicaoId;
   }
-  return res.json();
+  try {
+    const eleicoes = await getEleicoes();
+    const match = eleicoes.find((e) => e.id === eleicaoId);
+    if (match) return match.ano;
+  } catch {}
+  return eleicaoId;
+}
+
+async function hydrateChapasProporcionais(
+  eleicaoId: number,
+  storedList: StoredChapaProporcional[]
+): Promise<ChapaProporcionalDto[]> {
+  const ano = await resolveAnoFromEleicaoId(eleicaoId);
+  const partidosAno = await getPartidosAno(ano).catch(() => ({
+    ano,
+    partidos: [],
+    total_geral_votos: 0,
+  }));
+  const cadastros = await getPartidosCadastrados().catch(() => []);
+
+  const desempByNum = new Map<number, (typeof partidosAno.partidos)[number]>();
+  for (const p of partidosAno.partidos) {
+    const num = p.numero || resolvePartido(p.sigla)?.numero;
+    if (num && num > 0) {
+      desempByNum.set(num, p);
+    }
+  }
+
+  const cadByNum = new Map<number, PartidoCadastroDto>();
+  for (const c of cadastros) {
+    cadByNum.set(c.numero, c);
+  }
+
+  return storedList
+    .filter((ch) => ch.eleicao_id === eleicaoId && !ch.is_deleted)
+    .sort((a, b) => a.nome.localeCompare(b.nome))
+    .map((ch) => ({
+      id: ch.id,
+      eleicao_id: ch.eleicao_id,
+      nome: ch.nome,
+      tipo: ch.tipo,
+      is_active: ch.is_active,
+      is_deleted: ch.is_deleted,
+      partidos: ch.partido_ids.map((pid, idx) => {
+        const desemp = desempByNum.get(pid);
+        const cad = cadByNum.get(pid) || resolvePartido(pid);
+        const denom = cad ? getDenominacaoNoAno(cad, ano) : null;
+        return {
+          id: ch.id * 100 + idx + 1,
+          partido_id: pid,
+          numero: pid,
+          sigla: desemp?.sigla || denom?.sigla || cad?.sigla || String(pid),
+          nome: cad?.nome || denom?.nome || null,
+          votos_nominais: desemp?.votos_nominais || 0,
+          votos_legenda: desemp?.votos_legenda || 0,
+          total_votos: desemp?.total_votos || 0,
+        };
+      }),
+    }));
+}
+
+export async function getParametrosQe(eleicaoId: number): Promise<ParametrosQeDto> {
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.vagas_vereador === 'number') {
+        return data;
+      }
+    }
+  } catch {}
+
+  const stored = loadStoredQeParams();
+  if (stored[eleicaoId]) {
+    return stored[eleicaoId];
+  }
+
+  return {
+    id: eleicaoId,
+    eleicao_id: eleicaoId,
+    vagas_vereador: 9,
+    perc_minimo_candidato_qp: 10.0,
+    perc_minimo_chapa_sobras: 80.0,
+    perc_minimo_candidato_sobras: 20.0,
+    permite_repescagem_sobras: true,
+    is_active: true,
+    is_deleted: false,
+  };
 }
 
 export async function updateParametrosQe(
   eleicaoId: number,
   payload: UpdateParametrosQePayload
 ): Promise<ParametrosQeDto> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Falha ao atualizar parâmetros do QE.');
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    if (res.status === 400 || res.status === 422) {
+      const errorData = await res.json().catch(() => ({}));
+      if (errorData.detail) throw new Error(errorData.detail);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name !== 'AbortError' && err.name !== 'TimeoutError' && !err.message.includes('fetch')) {
+      throw err;
+    }
   }
-  return res.json();
+
+  const current = await getParametrosQe(eleicaoId);
+  const updated: ParametrosQeDto = {
+    ...current,
+    vagas_vereador: payload.vagas_vereador ?? current.vagas_vereador,
+    perc_minimo_candidato_qp: payload.perc_minimo_candidato_qp ?? current.perc_minimo_candidato_qp,
+    perc_minimo_chapa_sobras: payload.perc_minimo_chapa_sobras ?? current.perc_minimo_chapa_sobras,
+    perc_minimo_candidato_sobras: payload.perc_minimo_candidato_sobras ?? current.perc_minimo_candidato_sobras,
+    permite_repescagem_sobras: payload.permite_repescagem_sobras ?? current.permite_repescagem_sobras,
+    is_active: true,
+    is_deleted: false,
+  };
+  const map = loadStoredQeParams();
+  map[eleicaoId] = updated;
+  saveStoredQeParams(map);
+  return updated;
 }
 
 export async function getChapasProporcionais(eleicaoId: number): Promise<ChapaProporcionalDto[]> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    throw new Error(`Falha ao carregar chapas proporcionais da eleição ${eleicaoId}`);
-  }
-  return res.json();
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
+    }
+  } catch {}
+
+  const all = loadStoredQeChapas();
+  return hydrateChapasProporcionais(eleicaoId, all);
 }
 
 export async function createChapaProporcional(
   eleicaoId: number,
   payload: CreateChapaProporcionalPayload
 ): Promise<ChapaProporcionalDto> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Falha ao criar chapa proporcional.');
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    if (res.status === 400 || res.status === 422) {
+      const errorData = await res.json().catch(() => ({}));
+      if (errorData.detail) throw new Error(errorData.detail);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name !== 'AbortError' && err.name !== 'TimeoutError' && !err.message.includes('fetch')) {
+      throw err;
+    }
   }
-  return res.json();
+
+  const nomeTrim = payload.nome.trim();
+  if (!nomeTrim) {
+    throw new Error('O nome da chapa proporcional é obrigatório.');
+  }
+  const uniquePartidoIds = Array.from(new Set(payload.partido_ids.filter((id) => Number(id) > 0)));
+  if (uniquePartidoIds.length === 0) {
+    throw new Error('Ao menos um partido válido deve ser vinculado à chapa proporcional.');
+  }
+
+  const all = loadStoredQeChapas();
+  const activeInElection = all.filter((c) => c.eleicao_id === eleicaoId && !c.is_deleted);
+
+  for (const pid of uniquePartidoIds) {
+    const conflict = activeInElection.find((c) => c.partido_ids.includes(pid));
+    if (conflict) {
+      const pInfo = resolvePartido(pid);
+      const sigla = pInfo?.sigla || String(pid);
+      throw new Error(
+        `O partido ${sigla} (número ${pid}) já está vinculado à chapa "${conflict.nome}" nesta eleição.`
+      );
+    }
+  }
+
+  const nextId = all.reduce((max, c) => Math.max(max, c.id), 0) + 1;
+  const newStored: StoredChapaProporcional = {
+    id: nextId,
+    eleicao_id: eleicaoId,
+    nome: nomeTrim,
+    tipo: (payload.tipo || 'PARTIDO').trim().toUpperCase(),
+    partido_ids: uniquePartidoIds,
+    is_active: true,
+    is_deleted: false,
+  };
+  all.push(newStored);
+  saveStoredQeChapas(all);
+
+  const hydrated = await hydrateChapasProporcionais(eleicaoId, [newStored]);
+  return hydrated[0];
 }
 
 export async function updateChapaProporcional(
   chapaId: number,
   payload: UpdateChapaProporcionalPayload
 ): Promise<ChapaProporcionalDto> {
-  const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Falha ao atualizar chapa proporcional.');
+  try {
+    const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    if (res.status === 400 || res.status === 422) {
+      const errorData = await res.json().catch(() => ({}));
+      if (errorData.detail) throw new Error(errorData.detail);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name !== 'AbortError' && err.name !== 'TimeoutError' && !err.message.includes('fetch')) {
+      throw err;
+    }
   }
-  return res.json();
+
+  const all = loadStoredQeChapas();
+  const target = all.find((c) => c.id === chapaId && !c.is_deleted);
+  if (!target) {
+    throw new Error(`Chapa proporcional de ID ${chapaId} não encontrada.`);
+  }
+
+  if (payload.partido_ids !== undefined) {
+    const uniquePartidoIds = Array.from(new Set(payload.partido_ids.filter((id) => Number(id) > 0)));
+    if (uniquePartidoIds.length === 0) {
+      throw new Error('Ao menos um partido válido deve permanecer vinculado à chapa.');
+    }
+    const others = all.filter(
+      (c) => c.eleicao_id === target.eleicao_id && c.id !== chapaId && !c.is_deleted
+    );
+    for (const pid of uniquePartidoIds) {
+      const conflict = others.find((c) => c.partido_ids.includes(pid));
+      if (conflict) {
+        const pInfo = resolvePartido(pid);
+        const sigla = pInfo?.sigla || String(pid);
+        throw new Error(
+          `O partido ${sigla} (número ${pid}) já está vinculado à chapa "${conflict.nome}" nesta eleição.`
+        );
+      }
+    }
+    target.partido_ids = uniquePartidoIds;
+  }
+
+  if (payload.nome !== undefined) target.nome = payload.nome.trim();
+  if (payload.tipo !== undefined) target.tipo = payload.tipo.trim().toUpperCase();
+  if (payload.is_active !== undefined) target.is_active = payload.is_active;
+
+  saveStoredQeChapas(all);
+  const hydrated = await hydrateChapasProporcionais(target.eleicao_id, [target]);
+  return hydrated[0];
 }
 
 export async function deleteChapaProporcional(chapaId: number): Promise<void> {
-  const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
-    method: 'DELETE',
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    throw new Error(`Falha ao excluir chapa proporcional ${chapaId}`);
+  try {
+    const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
+      method: 'DELETE',
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) return;
+  } catch {}
+
+  const all = loadStoredQeChapas();
+  const match = all.find((c) => c.id === chapaId);
+  if (match) {
+    match.is_deleted = true;
+    match.is_active = false;
+    saveStoredQeChapas(all);
   }
 }
 
 export async function gerarChapasIsoladas(eleicaoId: number): Promise<ChapaProporcionalDto[]> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais/gerar-isoladas`, {
-    method: 'POST',
-    signal: AbortSignal.timeout(3000),
-  });
-  if (!res.ok) {
-    throw new Error('Falha ao gerar chapas isoladas automaticamente.');
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais/gerar-isoladas`, {
+      method: 'POST',
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
+    }
+  } catch {}
+
+  const ano = await resolveAnoFromEleicaoId(eleicaoId);
+  const partidosAno = await getPartidosAno(ano).catch(() => ({
+    ano,
+    partidos: [],
+    total_geral_votos: 0,
+  }));
+
+  const all = loadStoredQeChapas();
+  const activeInElection = all.filter((c) => c.eleicao_id === eleicaoId && !c.is_deleted);
+  const linkedSet = new Set<number>();
+  for (const ch of activeInElection) {
+    for (const pid of ch.partido_ids) {
+      linkedSet.add(pid);
+    }
   }
-  return res.json();
+
+  let nextId = all.reduce((max, c) => Math.max(max, c.id), 0) + 1;
+
+  for (const p of partidosAno.partidos) {
+    const pNum = p.numero || resolvePartido(p.sigla)?.numero || 0;
+    if (pNum > 0 && !linkedSet.has(pNum)) {
+      all.push({
+        id: nextId++,
+        eleicao_id: eleicaoId,
+        nome: p.sigla || `Partido ${pNum}`,
+        tipo: 'PARTIDO',
+        partido_ids: [pNum],
+        is_active: true,
+        is_deleted: false,
+      });
+      linkedSet.add(pNum);
+    }
+  }
+
+  saveStoredQeChapas(all);
+  return hydrateChapasProporcionais(eleicaoId, all);
 }
 
 export async function getCalculoQe(eleicaoId: number): Promise<CalculoQeResponseDto> {
-  const res = await fetch(`/api/eleicoes/${eleicaoId}/calculo-qe`, {
-    signal: AbortSignal.timeout(4000),
-  });
-  if (!res.ok) {
-    throw new Error(`Falha ao calcular Quociente Eleitoral da eleição ${eleicaoId}`);
+  try {
+    const res = await fetch(`/api/eleicoes/${eleicaoId}/calculo-qe`, {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.qe_arredondado === 'number') {
+        return data;
+      }
+    }
+  } catch {}
+
+  const ano = await resolveAnoFromEleicaoId(eleicaoId);
+  const [params, chapas, partidosAno, vereadores] = await Promise.all([
+    getParametrosQe(eleicaoId),
+    getChapasProporcionais(eleicaoId),
+    getPartidosAno(ano).catch(() => ({ ano, partidos: [], total_geral_votos: 0 })),
+    getResultados(ano, 'Vereador').catch(() => []),
+  ]);
+
+  const vagas = params.vagas_vereador || 9;
+  const percCandQp = params.perc_minimo_candidato_qp;
+  const percChapaSobras = params.perc_minimo_chapa_sobras;
+  const percCandSobras = params.perc_minimo_candidato_sobras;
+  const permiteRepescagem = params.permite_repescagem_sobras;
+
+  const legendaPorPartido = new Map<number, number>();
+  for (const p of partidosAno.partidos) {
+    const pNum = p.numero || resolvePartido(p.sigla)?.numero || 0;
+    if (pNum > 0) {
+      legendaPorPartido.set(pNum, (legendaPorPartido.get(pNum) || 0) + p.votos_legenda);
+    }
   }
-  return res.json();
+
+  const candidatosPorPartido = new Map<number, ResultadoCandidatoDto[]>();
+  for (const cand of vereadores) {
+    const twoDigitPrefix = cand.numero_urna >= 10 ? Number(String(cand.numero_urna).slice(0, 2)) : 0;
+    const pNum =
+      cand.partido_numero ||
+      (!isNaN(twoDigitPrefix) && twoDigitPrefix >= 10 ? twoDigitPrefix : 0) ||
+      resolvePartido(cand.sigla_partido)?.numero ||
+      0;
+    if (pNum > 0) {
+      const list = candidatosPorPartido.get(pNum) || [];
+      list.push({ ...cand, partido_numero: pNum });
+      candidatosPorPartido.set(pNum, list);
+    }
+  }
+
+  const totalNominais = vereadores.reduce((acc, c) => acc + c.votos, 0);
+  const totalLegenda = partidosAno.partidos.reduce((acc, p) => acc + p.votos_legenda, 0);
+  const totalValidos = totalNominais + totalLegenda;
+
+  let qeExato = 0;
+  let qeArredondado = 0;
+  if (vagas > 0 && totalValidos > 0) {
+    qeExato = Number((totalValidos / vagas).toFixed(4));
+    const frac = Number((qeExato - Math.floor(qeExato)).toFixed(6));
+    qeArredondado = frac > 0.5 ? Math.ceil(qeExato) : Math.floor(qeExato);
+  }
+
+  const corte10Qp = Number((qeArredondado * (percCandQp / 100)).toFixed(2));
+  const corte80Chapa = Number((qeArredondado * (percChapaSobras / 100)).toFixed(2));
+  const corte20Sobras = Number((qeArredondado * (percCandSobras / 100)).toFixed(2));
+
+  if (chapas.length === 0) {
+    return {
+      eleicao_id: eleicaoId,
+      ano,
+      vagas_vereador: vagas,
+      total_votos_nominais: totalNominais,
+      total_votos_legenda: totalLegenda,
+      total_votos_validos: totalValidos,
+      qe_exato: qeExato,
+      qe_arredondado: qeArredondado,
+      corte_10_qp: corte10Qp,
+      corte_80_chapa: corte80Chapa,
+      corte_20_sobras: corte20Sobras,
+      total_vagas_qp_distribuidas: 0,
+      total_vagas_media_distribuidas: 0,
+      chapas: [],
+      memoria_sobras: [],
+    };
+  }
+
+  interface ChapaWork {
+    chapa: ChapaProporcionalDto;
+    partidoIds: number[];
+    candidatos: ResultadoCandidatoDto[];
+    votosNominais: number;
+    votosLegenda: number;
+    votosValidos: number;
+    vagasQp: number;
+    eleitosQpCount: number;
+    eleitosMediaCount: number;
+    vagasObtidas: number;
+    status: Array<'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE'>;
+  }
+
+  const chapasWork: ChapaWork[] = chapas.map((ch) => {
+    const partidoIds = ch.partidos.map((p) => p.partido_id);
+    const cands: ResultadoCandidatoDto[] = [];
+    for (const pid of partidoIds) {
+      cands.push(...(candidatosPorPartido.get(pid) || []));
+    }
+    cands.sort((a, b) => b.votos - a.votos);
+
+    const vNom = cands.reduce((acc, c) => acc + c.votos, 0);
+    const vLeg = partidoIds.reduce((acc, pid) => acc + (legendaPorPartido.get(pid) || 0), 0);
+    const vTot = vNom + vLeg;
+    const vagasQp = qeArredondado > 0 ? Math.floor(vTot / qeArredondado) : 0;
+
+    const status: Array<'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE'> = cands.map(() => 'SUPLENTE');
+    let eleitosQpCount = 0;
+    for (let i = 0; i < cands.length; i++) {
+      if (eleitosQpCount < vagasQp && cands[i].votos >= corte10Qp) {
+        status[i] = 'ELEITO_QP';
+        eleitosQpCount++;
+      }
+    }
+
+    return {
+      chapa: ch,
+      partidoIds,
+      candidatos: cands,
+      votosNominais: vNom,
+      votosLegenda: vLeg,
+      votosValidos: vTot,
+      vagasQp,
+      eleitosQpCount,
+      eleitosMediaCount: 0,
+      vagasObtidas: eleitosQpCount,
+      status,
+    };
+  });
+
+  const totalVagasQp = chapasWork.reduce((acc, ch) => acc + ch.eleitosQpCount, 0);
+  const vagasRestantes = Math.max(0, vagas - totalVagasQp);
+
+  const memoriaSobras: CalculoQeResponseDto['memoria_sobras'] = [];
+
+  for (let rodada = 1; rodada <= vagasRestantes; rodada++) {
+    let fase: '80/20' | 'REPESCAGEM' = '80/20';
+    let disputa = chapasWork.filter(
+      (ch) =>
+        ch.votosValidos >= corte80Chapa &&
+        ch.candidatos.some((c, idx) => ch.status[idx] === 'SUPLENTE' && c.votos >= corte20Sobras)
+    );
+
+    if (disputa.length === 0 && permiteRepescagem) {
+      fase = 'REPESCAGEM';
+      disputa = chapasWork.filter((ch) =>
+        ch.candidatos.some((_, idx) => ch.status[idx] === 'SUPLENTE')
+      );
+    }
+
+    if (disputa.length === 0) break;
+
+    const getCandDaVez = (ch: ChapaWork) => {
+      for (let i = 0; i < ch.candidatos.length; i++) {
+        if (ch.status[i] === 'SUPLENTE') {
+          if (fase === '80/20' && ch.candidatos[i].votos < corte20Sobras) continue;
+          return { votos: ch.candidatos[i].votos, idx: i };
+        }
+      }
+      return { votos: -1, idx: -1 };
+    };
+
+    let melhorChapa: ChapaWork | null = null;
+    let maiorMedia = -1;
+    let melhorCandIdx = -1;
+    let melhorCandVotos = -1;
+
+    for (const ch of disputa) {
+      const media = ch.votosValidos / (ch.vagasObtidas + 1);
+      const { votos: candVotos, idx: candIdx } = getCandDaVez(ch);
+      if (candIdx < 0) continue;
+
+      let isMelhor = false;
+      if (!melhorChapa) {
+        isMelhor = true;
+      } else if (Number(media.toFixed(6)) > Number(maiorMedia.toFixed(6))) {
+        isMelhor = true;
+      } else if (Number(media.toFixed(6)) === Number(maiorMedia.toFixed(6))) {
+        if (ch.votosValidos > melhorChapa.votosValidos) {
+          isMelhor = true;
+        } else if (ch.votosValidos === melhorChapa.votosValidos && candVotos > melhorCandVotos) {
+          isMelhor = true;
+        }
+      }
+
+      if (isMelhor) {
+        melhorChapa = ch;
+        maiorMedia = media;
+        melhorCandIdx = candIdx;
+        melhorCandVotos = candVotos;
+      }
+    }
+
+    if (melhorChapa && melhorCandIdx >= 0) {
+      const vagasAnt = melhorChapa.vagasObtidas;
+      melhorChapa.status[melhorCandIdx] = 'ELEITO_MEDIA';
+      melhorChapa.vagasObtidas++;
+      melhorChapa.eleitosMediaCount++;
+      const candObj = melhorChapa.candidatos[melhorCandIdx];
+      memoriaSobras.push({
+        rodada,
+        chapa_id: melhorChapa.chapa.id,
+        chapa_nome: melhorChapa.chapa.nome,
+        candidato_nome: candObj.nome_urna,
+        candidato_votos: candObj.votos,
+        media: Number(maiorMedia.toFixed(4)),
+        fase,
+        vagas_anteriores: vagasAnt,
+        vagas_finais: melhorChapa.vagasObtidas,
+      });
+    }
+  }
+
+  const totalVagasMedia = chapasWork.reduce((acc, ch) => acc + ch.eleitosMediaCount, 0);
+
+  const chapasConsolidadas = chapasWork
+    .map((ch) => {
+      const ranking = ch.candidatos.map((cand, idx) => {
+        const stCalc = ch.status[idx];
+        const pctQe = qeArredondado > 0 ? Number(((cand.votos / qeArredondado) * 100).toFixed(2)) : 0;
+        const sitOficial = (cand.situacao || '').toUpperCase();
+        const isOficialEleito = sitOficial.includes('ELEITO') && !sitOficial.includes('NÃO');
+        const coincide =
+          (isOficialEleito && (stCalc === 'ELEITO_QP' || stCalc === 'ELEITO_MEDIA')) ||
+          (!isOficialEleito && stCalc === 'SUPLENTE');
+
+        return {
+          posicao_ranking: idx + 1,
+          titulo_eleitor: cand.titulo_eleitor,
+          nome_urna: cand.nome_urna,
+          nome_completo: cand.nome_completo,
+          numero_urna: cand.numero_urna,
+          partido_numero: cand.partido_numero || 0,
+          sigla_partido: cand.sigla_partido,
+          votos: cand.votos,
+          percentual_qe: pctQe,
+          atingiu_10_qp: cand.votos >= corte10Qp,
+          atingiu_20_sobras: cand.votos >= corte20Sobras,
+          status_calculado: stCalc,
+          situacao_oficial: cand.situacao,
+          coincide_oficial: coincide,
+        };
+      });
+
+      const pctValidos = totalValidos > 0 ? Number(((ch.votosValidos / totalValidos) * 100).toFixed(2)) : 0;
+      const qpExato = qeArredondado > 0 ? Number((ch.votosValidos / qeArredondado).toFixed(2)) : 0;
+      const mediaFinal = Number((ch.votosValidos / (ch.vagasObtidas + 1)).toFixed(2));
+      const totalEleitos = ch.eleitosQpCount + ch.eleitosMediaCount;
+
+      return {
+        id: ch.chapa.id,
+        nome: ch.chapa.nome,
+        tipo: ch.chapa.tipo,
+        partidos: ch.chapa.partidos,
+        votos_nominais: ch.votosNominais,
+        votos_legenda: ch.votosLegenda,
+        votos_validos_total: ch.votosValidos,
+        percentual_votos_validos: pctValidos,
+        qp_exato: qpExato,
+        vagas_qp: ch.vagasQp,
+        eleitos_qp: ch.eleitosQpCount,
+        eleitos_media: ch.eleitosMediaCount,
+        total_eleitos: totalEleitos,
+        atingiu_80_qe: ch.votosValidos >= corte80Chapa,
+        media_final: mediaFinal,
+        ranking_candidatos: ranking,
+      };
+    })
+    .sort((a, b) => b.total_eleitos - a.total_eleitos || b.votos_validos_total - a.votos_validos_total);
+
+  return {
+    eleicao_id: eleicaoId,
+    ano,
+    vagas_vereador: vagas,
+    total_votos_nominais: totalNominais,
+    total_votos_legenda: totalLegenda,
+    total_votos_validos: totalValidos,
+    qe_exato: qeExato,
+    qe_arredondado: qeArredondado,
+    corte_10_qp: corte10Qp,
+    corte_80_chapa: corte80Chapa,
+    corte_20_sobras: corte20Sobras,
+    total_vagas_qp_distribuidas: totalVagasQp,
+    total_vagas_media_distribuidas: totalVagasMedia,
+    chapas: chapasConsolidadas,
+    memoria_sobras: memoriaSobras,
+  };
 }
 
 
