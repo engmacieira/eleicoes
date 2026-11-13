@@ -12,12 +12,16 @@ from ..domain.entities import (
     CandidatosEleicaoEntity,
     ColigacaoEntity,
     ColigacaoPartidoEntity,
+    ParametrosQeEntity,
+    ChapaProporcionalEntity,
+    ChapaProporcionalPartidoEntity,
 )
 from ..domain.repositories import (
     IEleicaoRepository,
     ICandidatoRepository,
     IPartidoRepository,
     IColigacaoRepository,
+    IQuocienteEleitoralRepository,
 )
 from .models import (
     DadosCandidato,
@@ -29,6 +33,9 @@ from .models import (
     CandidatosEleicao,
     Coligacao,
     ColigacaoPartidos,
+    ParametrosQeEleicao,
+    ChapaProporcional,
+    ChapaProporcionalPartidos,
 )
 
 
@@ -1177,5 +1184,341 @@ class SqlAlchemyColigacaoRepository(IColigacaoRepository):
 
         self.db.commit()
         return True
+
+
+class SqlAlchemyQuocienteRepository(IQuocienteEleitoralRepository):
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_parametros(self, eleicao_id: int) -> Optional[ParametrosQeEntity]:
+        stmt = select(ParametrosQeEleicao).where(
+            ParametrosQeEleicao.eleicao_id == eleicao_id,
+            ParametrosQeEleicao.is_deleted.is_(False),
+        )
+        row = self.db.scalars(stmt).first()
+        if not row:
+            return None
+        return ParametrosQeEntity(
+            id=row.id,
+            eleicao_id=row.eleicao_id,
+            vagas_vereador=row.vagas_vereador,
+            perc_minimo_candidato_qp=float(row.perc_minimo_candidato_qp),
+            perc_minimo_chapa_sobras=float(row.perc_minimo_chapa_sobras),
+            perc_minimo_candidato_sobras=float(row.perc_minimo_candidato_sobras),
+            permite_repescagem_sobras=row.permite_repescagem_sobras,
+            is_active=row.is_active,
+            is_deleted=row.is_deleted,
+        )
+
+    def save_parametros(self, entity: ParametrosQeEntity) -> ParametrosQeEntity:
+        stmt = select(ParametrosQeEleicao).where(
+            ParametrosQeEleicao.eleicao_id == entity.eleicao_id,
+        )
+        row = self.db.scalars(stmt).first()
+        if row:
+            row.vagas_vereador = entity.vagas_vereador
+            row.perc_minimo_candidato_qp = entity.perc_minimo_candidato_qp
+            row.perc_minimo_chapa_sobras = entity.perc_minimo_chapa_sobras
+            row.perc_minimo_candidato_sobras = entity.perc_minimo_candidato_sobras
+            row.permite_repescagem_sobras = entity.permite_repescagem_sobras
+            row.is_active = True
+            row.is_deleted = False
+        else:
+            row = ParametrosQeEleicao(
+                eleicao_id=entity.eleicao_id,
+                vagas_vereador=entity.vagas_vereador,
+                perc_minimo_candidato_qp=entity.perc_minimo_candidato_qp,
+                perc_minimo_chapa_sobras=entity.perc_minimo_chapa_sobras,
+                perc_minimo_candidato_sobras=entity.perc_minimo_candidato_sobras,
+                permite_repescagem_sobras=entity.permite_repescagem_sobras,
+                is_active=True,
+                is_deleted=False,
+            )
+            self.db.add(row)
+
+        self.db.commit()
+        self.db.refresh(row)
+        return ParametrosQeEntity(
+            id=row.id,
+            eleicao_id=row.eleicao_id,
+            vagas_vereador=row.vagas_vereador,
+            perc_minimo_candidato_qp=float(row.perc_minimo_candidato_qp),
+            perc_minimo_chapa_sobras=float(row.perc_minimo_chapa_sobras),
+            perc_minimo_candidato_sobras=float(row.perc_minimo_candidato_sobras),
+            permite_repescagem_sobras=row.permite_repescagem_sobras,
+            is_active=row.is_active,
+            is_deleted=row.is_deleted,
+        )
+
+    def _to_chapa_entity(self, chapa: ChapaProporcional) -> ChapaProporcionalEntity:
+        membros_stmt = (
+            select(
+                ChapaProporcionalPartidos,
+                Partidos.sigla_atual,
+                Partidos.nome_atual,
+                PartidosEleicao.votos_nominais,
+                PartidosEleicao.votos_legenda,
+                PartidosEleicao.total_votos,
+            )
+            .join(Partidos, ChapaProporcionalPartidos.partido_id == Partidos.numero)
+            .outerjoin(
+                PartidosEleicao,
+                (PartidosEleicao.partido_numero == Partidos.numero)
+                & (PartidosEleicao.id_eleicao == chapa.eleicao_id)
+                & (PartidosEleicao.is_deleted.is_(False)),
+            )
+            .where(
+                ChapaProporcionalPartidos.chapa_proporcional_id == chapa.id,
+                ChapaProporcionalPartidos.is_deleted.is_(False),
+            )
+            .order_by(asc(Partidos.numero))
+        )
+        membros_rows = self.db.execute(membros_stmt).all()
+        membros_entities = []
+        for m, sigla, nome, v_nom, v_leg, v_tot in membros_rows:
+            membros_entities.append(
+                ChapaProporcionalPartidoEntity(
+                    id=m.id,
+                    chapa_proporcional_id=m.chapa_proporcional_id,
+                    partido_id=m.partido_id,
+                    numero=m.partido_id,
+                    sigla=sigla,
+                    nome=nome,
+                    votos_nominais=v_nom or 0,
+                    votos_legenda=v_leg or 0,
+                    total_votos=v_tot or 0,
+                    is_active=m.is_active,
+                    is_deleted=m.is_deleted,
+                )
+            )
+
+        return ChapaProporcionalEntity(
+            id=chapa.id,
+            eleicao_id=chapa.eleicao_id,
+            nome=chapa.nome,
+            tipo=chapa.tipo,
+            partidos=membros_entities,
+            is_active=chapa.is_active,
+            is_deleted=chapa.is_deleted,
+        )
+
+    def list_chapas(self, eleicao_id: int) -> List[ChapaProporcionalEntity]:
+        stmt = (
+            select(ChapaProporcional)
+            .where(
+                ChapaProporcional.eleicao_id == eleicao_id,
+                ChapaProporcional.is_deleted.is_(False),
+            )
+            .order_by(asc(ChapaProporcional.nome))
+        )
+        chapas = self.db.scalars(stmt).all()
+        return [self._to_chapa_entity(c) for c in chapas]
+
+    def get_chapa_by_id(self, chapa_id: int) -> Optional[ChapaProporcionalEntity]:
+        chapa = self.db.scalar(
+            select(ChapaProporcional).where(
+                ChapaProporcional.id == chapa_id,
+                ChapaProporcional.is_deleted.is_(False),
+            )
+        )
+        if not chapa:
+            return None
+        return self._to_chapa_entity(chapa)
+
+    def verificar_partido_em_outra_chapa(
+        self, eleicao_id: int, partido_id: int, ignore_chapa_id: Optional[int] = None
+    ) -> bool:
+        stmt = (
+            select(ChapaProporcionalPartidos.id)
+            .join(ChapaProporcional, ChapaProporcionalPartidos.chapa_proporcional_id == ChapaProporcional.id)
+            .where(
+                ChapaProporcional.eleicao_id == eleicao_id,
+                ChapaProporcionalPartidos.partido_id == partido_id,
+                ChapaProporcional.is_deleted.is_(False),
+                ChapaProporcionalPartidos.is_deleted.is_(False),
+            )
+        )
+        if ignore_chapa_id is not None:
+            stmt = stmt.where(ChapaProporcional.id != ignore_chapa_id)
+
+        res = self.db.scalar(stmt)
+        return res is not None
+
+    def create_chapa(
+        self, eleicao_id: int, nome: str, tipo: str, partido_ids: List[int]
+    ) -> ChapaProporcionalEntity:
+        for p_id in partido_ids:
+            if self.verificar_partido_em_outra_chapa(eleicao_id, p_id):
+                partido = self.db.scalar(select(Partidos).where(Partidos.numero == p_id))
+                sigla = partido.sigla_atual if partido else str(p_id)
+                raise ValueError(f"O partido {sigla} (número {p_id}) já está vinculado a outra chapa proporcional nesta eleição.")
+
+        chapa = ChapaProporcional(
+            eleicao_id=eleicao_id,
+            nome=nome.strip(),
+            tipo=tipo.strip().upper(),
+            is_active=True,
+            is_deleted=False,
+        )
+        self.db.add(chapa)
+        self.db.flush()
+
+        for p_id in partido_ids:
+            membro = ChapaProporcionalPartidos(
+                chapa_proporcional_id=chapa.id,
+                partido_id=p_id,
+                is_active=True,
+                is_deleted=False,
+            )
+            self.db.add(membro)
+
+        self.db.commit()
+        self.db.refresh(chapa)
+        return self._to_chapa_entity(chapa)
+
+    def update_chapa(
+        self,
+        chapa_id: int,
+        nome: Optional[str] = None,
+        tipo: Optional[str] = None,
+        partido_ids: Optional[List[int]] = None,
+        is_active: Optional[bool] = None,
+    ) -> Optional[ChapaProporcionalEntity]:
+        chapa = self.db.scalar(
+            select(ChapaProporcional).where(
+                ChapaProporcional.id == chapa_id,
+                ChapaProporcional.is_deleted.is_(False),
+            )
+        )
+        if not chapa:
+            return None
+
+        if nome is not None:
+            chapa.nome = nome.strip()
+        if tipo is not None:
+            chapa.tipo = tipo.strip().upper()
+        if is_active is not None:
+            chapa.is_active = is_active
+
+        if partido_ids is not None:
+            for p_id in partido_ids:
+                if self.verificar_partido_em_outra_chapa(chapa.eleicao_id, p_id, ignore_chapa_id=chapa.id):
+                    partido = self.db.scalar(select(Partidos).where(Partidos.numero == p_id))
+                    sigla = partido.sigla_atual if partido else str(p_id)
+                    raise ValueError(f"O partido {sigla} (número {p_id}) já está vinculado a outra chapa proporcional nesta eleição.")
+
+            # Deletar membros anteriores
+            antigos = self.db.scalars(
+                select(ChapaProporcionalPartidos).where(
+                    ChapaProporcionalPartidos.chapa_proporcional_id == chapa.id
+                )
+            ).all()
+            for a in antigos:
+                self.db.delete(a)
+            self.db.flush()
+
+            for p_id in partido_ids:
+                membro = ChapaProporcionalPartidos(
+                    chapa_proporcional_id=chapa.id,
+                    partido_id=p_id,
+                    is_active=True,
+                    is_deleted=False,
+                )
+                self.db.add(membro)
+
+        self.db.commit()
+        self.db.refresh(chapa)
+        return self._to_chapa_entity(chapa)
+
+    def soft_delete_chapa(self, chapa_id: int) -> bool:
+        chapa = self.db.scalar(
+            select(ChapaProporcional).where(
+                ChapaProporcional.id == chapa_id,
+                ChapaProporcional.is_deleted.is_(False),
+            )
+        )
+        if not chapa:
+            return False
+
+        chapa.is_deleted = True
+        chapa.is_active = False
+
+        membros = self.db.scalars(
+            select(ChapaProporcionalPartidos).where(
+                ChapaProporcionalPartidos.chapa_proporcional_id == chapa.id
+            )
+        ).all()
+        for m in membros:
+            m.is_deleted = True
+            m.is_active = False
+
+        self.db.commit()
+        return True
+
+    def get_dados_apuracao_vereador(
+        self, eleicao_id: int
+    ) -> Tuple[List[Tuple[PartidosEleicaoEntity, str, Optional[str]]], List[Tuple[CandidatosEleicaoEntity, str, str]]]:
+        # 1. Desempenho dos partidos na eleição
+        partidos_stmt = (
+            select(PartidosEleicao, Partidos.sigla_atual, Partidos.nome_atual)
+            .join(Partidos, PartidosEleicao.partido_numero == Partidos.numero)
+            .where(
+                PartidosEleicao.id_eleicao == eleicao_id,
+                PartidosEleicao.is_deleted.is_(False),
+                Partidos.is_deleted.is_(False),
+            )
+            .order_by(desc(PartidosEleicao.total_votos))
+        )
+        p_rows = self.db.execute(partidos_stmt).all()
+        partidos_list = []
+        for pe, sigla, nome in p_rows:
+            p_entity = PartidosEleicaoEntity(
+                id=pe.id,
+                id_eleicao=pe.id_eleicao,
+                partido_numero=pe.partido_numero,
+                votos_nominais=pe.votos_nominais,
+                votos_legenda=pe.votos_legenda,
+                total_votos=pe.total_votos,
+                is_active=pe.is_active,
+                is_deleted=pe.is_deleted,
+            )
+            partidos_list.append((p_entity, sigla, nome))
+
+        # 2. Candidatos a vereador na eleição
+        cand_stmt = (
+            select(CandidatosEleicao, DadosCandidato.nome_completo, Partidos.sigla_atual)
+            .join(DadosCandidato, CandidatosEleicao.titulo_eleitor == DadosCandidato.titulo_eleitor)
+            .outerjoin(Partidos, CandidatosEleicao.partido_numero == Partidos.numero)
+            .where(
+                CandidatosEleicao.id_eleicao == eleicao_id,
+                CandidatosEleicao.cargo.ilike("Vereador"),
+                CandidatosEleicao.is_deleted.is_(False),
+                DadosCandidato.is_deleted.is_(False),
+            )
+            .order_by(desc(CandidatosEleicao.votos))
+        )
+        c_rows = self.db.execute(cand_stmt).all()
+        cand_list = []
+        for ce, nome_comp, sigla_at in c_rows:
+            c_entity = CandidatosEleicaoEntity(
+                id=ce.id,
+                titulo_eleitor=ce.titulo_eleitor,
+                id_eleicao=ce.id_eleicao,
+                partido_numero=ce.partido_numero,
+                cargo=ce.cargo,
+                numero_urna=ce.numero_urna,
+                nome_urna=ce.nome_urna,
+                votos=ce.votos,
+                situacao=ce.situacao,
+                posicao=ce.posicao,
+                sigla_epoca=ce.sigla_epoca,
+                is_active=ce.is_active,
+                is_deleted=ce.is_deleted,
+            )
+            sigla_exibicao = ce.sigla_epoca or sigla_at or str(ce.partido_numero)
+            cand_list.append((c_entity, nome_comp, sigla_exibicao))
+
+        return partidos_list, cand_list
+
 
 

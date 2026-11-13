@@ -10,6 +10,9 @@ from .entities import (
     CandidatosEleicaoEntity,
     ColigacaoEntity,
     ColigacaoPartidoEntity,
+    ParametrosQeEntity,
+    ChapaProporcionalEntity,
+    ChapaProporcionalPartidoEntity,
 )
 
 
@@ -175,5 +178,57 @@ class IColigacaoRepository(ABC):
     @abstractmethod
     def soft_delete(self, id: int) -> bool:
         pass
+
+
+class IQuocienteEleitoralRepository(ABC):
+    @abstractmethod
+    def get_parametros(self, eleicao_id: int) -> Optional[ParametrosQeEntity]:
+        pass
+
+    @abstractmethod
+    def save_parametros(self, entity: ParametrosQeEntity) -> ParametrosQeEntity:
+        pass
+
+    @abstractmethod
+    def list_chapas(self, eleicao_id: int) -> List[ChapaProporcionalEntity]:
+        pass
+
+    @abstractmethod
+    def get_chapa_by_id(self, chapa_id: int) -> Optional[ChapaProporcionalEntity]:
+        pass
+
+    @abstractmethod
+    def create_chapa(
+        self, eleicao_id: int, nome: str, tipo: str, partido_ids: List[int]
+    ) -> ChapaProporcionalEntity:
+        pass
+
+    @abstractmethod
+    def update_chapa(
+        self,
+        chapa_id: int,
+        nome: Optional[str] = None,
+        tipo: Optional[str] = None,
+        partido_ids: Optional[List[int]] = None,
+        is_active: Optional[bool] = None,
+    ) -> Optional[ChapaProporcionalEntity]:
+        pass
+
+    @abstractmethod
+    def soft_delete_chapa(self, chapa_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    def verificar_partido_em_outra_chapa(
+        self, eleicao_id: int, partido_id: int, ignore_chapa_id: Optional[int] = None
+    ) -> bool:
+        pass
+
+    @abstractmethod
+    def get_dados_apuracao_vereador(
+        self, eleicao_id: int
+    ) -> Tuple[List[Tuple[PartidosEleicaoEntity, str, Optional[str]]], List[Tuple[CandidatosEleicaoEntity, str, str]]]:
+        pass
+
 
 

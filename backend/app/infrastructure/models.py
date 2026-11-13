@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     Date,
     Boolean,
+    Numeric,
     ForeignKey,
     UniqueConstraint,
 )
@@ -51,6 +52,12 @@ class Eleicao(Base):
     )
     coligacoes: Mapped[List["Coligacao"]] = relationship(
         "Coligacao", back_populates="eleicao", cascade="all, delete-orphan"
+    )
+    parametros_qe: Mapped[Optional["ParametrosQeEleicao"]] = relationship(
+        "ParametrosQeEleicao", back_populates="eleicao", uselist=False, cascade="all, delete-orphan"
+    )
+    chapas_proporcionais: Mapped[List["ChapaProporcional"]] = relationship(
+        "ChapaProporcional", back_populates="eleicao", cascade="all, delete-orphan"
     )
 
 
@@ -298,5 +305,80 @@ class ColigacaoPartidos(Base):
     def id_partido(self, val: int):
         if val is not None and not self.partido_numero:
             self.partido_numero = val
+
+
+class ParametrosQeEleicao(Base):
+    """Parâmetros e regras de corte para cálculo do Quociente Eleitoral (QE) e sobras (1:1 com eleição)."""
+    __tablename__ = "parametros_qe_eleicao"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    eleicao_id: Mapped[int] = mapped_column(
+        ForeignKey("eleicao.id", ondelete="CASCADE"), nullable=False, unique=True, index=True
+    )
+    vagas_vereador: Mapped[int] = mapped_column(Integer, default=9, nullable=False)
+    perc_minimo_candidato_qp: Mapped[float] = mapped_column(Numeric(5, 2), default=10.00, nullable=False)
+    perc_minimo_chapa_sobras: Mapped[float] = mapped_column(Numeric(5, 2), default=80.00, nullable=False)
+    perc_minimo_candidato_sobras: Mapped[float] = mapped_column(Numeric(5, 2), default=20.00, nullable=False)
+    permite_repescagem_sobras: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # Soft Delete Universal
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    eleicao: Mapped["Eleicao"] = relationship("Eleicao", back_populates="parametros_qe")
+
+
+class ChapaProporcional(Base):
+    """Representa a unidade de disputa proporcional (Partido isolado, Coligação ou Federação) para Vereador."""
+    __tablename__ = "chapas_proporcionais"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    eleicao_id: Mapped[int] = mapped_column(
+        ForeignKey("eleicao.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    nome: Mapped[str] = mapped_column(String(150), nullable=False)
+    tipo: Mapped[str] = mapped_column(String(50), default="PARTIDO", nullable=False)  # 'PARTIDO', 'COLIGACAO', 'FEDERACAO'
+
+    # Soft Delete Universal
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    eleicao: Mapped["Eleicao"] = relationship("Eleicao", back_populates="chapas_proporcionais")
+    partidos_membros: Mapped[List["ChapaProporcionalPartidos"]] = relationship(
+        "ChapaProporcionalPartidos", back_populates="chapa", cascade="all, delete-orphan"
+    )
+
+
+class ChapaProporcionalPartidos(Base):
+    """Associação de partidos a uma chapa proporcional em determinada eleição."""
+    __tablename__ = "chapa_proporcional_partidos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    chapa_proporcional_id: Mapped[int] = mapped_column(
+        ForeignKey("chapas_proporcionais.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    partido_id: Mapped[int] = mapped_column(
+        ForeignKey("partidos.numero", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+    # Soft Delete Universal
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("chapa_proporcional_id", "partido_id", name="uq_chapa_proporcional_partido"),
+    )
+
+    chapa: Mapped["ChapaProporcional"] = relationship("ChapaProporcional", back_populates="partidos_membros")
+    partido: Mapped["Partidos"] = relationship("Partidos", foreign_keys=[partido_id])
+
+    @property
+    def partido_numero(self) -> int:
+        return self.partido_id
+
+    @partido_numero.setter
+    def partido_numero(self, val: int):
+        self.partido_id = val
+
 
 

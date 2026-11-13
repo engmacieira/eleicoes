@@ -7,6 +7,7 @@ import { DossiePage } from './pages/DossiePage';
 import { CandidatoDetailPage } from './pages/CandidatoDetailPage';
 import { CadastrosPage } from './pages/CadastrosPage';
 import { ColigacoesPage } from './pages/ColigacoesPage';
+import { QuocienteEleitoralPage } from './pages/QuocienteEleitoralPage';
 import { SqlExplorerPage } from './pages/SqlExplorerPage';
 import { CloudSqlConfigPage } from './pages/CloudSqlConfigPage';
 import {
@@ -74,6 +75,7 @@ ${seed}
       {currentRoute.name === 'pleito' && <PleitoPage />}
       {currentRoute.name === 'partidos' && <PartidosPage />}
       {currentRoute.name === 'coligacoes' && <ColigacoesPage />}
+      {currentRoute.name === 'quociente' && <QuocienteEleitoralPage />}
       {currentRoute.name === 'dossie' && <DossiePage />}
       {currentRoute.name === 'candidato' && <CandidatoDetailPage />}
       {currentRoute.name === 'cadastros' && <CadastrosPage />}

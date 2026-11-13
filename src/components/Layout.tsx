@@ -16,6 +16,7 @@ import {
   FileSpreadsheet,
   UserCheck,
   Network,
+  Calculator,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -51,6 +52,12 @@ export const Layout: React.FC<LayoutProps> = ({
       label: 'Coligações Partidárias',
       icon: Network,
       badge: 'Alianças & Apoios',
+    },
+    {
+      id: 'quociente',
+      label: 'Quociente Eleitoral (Vereador)',
+      icon: Calculator,
+      badge: 'QE / QP / Sobras',
     },
     {
       id: 'dossie',
@@ -89,6 +96,8 @@ export const Layout: React.FC<LayoutProps> = ({
         return { context: 'Inteligência Eleitoral', section: 'Raio-X Partidário' };
       case 'coligacoes':
         return { context: 'Inteligência Eleitoral', section: 'Coligações Partidárias' };
+      case 'quociente':
+        return { context: 'Inteligência Eleitoral', section: 'Quociente Eleitoral (Vereador)' };
       case 'dossie':
         return { context: 'Inteligência Eleitoral', section: 'Dossiê de Candidatos' };
       case 'candidato':

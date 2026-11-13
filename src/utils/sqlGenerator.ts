@@ -577,6 +577,79 @@ export const SCHEMA_TABLES: TableSchema[] = [
       'CONSTRAINT uq_coligacao_partido UNIQUE (id_coligacao, partido_numero)',
     ],
   },
+  {
+    id: 'parametros_qe_eleicao',
+    name: 'parametros_qe_eleicao',
+    category: 'dimensao',
+    description: 'Armazena as regras matemáticas e cláusulas de barreira do Quociente Eleitoral (QE), QP e Sobras (80/20) por eleição.',
+    columns: [
+      { name: 'id', type: 'INTEGER GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária.' },
+      { name: 'eleicao_id', type: 'INTEGER', isFk: true, fkTarget: 'eleicao(id)', nullable: false, constraint: 'UNIQUE', description: 'Eleição vinculada (1:1).' },
+      { name: 'vagas_vereador', type: 'INTEGER', nullable: false, constraint: 'DEFAULT 9', description: 'Número de cadeiras em disputa para a Câmara Municipal.' },
+      { name: 'perc_minimo_candidato_qp', type: 'NUMERIC(5,2)', nullable: false, constraint: 'DEFAULT 10.00', description: 'Percentual do QE exigido do candidato para assumir vaga direta de QP (ex: 10%).' },
+      { name: 'perc_minimo_chapa_sobras', type: 'NUMERIC(5,2)', nullable: false, constraint: 'DEFAULT 80.00', description: 'Percentual do QE exigido da chapa para disputar as médias na 1ª fase (ex: 80%).' },
+      { name: 'perc_minimo_candidato_sobras', type: 'NUMERIC(5,2)', nullable: false, constraint: 'DEFAULT 20.00', description: 'Percentual do QE exigido do candidato para disputar as médias na 1ª fase (ex: 20%).' },
+      { name: 'permite_repescagem_sobras', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Libera repescagem universal caso restem vagas não preenchidas na 1ª fase.' },
+      { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
+      { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
+      { name: 'criado_em', type: 'TIMESTAMPTZ', nullable: false, constraint: 'DEFAULT CURRENT_TIMESTAMP', description: 'Auditoria de inserção.' },
+    ],
+    indexes: [
+      'CREATE UNIQUE INDEX uq_parametros_qe_eleicao ON parametros_qe_eleicao(eleicao_id);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_parametros_eleicao FOREIGN KEY (eleicao_id) REFERENCES eleicao(id) ON DELETE CASCADE',
+      'CONSTRAINT uq_parametros_eleicao UNIQUE (eleicao_id)',
+    ],
+  },
+  {
+    id: 'chapas_proporcionais',
+    name: 'chapas_proporcionais',
+    category: 'fato',
+    description: 'Representa a unidade de disputa proporcional (Partido isolado, Coligação proporcional ou Federação) para Vereador no pleito.',
+    columns: [
+      { name: 'id', type: 'INTEGER GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária.' },
+      { name: 'eleicao_id', type: 'INTEGER', isFk: true, fkTarget: 'eleicao(id)', nullable: false, description: 'Eleição municipal à qual a chapa concorre.' },
+      { name: 'nome', type: 'VARCHAR(150)', nullable: false, description: 'Denominação da chapa (ex: MDB, Federação Brasil da Esperança, Coligação Unidos por Braúnas).' },
+      { name: 'tipo', type: 'VARCHAR(50)', nullable: false, constraint: "DEFAULT 'PARTIDO'", description: 'Tipo da unidade: PARTIDO, COLIGACAO ou FEDERACAO.' },
+      { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo no sistema.' },
+      { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
+      { name: 'criado_em', type: 'TIMESTAMPTZ', nullable: false, constraint: 'DEFAULT CURRENT_TIMESTAMP', description: 'Auditoria de inserção.' },
+    ],
+    indexes: [
+      'CREATE INDEX idx_chapas_prop_eleicao ON chapas_proporcionais(eleicao_id);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_chapa_prop_eleicao FOREIGN KEY (eleicao_id) REFERENCES eleicao(id) ON DELETE CASCADE',
+    ],
+  },
+  {
+    id: 'chapa_proporcional_partidos',
+    name: 'chapa_proporcional_partidos',
+    category: 'fato',
+    description: 'Tabela associativa que vincula os partidos de cada pleito à sua respectiva chapa proporcional de vereador.',
+    columns: [
+      { name: 'id', type: 'INTEGER GENERATED ALWAYS AS IDENTITY', isPk: true, nullable: false, description: 'Chave primária.' },
+      { name: 'chapa_proporcional_id', type: 'INTEGER', isFk: true, fkTarget: 'chapas_proporcionais(id)', nullable: false, description: 'Chapa proporcional à qual o partido pertence.' },
+      { name: 'partido_id', type: 'INTEGER', isFk: true, fkTarget: 'partidos(numero)', nullable: false, description: 'Número TSE do partido integrante.' },
+      { name: 'is_active', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT TRUE', description: 'Registro ativo.' },
+      { name: 'is_deleted', type: 'BOOLEAN', nullable: false, constraint: 'DEFAULT FALSE', description: 'Soft Delete universal.' },
+      { name: 'criado_em', type: 'TIMESTAMPTZ', nullable: false, constraint: 'DEFAULT CURRENT_TIMESTAMP', description: 'Auditoria de inserção.' },
+    ],
+    indexes: [
+      'CREATE INDEX idx_chapa_prop_partidos_chapa ON chapa_proporcional_partidos(chapa_proporcional_id);',
+      'CREATE INDEX idx_chapa_prop_partidos_partido ON chapa_proporcional_partidos(partido_id);',
+      'CREATE UNIQUE INDEX uq_chapa_prop_partido ON chapa_proporcional_partidos(chapa_proporcional_id, partido_id);',
+    ],
+    constraints: [
+      'PRIMARY KEY (id)',
+      'CONSTRAINT fk_cpp_chapa FOREIGN KEY (chapa_proporcional_id) REFERENCES chapas_proporcionais(id) ON DELETE CASCADE',
+      'CONSTRAINT fk_cpp_partido FOREIGN KEY (partido_id) REFERENCES partidos(numero) ON DELETE RESTRICT',
+      'CONSTRAINT uq_chapa_prop_partido UNIQUE (chapa_proporcional_id, partido_id)',
+    ],
+  },
 ];
 
 export const FULL_DDL_SCRIPT = `-- =======================================================================
@@ -840,6 +913,72 @@ CREATE TABLE IF NOT EXISTS coligacao_partidos (
 );
 
 COMMENT ON TABLE coligacao_partidos IS 'Partidos integrantes de cada chapa/coligação com Soft Delete universal';
+
+-- =======================================================================
+-- 9. MÓDULO DE QUOCIENTE ELEITORAL & CHAPAS PROPORCIONAIS (VEREADOR)
+-- =======================================================================
+
+CREATE TABLE IF NOT EXISTS parametros_qe_eleicao (
+    id                          INTEGER GENERATED ALWAYS AS IDENTITY,
+    eleicao_id                  INTEGER NOT NULL,
+    vagas_vereador              INTEGER NOT NULL DEFAULT 9,
+    perc_minimo_candidato_qp    NUMERIC(5,2) NOT NULL DEFAULT 10.00,
+    perc_minimo_chapa_sobras    NUMERIC(5,2) NOT NULL DEFAULT 80.00,
+    perc_minimo_candidato_sobras NUMERIC(5,2) NOT NULL DEFAULT 20.00,
+    permite_repescagem_sobras   BOOLEAN NOT NULL DEFAULT TRUE,
+    is_active                   BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted                  BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em                   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_parametros_qe_eleicao PRIMARY KEY (id),
+    CONSTRAINT fk_parametros_eleicao 
+        FOREIGN KEY (eleicao_id) 
+        REFERENCES eleicao(id) 
+        ON DELETE CASCADE,
+    CONSTRAINT uq_parametros_eleicao UNIQUE (eleicao_id)
+);
+
+COMMENT ON TABLE parametros_qe_eleicao IS 'Parâmetros e regras de corte para cálculo do QE, QP e Sobras por pleito';
+
+CREATE TABLE IF NOT EXISTS chapas_proporcionais (
+    id                          INTEGER GENERATED ALWAYS AS IDENTITY,
+    eleicao_id                  INTEGER NOT NULL,
+    nome                        VARCHAR(150) NOT NULL,
+    tipo                        VARCHAR(50) NOT NULL DEFAULT 'PARTIDO',
+    is_active                   BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted                  BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em                   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_chapas_proporcionais PRIMARY KEY (id),
+    CONSTRAINT fk_chapa_prop_eleicao 
+        FOREIGN KEY (eleicao_id) 
+        REFERENCES eleicao(id) 
+        ON DELETE CASCADE
+);
+
+COMMENT ON TABLE chapas_proporcionais IS 'Unidades de disputa proporcional (Partido, Coligação ou Federação) para Vereador';
+
+CREATE TABLE IF NOT EXISTS chapa_proporcional_partidos (
+    id                          INTEGER GENERATED ALWAYS AS IDENTITY,
+    chapa_proporcional_id       INTEGER NOT NULL,
+    partido_id                  INTEGER NOT NULL,
+    is_active                   BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted                  BOOLEAN NOT NULL DEFAULT FALSE,
+    criado_em                   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_chapa_proporcional_partidos PRIMARY KEY (id),
+    CONSTRAINT fk_cpp_chapa 
+        FOREIGN KEY (chapa_proporcional_id) 
+        REFERENCES chapas_proporcionais(id) 
+        ON DELETE CASCADE,
+    CONSTRAINT fk_cpp_partido 
+        FOREIGN KEY (partido_id) 
+        REFERENCES partidos(numero) 
+        ON DELETE RESTRICT,
+    CONSTRAINT uq_chapa_proporcional_partido UNIQUE (chapa_proporcional_id, partido_id)
+);
+
+COMMENT ON TABLE chapa_proporcional_partidos IS 'Partidos que integram cada chapa proporcional de vereador';
 `;
 
 export const FULL_INDEXES_SCRIPT = `-- =======================================================================

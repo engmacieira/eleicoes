@@ -18,6 +18,9 @@ from app.infrastructure.models import (
     CandidatosEleicao,
     Coligacao,
     ColigacaoPartidos,
+    ParametrosQeEleicao,
+    ChapaProporcional,
+    ChapaProporcionalPartidos,
 )
 
 __all__ = [
@@ -31,4 +34,7 @@ __all__ = [
     "CandidatosEleicao",
     "Coligacao",
     "ColigacaoPartidos",
+    "ParametrosQeEleicao",
+    "ChapaProporcional",
+    "ChapaProporcionalPartidos",
 ]

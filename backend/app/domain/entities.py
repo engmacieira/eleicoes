@@ -159,3 +159,117 @@ class ColigacaoEntity:
     ano: Optional[int] = None
 
 
+@dataclass
+class ParametrosQeEntity:
+    eleicao_id: int
+    id: Optional[int] = None
+    vagas_vereador: int = 9
+    perc_minimo_candidato_qp: float = 10.00
+    perc_minimo_chapa_sobras: float = 80.00
+    perc_minimo_candidato_sobras: float = 20.00
+    permite_repescagem_sobras: bool = True
+    is_active: bool = True
+    is_deleted: bool = False
+
+
+@dataclass
+class ChapaProporcionalPartidoEntity:
+    chapa_proporcional_id: int
+    partido_id: int
+    id: Optional[int] = None
+    numero: Optional[int] = None
+    sigla: Optional[str] = None
+    nome: Optional[str] = None
+    votos_nominais: int = 0
+    votos_legenda: int = 0
+    total_votos: int = 0
+    is_active: bool = True
+    is_deleted: bool = False
+
+    @property
+    def partido_numero(self) -> int:
+        return self.partido_id
+
+
+@dataclass
+class ChapaProporcionalEntity:
+    eleicao_id: int
+    nome: str
+    tipo: str = "PARTIDO"
+    id: Optional[int] = None
+    partidos: Optional[List[ChapaProporcionalPartidoEntity]] = None
+    is_active: bool = True
+    is_deleted: bool = False
+
+
+@dataclass
+class CandidatoQeEntity:
+    posicao_ranking: int
+    titulo_eleitor: str
+    nome_urna: str
+    nome_completo: str
+    numero_urna: int
+    partido_numero: int
+    sigla_partido: str
+    votos: int
+    percentual_qe: float
+    atingiu_10_qp: bool
+    atingiu_20_sobras: bool
+    status_calculado: str  # 'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE'
+    situacao_oficial: str
+    coincide_oficial: bool
+
+
+@dataclass
+class RodadaSobrasEntity:
+    rodada: int
+    chapa_id: int
+    chapa_nome: str
+    candidato_nome: str
+    candidato_votos: int
+    media: float
+    fase: str  # '80/20' | 'REPESCAGEM'
+    vagas_anteriores: int
+    vagas_finais: int
+
+
+@dataclass
+class ChapaConsolidadaQeEntity:
+    id: int
+    nome: str
+    tipo: str
+    partidos: List[ChapaProporcionalPartidoEntity]
+    votos_nominais: int
+    votos_legenda: int
+    votos_validos_total: int
+    percentual_votos_validos: float
+    qp_exato: float
+    vagas_qp: int
+    eleitos_qp: int
+    eleitos_media: int
+    total_eleitos: int
+    atingiu_80_qe: bool
+    media_final: float
+    ranking_candidatos: List[CandidatoQeEntity]
+
+
+@dataclass
+class ResultadoCalculoQeEntity:
+    eleicao_id: int
+    ano: int
+    vagas_vereador: int
+    total_votos_nominais: int
+    total_votos_legenda: int
+    total_votos_validos: int
+    qe_exato: float
+    qe_arredondado: int
+    corte_10_qp: float
+    corte_80_chapa: float
+    corte_20_sobras: float
+    total_vagas_qp_distribuidas: int
+    total_vagas_media_distribuidas: int
+    chapas: List[ChapaConsolidadaQeEntity]
+    memoria_sobras: List[RodadaSobrasEntity]
+
+
+

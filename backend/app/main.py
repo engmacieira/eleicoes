@@ -6,6 +6,7 @@ from .presentation.routers.candidatos_router import router as candidatos_router
 from .presentation.routers.partidos_router import router as partidos_router
 from .presentation.routers.coligacoes_router import router as coligacoes_router
 from .presentation.routers.infra_router import router as infra_router
+from .presentation.routers.quociente_router import router as quociente_router
 
 app = FastAPI(
     title="VigiMinas - API Eleições Braúnas/MG (2000 a 2024)",
@@ -28,3 +29,4 @@ app.include_router(resultados_router)
 app.include_router(candidatos_router)
 app.include_router(partidos_router)
 app.include_router(coligacoes_router)
+app.include_router(quociente_router)

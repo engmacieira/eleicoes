@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Server, Code, FileText, CheckCircle2, BarChart3, Layers, Download, Vote, User } from 'lucide-react';
+import { Database, Server, Code, FileText, CheckCircle2, BarChart3, Layers, Download, Vote, User, Calculator } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -10,6 +10,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onDownloadAllSql }) => {
   const navItems = [
     { id: 'pleito', label: 'Visão Geral do Pleito', icon: Vote },
+    { id: 'quociente', label: 'Quociente Eleitoral (Vereador)', icon: Calculator },
     { id: 'dossie', label: 'Dossiê do Político', icon: User },
     { id: 'partidos', label: 'Raio-X Partidário', icon: BarChart3 },
     { id: 'backend', label: 'FastAPI & Cloud SQL', icon: Server },

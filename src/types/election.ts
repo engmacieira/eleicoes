@@ -362,4 +362,126 @@ export interface PartidoTimelineResponse {
   siglas_anteriores?: string[];
 }
 
+// --- Interfaces para Quociente Eleitoral (Vereador) ---
+export interface ParametrosQeDto {
+  id: number;
+  eleicao_id: number;
+  vagas_vereador: number;
+  perc_minimo_candidato_qp: number;
+  perc_minimo_chapa_sobras: number;
+  perc_minimo_candidato_sobras: number;
+  permite_repescagem_sobras: boolean;
+  is_active: boolean;
+  is_deleted: boolean;
+}
+
+export interface UpdateParametrosQePayload {
+  vagas_vereador?: number;
+  perc_minimo_candidato_qp?: number;
+  perc_minimo_chapa_sobras?: number;
+  perc_minimo_candidato_sobras?: number;
+  permite_repescagem_sobras?: boolean;
+}
+
+export interface ChapaProporcionalPartidoDto {
+  id?: number;
+  partido_id: number;
+  numero: number;
+  sigla: string;
+  nome?: string | null;
+  votos_nominais: number;
+  votos_legenda: number;
+  total_votos: number;
+}
+
+export interface ChapaProporcionalDto {
+  id: number;
+  eleicao_id: number;
+  nome: string;
+  tipo: 'PARTIDO' | 'COLIGACAO' | 'FEDERACAO' | string;
+  partidos: ChapaProporcionalPartidoDto[];
+  is_active: boolean;
+  is_deleted: boolean;
+}
+
+export interface CreateChapaProporcionalPayload {
+  nome: string;
+  tipo: 'PARTIDO' | 'COLIGACAO' | 'FEDERACAO' | string;
+  partido_ids: number[];
+}
+
+export interface UpdateChapaProporcionalPayload {
+  nome?: string;
+  tipo?: 'PARTIDO' | 'COLIGACAO' | 'FEDERACAO' | string;
+  partido_ids?: number[];
+  is_active?: boolean;
+}
+
+export interface CandidatoQeDto {
+  posicao_ranking: number;
+  titulo_eleitor: string;
+  nome_urna: string;
+  nome_completo: string;
+  numero_urna: number;
+  partido_numero: number;
+  sigla_partido: string;
+  votos: number;
+  percentual_qe: number;
+  atingiu_10_qp: boolean;
+  atingiu_20_sobras: boolean;
+  status_calculado: 'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE';
+  situacao_oficial: string;
+  coincide_oficial: boolean;
+}
+
+export interface RodadaSobrasDto {
+  rodada: number;
+  chapa_id: number;
+  chapa_nome: string;
+  candidato_nome: string;
+  candidato_votos: number;
+  media: number;
+  fase: string;
+  vagas_anteriores: number;
+  vagas_finais: number;
+}
+
+export interface ChapaConsolidadaQeDto {
+  id: number;
+  nome: string;
+  tipo: string;
+  partidos: ChapaProporcionalPartidoDto[];
+  votos_nominais: number;
+  votos_legenda: number;
+  votos_validos_total: number;
+  percentual_votos_validos: number;
+  qp_exato: number;
+  vagas_qp: number;
+  eleitos_qp: number;
+  eleitos_media: number;
+  total_eleitos: number;
+  atingiu_80_qe: boolean;
+  media_final: number;
+  ranking_candidatos: CandidatoQeDto[];
+}
+
+export interface CalculoQeResponseDto {
+  eleicao_id: number;
+  ano: number;
+  vagas_vereador: number;
+  total_votos_nominais: number;
+  total_votos_legenda: number;
+  total_votos_validos: number;
+  qe_exato: number;
+  qe_arredondado: number;
+  corte_10_qp: number;
+  corte_80_chapa: number;
+  corte_20_sobras: number;
+  total_vagas_qp_distribuidas: number;
+  total_vagas_media_distribuidas: number;
+  chapas: ChapaConsolidadaQeDto[];
+  memoria_sobras: RodadaSobrasDto[];
+}
+
+
 

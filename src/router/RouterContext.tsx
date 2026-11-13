@@ -4,6 +4,7 @@ export type RouteName =
   | 'pleito'
   | 'partidos'
   | 'coligacoes'
+  | 'quociente'
   | 'dossie'
   | 'candidato'
   | 'cadastros'
@@ -47,6 +48,10 @@ const parseHash = (hash: string): RouteState => {
 
   if (segments[0] === 'coligacoes') {
     return { name: 'coligacoes', params: {}, query };
+  }
+
+  if (segments[0] === 'quociente' || segments[0] === 'quociente-eleitoral') {
+    return { name: 'quociente', params: {}, query };
   }
 
   if (segments[0] === 'dossie') {
@@ -121,6 +126,9 @@ export const RouterProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           break;
         case 'coligacoes':
           path = '#/coligacoes';
+          break;
+        case 'quociente':
+          path = '#/quociente';
           break;
         case 'dossie':
           path = '#/dossie';

@@ -332,4 +332,140 @@ class PartidoTimelineResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# --- Schemas de Quociente Eleitoral e Chapas Proporcionais ---
+class ParametrosQeSchema(BaseModel):
+    id: int
+    eleicao_id: int
+    vagas_vereador: int = 9
+    perc_minimo_candidato_qp: float = 10.00
+    perc_minimo_chapa_sobras: float = 80.00
+    perc_minimo_candidato_sobras: float = 20.00
+    permite_repescagem_sobras: bool = True
+    is_active: bool = True
+    is_deleted: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ParametrosQeUpdateSchema(BaseModel):
+    vagas_vereador: Optional[int] = 9
+    perc_minimo_candidato_qp: Optional[float] = 10.00
+    perc_minimo_chapa_sobras: Optional[float] = 80.00
+    perc_minimo_candidato_sobras: Optional[float] = 20.00
+    permite_repescagem_sobras: Optional[bool] = True
+
+
+class ChapaProporcionalPartidoSchema(BaseModel):
+    id: Optional[int] = None
+    partido_id: int
+    numero: int
+    sigla: str
+    nome: Optional[str] = None
+    votos_nominais: int = 0
+    votos_legenda: int = 0
+    total_votos: int = 0
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChapaProporcionalCreateSchema(BaseModel):
+    nome: str
+    tipo: str = "PARTIDO"
+    partido_ids: List[int]
+
+
+class ChapaProporcionalUpdateSchema(BaseModel):
+    nome: Optional[str] = None
+    tipo: Optional[str] = None
+    partido_ids: Optional[List[int]] = None
+    is_active: Optional[bool] = None
+
+
+class ChapaProporcionalResponseSchema(BaseModel):
+    id: int
+    eleicao_id: int
+    nome: str
+    tipo: str
+    partidos: List[ChapaProporcionalPartidoSchema] = []
+    is_active: bool = True
+    is_deleted: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CandidatoQeSchema(BaseModel):
+    posicao_ranking: int
+    titulo_eleitor: str
+    nome_urna: str
+    nome_completo: str
+    numero_urna: int
+    partido_numero: int
+    sigla_partido: str
+    votos: int
+    percentual_qe: float
+    atingiu_10_qp: bool
+    atingiu_20_sobras: bool
+    status_calculado: str  # 'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE'
+    situacao_oficial: str
+    coincide_oficial: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RodadaSobrasSchema(BaseModel):
+    rodada: int
+    chapa_id: int
+    chapa_nome: str
+    candidato_nome: str
+    candidato_votos: int
+    media: float
+    fase: str  # '80/20' | 'REPESCAGEM'
+    vagas_anteriores: int
+    vagas_finais: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChapaConsolidadaQeSchema(BaseModel):
+    id: int
+    nome: str
+    tipo: str
+    partidos: List[ChapaProporcionalPartidoSchema] = []
+    votos_nominais: int
+    votos_legenda: int
+    votos_validos_total: int
+    percentual_votos_validos: float
+    qp_exato: float
+    vagas_qp: int
+    eleitos_qp: int
+    eleitos_media: int
+    total_eleitos: int
+    atingiu_80_qe: bool
+    media_final: float
+    ranking_candidatos: List[CandidatoQeSchema] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CalculoQeResponseSchema(BaseModel):
+    eleicao_id: int
+    ano: int
+    vagas_vereador: int
+    total_votos_nominais: int
+    total_votos_legenda: int
+    total_votos_validos: int
+    qe_exato: float
+    qe_arredondado: int
+    corte_10_qp: float
+    corte_80_chapa: float
+    corte_20_sobras: float
+    total_vagas_qp_distribuidas: int
+    total_vagas_media_distribuidas: int
+    chapas: List[ChapaConsolidadaQeSchema] = []
+    memoria_sobras: List[RodadaSobrasSchema] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+
 

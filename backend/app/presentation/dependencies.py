@@ -6,6 +6,7 @@ from ..infrastructure.repositories import (
     SqlAlchemyCandidatoRepository,
     SqlAlchemyPartidoRepository,
     SqlAlchemyColigacaoRepository,
+    SqlAlchemyQuocienteRepository,
 )
 from ..application.use_cases import (
     ListarEleicoesUseCase,
@@ -17,6 +18,14 @@ from ..application.use_cases import (
     AtualizarColigacaoUseCase,
     DeletarColigacaoUseCase,
     ObterLinhaDoTempoPartidoUseCase,
+    ObterParametrosQeUseCase,
+    SalvarParametrosQeUseCase,
+    ListarChapasProporcionaisUseCase,
+    CriarChapaProporcionalUseCase,
+    AtualizarChapaProporcionalUseCase,
+    DeletarChapaProporcionalUseCase,
+    GerarChapasIsoladasUseCase,
+    CalcularQuocienteEleitoralUseCase,
 )
 
 
@@ -91,5 +100,59 @@ def get_deletar_coligacao_use_case(
     coligacao_repo: SqlAlchemyColigacaoRepository = Depends(get_coligacao_repo),
 ) -> DeletarColigacaoUseCase:
     return DeletarColigacaoUseCase(coligacao_repo)
+
+
+def get_quociente_repo(db: Session = Depends(get_db)) -> SqlAlchemyQuocienteRepository:
+    return SqlAlchemyQuocienteRepository(db)
+
+
+def get_obter_parametros_qe_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> ObterParametrosQeUseCase:
+    return ObterParametrosQeUseCase(quociente_repo)
+
+
+def get_salvar_parametros_qe_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> SalvarParametrosQeUseCase:
+    return SalvarParametrosQeUseCase(quociente_repo)
+
+
+def get_listar_chapas_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> ListarChapasProporcionaisUseCase:
+    return ListarChapasProporcionaisUseCase(quociente_repo)
+
+
+def get_criar_chapa_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> CriarChapaProporcionalUseCase:
+    return CriarChapaProporcionalUseCase(quociente_repo)
+
+
+def get_atualizar_chapa_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> AtualizarChapaProporcionalUseCase:
+    return AtualizarChapaProporcionalUseCase(quociente_repo)
+
+
+def get_deletar_chapa_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> DeletarChapaProporcionalUseCase:
+    return DeletarChapaProporcionalUseCase(quociente_repo)
+
+
+def get_gerar_chapas_isoladas_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+) -> GerarChapasIsoladasUseCase:
+    return GerarChapasIsoladasUseCase(quociente_repo)
+
+
+def get_calcular_quociente_eleitoral_use_case(
+    quociente_repo: SqlAlchemyQuocienteRepository = Depends(get_quociente_repo),
+    eleicao_repo: SqlAlchemyEleicaoRepository = Depends(get_eleicao_repo),
+) -> CalcularQuocienteEleitoralUseCase:
+    return CalcularQuocienteEleitoralUseCase(quociente_repo, eleicao_repo)
+
 
 

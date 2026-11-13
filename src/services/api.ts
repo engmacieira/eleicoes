@@ -15,6 +15,12 @@ import {
   PartidoHistoricoDto,
   CreatePartidoPayload,
   UpdatePartidoPayload,
+  ParametrosQeDto,
+  UpdateParametrosQePayload,
+  ChapaProporcionalDto,
+  CreateChapaProporcionalPayload,
+  UpdateChapaProporcionalPayload,
+  CalculoQeResponseDto,
 } from '../types/election';
 
 let cachedDataset: RawElectionDataset | null = null;
@@ -1059,6 +1065,18 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     ],
   },
   {
+    id: 17,
+    numero: 17,
+    sigla: 'PSL',
+    nome: 'Partido Social Liberal',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 1701, id_partido: 17, numero: 17, sigla: 'PSL', nome: 'Partido Social Liberal', ano_inicio: 1994, ano_fim: 2022, is_atual: false, is_active: true, is_deleted: false },
+      { id: 1702, id_partido: 17, numero: 17, sigla: 'UNIÃO', nome: 'União Brasil (Fusão DEM/PSL)', ano_inicio: 2022, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
     id: 19,
     numero: 19,
     sigla: 'PODE',
@@ -1131,6 +1149,31 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     ],
   },
   {
+    id: 31,
+    numero: 31,
+    sigla: 'PHS',
+    nome: 'Partido Humanista da Solidariedade',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 3101, id_partido: 31, numero: 31, sigla: 'PHS', nome: 'Partido Humanista da Solidariedade', ano_inicio: 1997, ano_fim: 2019, is_atual: false, is_active: true, is_deleted: false },
+      { id: 3102, id_partido: 31, numero: 31, sigla: 'PODE', nome: 'Podemos (Incorporou PHS)', ano_inicio: 2019, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 36,
+    numero: 36,
+    sigla: 'AGIR',
+    nome: 'Agir',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 3601, id_partido: 36, numero: 36, sigla: 'PRN', nome: 'Partido da Reconstrução Nacional', ano_inicio: 1989, ano_fim: 2000, is_atual: false, is_active: true, is_deleted: false },
+      { id: 3602, id_partido: 36, numero: 36, sigla: 'PTC', nome: 'Partido Trabalhista Cristão', ano_inicio: 2000, ano_fim: 2022, is_atual: false, is_active: true, is_deleted: false },
+      { id: 3603, id_partido: 36, numero: 36, sigla: 'AGIR', nome: 'Agir', ano_inicio: 2022, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
     id: 40,
     numero: 40,
     sigla: 'PSB',
@@ -1160,7 +1203,9 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     is_active: true,
     is_deleted: false,
     historico: [
-      { id: 4401, id_partido: 44, numero: 44, sigla: 'UNIÃO', nome: 'União Brasil', ano_inicio: 2022, is_atual: true, is_active: true, is_deleted: false },
+      { id: 4401, id_partido: 44, numero: 44, sigla: 'DEM', nome: 'Democratas (Fusão em 2022)', ano_inicio: 2007, ano_fim: 2022, is_atual: false, is_active: true, is_deleted: false },
+      { id: 4402, id_partido: 44, numero: 44, sigla: 'PSL', nome: 'Partido Social Liberal (Fusão em 2022)', ano_inicio: 1994, ano_fim: 2022, is_atual: false, is_active: true, is_deleted: false },
+      { id: 4403, id_partido: 44, numero: 44, sigla: 'UNIÃO', nome: 'União Brasil', ano_inicio: 2022, is_atual: true, is_active: true, is_deleted: false },
     ],
   },
   {
@@ -1218,6 +1263,18 @@ export const PARTIDOS_BASE_TSE: PartidoCadastroDto[] = [
     historico: [
       { id: 7701, id_partido: 77, numero: 77, sigla: 'SD', nome: 'Solidariedade', ano_inicio: 2013, ano_fim: 2023, is_atual: false, is_active: true, is_deleted: false },
       { id: 7702, id_partido: 77, numero: 77, sigla: 'SOLIDARIEDADE', nome: 'Solidariedade', ano_inicio: 2023, is_atual: true, is_active: true, is_deleted: false },
+    ],
+  },
+  {
+    id: 90,
+    numero: 90,
+    sigla: 'PROS',
+    nome: 'Partido Republicano da Ordem Social',
+    is_active: true,
+    is_deleted: false,
+    historico: [
+      { id: 9001, id_partido: 90, numero: 90, sigla: 'PROS', nome: 'Partido Republicano da Ordem Social', ano_inicio: 2010, ano_fim: 2023, is_atual: false, is_active: true, is_deleted: false },
+      { id: 9002, id_partido: 90, numero: 90, sigla: 'SOLIDARIEDADE', nome: 'Solidariedade (Incorporou PROS)', ano_inicio: 2023, is_atual: true, is_active: true, is_deleted: false },
     ],
   },
 ];
@@ -1380,17 +1437,52 @@ export async function getPartidosCadastrados(q?: string): Promise<PartidoCadastr
     .filter((p) => !p.is_deleted);
 
   if (q) {
-    const qClean = q.trim().toUpperCase().replace(/\s+/g, '');
+    const qTrim = q.trim();
+    const qClean = qTrim.toUpperCase().replace(/\s+/g, '');
+    const qUpper = qTrim.toUpperCase();
     list = list.filter((p) => {
-      if (String(p.numero) === q.trim()) return true;
+      // 1. Busca por número eleitoral
+      if (String(p.numero) === qTrim || String(p.numero).startsWith(qTrim)) return true;
+      // 2. Busca por sigla atual
       if (p.sigla.toUpperCase().replace(/\s+/g, '').includes(qClean)) return true;
-      if (p.nome && p.nome.toUpperCase().includes(q.trim().toUpperCase())) return true;
-      if (p.historico?.some((h) => h.sigla.toUpperCase().replace(/\s+/g, '').includes(qClean))) return true;
+      if (p.sigla_atual && p.sigla_atual.toUpperCase().replace(/\s+/g, '').includes(qClean)) return true;
+      // 3. Busca por nome atual oficial
+      if (p.nome && p.nome.toUpperCase().includes(qUpper)) return true;
+      if (p.nome_atual && p.nome_atual.toUpperCase().includes(qUpper)) return true;
+      // 4. Busca por siglas históricas anteriores
+      if (p.siglas_anteriores?.some((s) => s.toUpperCase().replace(/\s+/g, '').includes(qClean))) return true;
+      // 5. Busca por nomes antigos e siglas antigas no histórico
+      if (p.historico?.some((h) =>
+        h.sigla.toUpperCase().replace(/\s+/g, '').includes(qClean) ||
+        (h.nome && h.nome.toUpperCase().includes(qUpper))
+      )) return true;
       return false;
     });
   }
 
   return list.sort((a, b) => a.numero - b.numero);
+}
+
+export function getDenominacaoNoAno(
+  partido: PartidoCadastroDto,
+  ano: number
+): { sigla: string; nome: string; isHistorico: boolean } {
+  const nomePadrao = partido.nome_atual || partido.nome || partido.sigla;
+  if (!partido.historico || partido.historico.length === 0) {
+    return { sigla: partido.sigla, nome: nomePadrao, isHistorico: false };
+  }
+  const hist = partido.historico.find((h) => {
+    const inicio = h.ano_inicio ?? 1900;
+    const fim = h.ano_fim ?? 2100;
+    return ano >= inicio && ano <= fim;
+  });
+  if (hist) {
+    const histNome = hist.nome || nomePadrao;
+    const isDiferente = hist.sigla.toUpperCase() !== partido.sigla.toUpperCase() ||
+      histNome.toUpperCase() !== nomePadrao.toUpperCase();
+    return { sigla: hist.sigla, nome: histNome, isHistorico: isDiferente };
+  }
+  return { sigla: partido.sigla, nome: nomePadrao, isHistorico: false };
 }
 
 export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroDto | null {
@@ -1425,13 +1517,16 @@ export function resolvePartido(siglaOuNumero: string | number): PartidoCadastroD
 
   // 2. Match with historical names/acronyms in the auxiliary table
   for (const p of all) {
-    if (p.historico && p.historico.some((h) => h.sigla.toUpperCase().replace(/\s+/g, '') === sClean)) {
+    if (p.historico && p.historico.some((h) =>
+      h.sigla.toUpperCase().replace(/\s+/g, '') === sClean ||
+      (h.nome && h.nome.toUpperCase().includes(rawStr))
+    )) {
       return p;
     }
   }
 
   // 3. Match with party name
-  const byName = all.find((p) => p.nome && p.nome.toUpperCase().includes(rawStr));
+  const byName = all.find((p) => (p.nome && p.nome.toUpperCase().includes(rawStr)) || (p.nome_atual && p.nome_atual.toUpperCase().includes(rawStr)));
   if (byName) return byName;
 
   return null;
@@ -2252,4 +2347,111 @@ export async function deleteColigacao(id: number): Promise<void> {
     saveStoredColigacoes(all);
   }
 }
+
+// =======================================================================
+// MÓDULO DE QUOCIENTE ELEITORAL (VEREADOR) & CHAPAS PROPORCIONAIS
+// =======================================================================
+
+export async function getParametrosQe(eleicaoId: number): Promise<ParametrosQeDto> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    throw new Error(`Falha ao obter parâmetros do QE da eleição ${eleicaoId}`);
+  }
+  return res.json();
+}
+
+export async function updateParametrosQe(
+  eleicaoId: number,
+  payload: UpdateParametrosQePayload
+): Promise<ParametrosQeDto> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/parametros-qe`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Falha ao atualizar parâmetros do QE.');
+  }
+  return res.json();
+}
+
+export async function getChapasProporcionais(eleicaoId: number): Promise<ChapaProporcionalDto[]> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    throw new Error(`Falha ao carregar chapas proporcionais da eleição ${eleicaoId}`);
+  }
+  return res.json();
+}
+
+export async function createChapaProporcional(
+  eleicaoId: number,
+  payload: CreateChapaProporcionalPayload
+): Promise<ChapaProporcionalDto> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Falha ao criar chapa proporcional.');
+  }
+  return res.json();
+}
+
+export async function updateChapaProporcional(
+  chapaId: number,
+  payload: UpdateChapaProporcionalPayload
+): Promise<ChapaProporcionalDto> {
+  const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Falha ao atualizar chapa proporcional.');
+  }
+  return res.json();
+}
+
+export async function deleteChapaProporcional(chapaId: number): Promise<void> {
+  const res = await fetch(`/api/chapas-proporcionais/${chapaId}`, {
+    method: 'DELETE',
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    throw new Error(`Falha ao excluir chapa proporcional ${chapaId}`);
+  }
+}
+
+export async function gerarChapasIsoladas(eleicaoId: number): Promise<ChapaProporcionalDto[]> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/chapas-proporcionais/gerar-isoladas`, {
+    method: 'POST',
+    signal: AbortSignal.timeout(3000),
+  });
+  if (!res.ok) {
+    throw new Error('Falha ao gerar chapas isoladas automaticamente.');
+  }
+  return res.json();
+}
+
+export async function getCalculoQe(eleicaoId: number): Promise<CalculoQeResponseDto> {
+  const res = await fetch(`/api/eleicoes/${eleicaoId}/calculo-qe`, {
+    signal: AbortSignal.timeout(4000),
+  });
+  if (!res.ok) {
+    throw new Error(`Falha ao calcular Quociente Eleitoral da eleição ${eleicaoId}`);
+  }
+  return res.json();
+}
+
 

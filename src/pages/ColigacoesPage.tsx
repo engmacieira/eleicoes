@@ -27,6 +27,7 @@ import {
   BarChart2,
   PieChart,
   Percent,
+  History,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -47,7 +48,9 @@ import {
   getPartidosCadastrados,
   getResultados,
   getPartidosAno,
+  getDenominacaoNoAno,
 } from '../services/api';
+import { PartidoSearchModal } from '../components/PartidoSearchModal';
 import {
   ColigacaoDto,
   ColigacaoMembroDto,
@@ -87,6 +90,7 @@ export const ColigacoesPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+<<<<<<< HEAD
   // Party Search / Autocomplete in Coalition Form
   const [partySearchQuery, setPartySearchQuery] = useState<string>('');
   const [isPartyDropdownOpen, setIsPartyDropdownOpen] = useState<boolean>(false);
@@ -103,6 +107,12 @@ export const ColigacoesPage: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+=======
+  // Party Search Modal and Inline Quick Search
+  const [isSearchPartidoModalOpen, setIsSearchPartidoModalOpen] = useState<boolean>(false);
+  const [inlineSearchTerm, setInlineSearchTerm] = useState<string>('');
+  const [isInlineDropdownOpen, setIsInlineDropdownOpen] = useState<boolean>(false);
+>>>>>>> 154db90 (feat: adição da funcionalidade QE)
 
   // Load registered elections
   useEffect(() => {
@@ -291,6 +301,7 @@ export const ColigacoesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+<<<<<<< HEAD
   // Helper to collect all historical / former acronyms for a party
   const getPartyHistoricalSiglas = (p: PartidoCadastroDto): string[] => {
     const siglas = new Set<string>();
@@ -478,17 +489,75 @@ export const ColigacoesPage: React.FC = () => {
           p.siglas_anteriores?.some((s) => s.toUpperCase() === cleanSigla) ||
           p.historico?.some((h) => h.sigla.toUpperCase() === cleanSigla)
       );
+=======
+  // Add party to coalition form
+  const handleAddPartidoToForm = (siglaOrPartido: string | PartidoCadastroDto, papel?: string) => {
+    const sigla = typeof siglaOrPartido === 'string' ? siglaOrPartido : siglaOrPartido.sigla;
+    if (!sigla) return;
+    if (formPartidos.some((p) => p.sigla_partido.toUpperCase() === sigla.toUpperCase())) {
+      return;
+    }
+    const partidoObj =
+      typeof siglaOrPartido === 'object'
+        ? siglaOrPartido
+        : partidosCadastrados.find((p) => p.sigla.toUpperCase() === sigla.toUpperCase());
+
+    const defaultPapel =
+      papel ||
+      (formPartidos.length === 0
+        ? 'Cabeça de Chapa'
+        : formPartidos.length === 1
+        ? 'Vice-Prefeito'
+        : 'Partido Apoiador');
+>>>>>>> 154db90 (feat: adição da funcionalidade QE)
 
     setFormPartidos((prev) => [
       ...prev,
       {
+<<<<<<< HEAD
         id_partido: partidoObj ? partidoObj.numero || partidoObj.id : 0,
         sigla_partido: cleanSigla,
         papel: prev.length === 0 ? 'Cabeça de Chapa' : prev.length === 1 ? 'Vice-Prefeito' : 'Partido Apoiador',
+=======
+        id_partido: partidoObj ? partidoObj.id : 0,
+        sigla_partido: sigla,
+        papel: defaultPapel,
+>>>>>>> 154db90 (feat: adição da funcionalidade QE)
       },
     ]);
     setPartySearchQuery('');
   };
+
+  // Partidos filtrados para a busca rápida inline no formulário
+  const inlineFilteredPartidos = useMemo(() => {
+    if (!inlineSearchTerm.trim()) {
+      return partidosCadastrados
+        .filter((p) => !formPartidos.some((m) => m.sigla_partido.toUpperCase() === p.sigla.toUpperCase()))
+        .slice(0, 8);
+    }
+    const term = inlineSearchTerm.trim();
+    const clean = term.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const cleanNoSpaces = clean.replace(/\s+/g, '');
+    const isNum = /^\d+$/.test(term);
+
+    return partidosCadastrados
+      .filter((p) => {
+        if (formPartidos.some((m) => m.sigla_partido.toUpperCase() === p.sigla.toUpperCase())) {
+          return false;
+        }
+        if (isNum && String(p.numero).startsWith(term)) return true;
+        if (p.sigla.toLowerCase().replace(/\s+/g, '').includes(cleanNoSpaces)) return true;
+        if (p.nome && p.nome.toLowerCase().includes(clean)) return true;
+        if (p.nome_atual && p.nome_atual.toLowerCase().includes(clean)) return true;
+        if (p.siglas_anteriores?.some((s) => s.toLowerCase().replace(/\s+/g, '').includes(cleanNoSpaces))) return true;
+        if (p.historico?.some((h) =>
+          h.sigla.toLowerCase().replace(/\s+/g, '').includes(cleanNoSpaces) ||
+          (h.nome && h.nome.toLowerCase().includes(clean))
+        )) return true;
+        return false;
+      })
+      .slice(0, 10);
+  }, [partidosCadastrados, formPartidos, inlineSearchTerm]);
 
   // Remove party from form
   const handleRemovePartidoFromForm = (sigla: string) => {
@@ -1578,6 +1647,7 @@ export const ColigacoesPage: React.FC = () => {
                     <span>1. Dados do Pleito e Registro da Chapa</span>
                   </div>
 
+<<<<<<< HEAD
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {/* Ano da Eleição */}
                     <div>
@@ -1993,6 +2063,263 @@ export const ColigacoesPage: React.FC = () => {
                       )}
                     </div>
                   </div>
+=======
+                {/* Número da Urna */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Número na Urna *
+                  </label>
+                  <input
+                    type="number"
+                    value={formNumeroUrna}
+                    onChange={(e) => setFormNumeroUrna(Number(e.target.value))}
+                    required
+                    min={10}
+                    max={99}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
+                  />
+                </div>
+
+                {/* Partido Titular */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Sigla Titular (Cabeça) *
+                  </label>
+                  <input
+                    type="text"
+                    value={formSiglaTitular}
+                    onChange={(e) => setFormSiglaTitular(e.target.value.toUpperCase())}
+                    required
+                    placeholder="Ex: PSD, PV, PSDB"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold uppercase"
+                  />
+                </div>
+              </div>
+
+              {/* Nome da Coligação */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Nome Oficial da Coligação *
+                </label>
+                <input
+                  type="text"
+                  value={formNomeColigacao}
+                  onChange={(e) => setFormNomeColigacao(e.target.value)}
+                  required
+                  placeholder="Ex: União por Braúnas, Juntos por uma Braúnas Melhor..."
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              {/* Seção de Partidos que compõem a Aliança */}
+              <div className="pt-3 border-t border-slate-200/80 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Partidos que estavam apoiando esta chapa</span>
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                        {formPartidos.length}
+                      </span>
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Defina quem encabeça a chapa, quem é o vice e os partidos da aliança política.
+                    </p>
+                  </div>
+
+                  {/* Botão de destaque para abrir o Modal de Pesquisa */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSearchPartidoModalOpen(true)}
+                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-xs transition-all group shrink-0"
+                  >
+                    <Search className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                    <span>Pesquisar Partidos</span>
+                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">
+                      Nº / Atual / Antigo
+                    </span>
+                  </button>
+                </div>
+
+                {/* Caixa de Busca Rápida Inline com Dropdown Autocomplete */}
+                <div className="relative">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={inlineSearchTerm}
+                      onChange={(e) => {
+                        setInlineSearchTerm(e.target.value);
+                        setIsInlineDropdownOpen(true);
+                      }}
+                      onFocus={() => setIsInlineDropdownOpen(true)}
+                      placeholder="Pesquisa rápida: digite número (ex: 15), nome atual ou nome antigo (PMDB, PFL, DEM, PRB, PPS)..."
+                      className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      {inlineSearchTerm && (
+                        <button
+                          type="button"
+                          onClick={() => setInlineSearchTerm('')}
+                          className="text-slate-400 hover:text-slate-600 p-0.5 rounded"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsSearchPartidoModalOpen(true)}
+                        className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 rounded transition-colors"
+                      >
+                        Abrir Modal
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dropdown de Sugestões Instantâneas */}
+                  {isInlineDropdownOpen && inlineFilteredPartidos.length > 0 && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-20"
+                        onClick={() => setIsInlineDropdownOpen(false)}
+                      />
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 max-h-56 overflow-y-auto p-1.5 divide-y divide-slate-100 animate-in fade-in zoom-in-95 duration-100">
+                        <div className="px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between">
+                          <span>Sugestões Encontradas</span>
+                          <span className="font-mono">{inlineFilteredPartidos.length} opções</span>
+                        </div>
+                        {inlineFilteredPartidos.map((p) => {
+                          const denom = getDenominacaoNoAno(p, formAno);
+                          const temHistorico =
+                            (p.historico && p.historico.length > 1) ||
+                            (p.siglas_anteriores && p.siglas_anteriores.length > 0);
+                          return (
+                            <button
+                              key={p.id || p.numero}
+                              type="button"
+                              onClick={() => {
+                                handleAddPartidoToForm(p);
+                                setInlineSearchTerm('');
+                                setIsInlineDropdownOpen(false);
+                              }}
+                              className="w-full text-left px-2.5 py-2 hover:bg-indigo-50/70 rounded-lg flex items-center justify-between gap-2 group transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span className="font-mono text-[11px] font-black bg-slate-900 text-white px-2 py-0.5 rounded shrink-0">
+                                  {p.numero}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-extrabold text-xs text-slate-900">{p.sigla}</span>
+                                    <span className="text-slate-500 text-[11px] truncate">{p.nome || p.nome_atual}</span>
+                                  </div>
+                                  {denom.isHistorico && (
+                                    <div className="text-[10px] text-indigo-700 font-medium">
+                                      Em {formAno}: {denom.sigla} ({denom.nome})
+                                    </div>
+                                  )}
+                                  {temHistorico && !denom.isHistorico && (
+                                    <div className="text-[10px] text-amber-700">
+                                      Antigo: {p.historico?.filter((h) => !h.is_atual).map((h) => h.sigla).join(', ')}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <span className="text-[11px] font-semibold text-indigo-600 group-hover:translate-x-0.5 transition-transform shrink-0">
+                                + Incluir
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* List of members with roles */}
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                  {formPartidos.length === 0 ? (
+                    <div className="p-5 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Nenhuma agremiação adicionada à chapa ainda.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsSearchPartidoModalOpen(true)}
+                        className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline inline-flex items-center gap-1"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        Clique aqui para pesquisar e adicionar partidos
+                      </button>
+                    </div>
+                  ) : (
+                    formPartidos.map((membro) => {
+                      const partidoObj = partidosCadastrados.find(
+                        (p) => p.sigla.toUpperCase() === membro.sigla_partido.toUpperCase()
+                      );
+                      const denomNoAno = partidoObj ? getDenominacaoNoAno(partidoObj, formAno) : null;
+                      const roleBadgeColor =
+                        membro.papel === 'Cabeça de Chapa'
+                          ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                          : membro.papel === 'Vice-Prefeito'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+
+                      return (
+                        <div
+                          key={membro.sigla_partido}
+                          className="flex items-center justify-between p-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-xs hover:border-slate-300 transition-all"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {partidoObj && (
+                              <span className="font-mono text-[11px] font-black bg-slate-900 text-white px-2 py-0.5 rounded shadow-2xs shrink-0">
+                                {partidoObj.numero}
+                              </span>
+                            )}
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-bold text-slate-900 font-mono text-xs">
+                                  {membro.sigla_partido}
+                                </span>
+                                {partidoObj && (
+                                  <span className="text-slate-500 text-[11px] truncate">
+                                    {partidoObj.nome || partidoObj.nome_atual}
+                                  </span>
+                                )}
+                              </div>
+                              {denomNoAno?.isHistorico && (
+                                <div className="text-[10px] text-indigo-600 font-medium mt-0.5">
+                                  No pleito de {formAno}: <span className="font-semibold">{denomNoAno.sigla}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <select
+                              value={membro.papel}
+                              onChange={(e) => handleChangePapel(membro.sigla_partido, e.target.value)}
+                              className={`px-2 py-1 rounded-lg border text-xs font-semibold focus:outline-none focus:ring-1 ${roleBadgeColor}`}
+                            >
+                              <option value="Cabeça de Chapa">Cabeça de Chapa</option>
+                              <option value="Vice-Prefeito">Vice-Prefeito</option>
+                              <option value="Partido Apoiador">Partido Apoiador</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePartidoFromForm(membro.sigla_partido)}
+                              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                              title="Remover partido da coligação"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+>>>>>>> 154db90 (feat: adição da funcionalidade QE)
                 </div>
               </div>
 
@@ -2063,6 +2390,18 @@ export const ColigacoesPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ADVANCED PARTY SEARCH MODAL (Número, Nome Atual e Nomes Antigos) */}
+      <PartidoSearchModal
+        isOpen={isSearchPartidoModalOpen}
+        onClose={() => setIsSearchPartidoModalOpen(false)}
+        partidosCadastrados={partidosCadastrados}
+        anoEleicao={formAno}
+        partidosSelecionados={formPartidos}
+        onAddPartido={(partido, papel) => handleAddPartidoToForm(partido, papel)}
+        onRemovePartido={handleRemovePartidoFromForm}
+        onChangePapel={handleChangePapel}
+      />
     </div>
   );
 };

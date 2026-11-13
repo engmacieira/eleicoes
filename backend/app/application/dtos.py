@@ -175,3 +175,110 @@ class PartidoTimelineDto:
     coligacoes: List[ColigacaoDto]
 
 
+@dataclass
+class ParametrosQeDto:
+    id: int
+    eleicao_id: int
+    vagas_vereador: int
+    perc_minimo_candidato_qp: float
+    perc_minimo_chapa_sobras: float
+    perc_minimo_candidato_sobras: float
+    permite_repescagem_sobras: bool
+    is_active: bool
+    is_deleted: bool
+
+
+@dataclass
+class ChapaProporcionalPartidoDto:
+    id: int
+    partido_id: int
+    numero: int
+    sigla: str
+    nome: Optional[str]
+    votos_nominais: int
+    votos_legenda: int
+    total_votos: int
+
+
+@dataclass
+class ChapaProporcionalDto:
+    id: int
+    eleicao_id: int
+    nome: str
+    tipo: str
+    partidos: List[ChapaProporcionalPartidoDto]
+    is_active: bool
+    is_deleted: bool
+
+
+@dataclass
+class CandidatoQeDto:
+    posicao_ranking: int
+    titulo_eleitor: str
+    nome_urna: str
+    nome_completo: str
+    numero_urna: int
+    partido_numero: int
+    sigla_partido: str
+    votos: int
+    percentual_qe: float
+    atingiu_10_qp: bool
+    atingiu_20_sobras: bool
+    status_calculado: str  # 'ELEITO_QP' | 'ELEITO_MEDIA' | 'SUPLENTE'
+    situacao_oficial: str
+    coincide_oficial: bool
+
+
+@dataclass
+class RodadaSobrasDto:
+    rodada: int
+    chapa_id: int
+    chapa_nome: str
+    candidato_nome: str
+    candidato_votos: int
+    media: float
+    fase: str  # '80/20' | 'REPESCAGEM'
+    vagas_anteriores: int
+    vagas_finais: int
+
+
+@dataclass
+class ChapaConsolidadaQeDto:
+    id: int
+    nome: str
+    tipo: str
+    partidos: List[ChapaProporcionalPartidoDto]
+    votos_nominais: int
+    votos_legenda: int
+    votos_validos_total: int
+    percentual_votos_validos: float
+    qp_exato: float
+    vagas_qp: int
+    eleitos_qp: int
+    eleitos_media: int
+    total_eleitos: int
+    atingiu_80_qe: bool
+    media_final: float
+    ranking_candidatos: List[CandidatoQeDto]
+
+
+@dataclass
+class CalculoQeResponseDto:
+    eleicao_id: int
+    ano: int
+    vagas_vereador: int
+    total_votos_nominais: int
+    total_votos_legenda: int
+    total_votos_validos: int
+    qe_exato: float
+    qe_arredondado: int
+    corte_10_qp: float
+    corte_80_chapa: float
+    corte_20_sobras: float
+    total_vagas_qp_distribuidas: int
+    total_vagas_media_distribuidas: int
+    chapas: List[ChapaConsolidadaQeDto]
+    memoria_sobras: List[RodadaSobrasDto]
+
+
+
